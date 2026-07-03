@@ -1597,7 +1597,7 @@ export const HomePage = () => {
 					</div>
 				</div>
 			</motion.section>
-\t\t\t<motion.section
+			<motion.section
 				id="reviews"
 				variants={sectionLift}
 				initial="hidden"
