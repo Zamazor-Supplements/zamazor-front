@@ -11,9 +11,11 @@ import { productService } from "@/features/products/services/productService";
 import {
 	Edit,
 	FolderKanban,
+	Package,
 	Plus,
 	RefreshCw,
 	Search,
+	TrendingUp,
 	Trash2,
 	X,
 } from "lucide-react";
@@ -59,6 +61,46 @@ export const CategoriesPage = () => {
 	const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
 	const [confirmDestructive, setConfirmDestructive] = useState(false);
 	const [confirmText, setConfirmText] = useState("Continue");
+
+	const categoryMetrics = useMemo(() => {
+		const categories = categoryAnalytics ?? [];
+		const linkedProducts = categories.reduce((sum, item) => sum + item.productCount, 0);
+		const unusedCategories = categories.filter((category) => category.productCount === 0).length;
+		const topCategoryEntry = [...categories]
+			.sort((a, b) => b.productCount - a.productCount)
+			.find((entry) => entry.productCount > 0);
+
+		return [
+			{
+				label: "Total Categories",
+				value: formatCount(categories.length),
+				helper: "Across the catalog",
+				icon: FolderKanban,
+				accent: "bg-emerald-50 text-emerald-800",
+			},
+			{
+				label: "Linked Products",
+				value: formatCount(linkedProducts),
+				helper: "From category analytics",
+				icon: Package,
+				accent: "bg-lime-50 text-lime-800",
+			},
+			{
+				label: "Unused Categories",
+				value: formatCount(unusedCategories),
+				helper: "Need product assignments",
+				icon: Trash2,
+				accent: "bg-amber-50 text-amber-800",
+			},
+			{
+				label: "Top Category",
+				value: topCategoryEntry ? topCategoryEntry.label : "-",
+				helper: topCategoryEntry ? `${formatCount(topCategoryEntry.productCount)} products` : "No linked products yet",
+				icon: TrendingUp,
+				accent: "bg-slate-50 text-slate-700",
+			},
+		];
+	}, [categoryAnalytics]);
 
 	const loadData = useCallback(async () => {
 		setLoading(true);
@@ -277,14 +319,7 @@ export const CategoriesPage = () => {
 			</div>
 
 			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-				{[
-					{
-						label: "Total Categories",
-						value: formatCount(categoryAnalytics.length),
-						icon: FolderKanban,
-						accent: "bg-emerald-50 text-emerald-800",
-					},
-				].map((metric, index) => {
+				{categoryMetrics.map((metric, index) => {
 					const Icon = metric.icon;
 					return (
 						<motion.div
@@ -301,9 +336,7 @@ export const CategoriesPage = () => {
 									<h3 className="mt-2 truncate text-2xl font-semibold tracking-tight text-slate-950">
 										{metric.value}
 									</h3>
-									<p className="mt-1 text-xs text-slate-500">
-										Across the catalog
-									</p>
+									<p className="mt-1 text-xs text-slate-500">{metric.helper}</p>
 								</div>
 								<div
 									className={`grid size-12 shrink-0 place-items-center rounded-2xl ring-1 ring-inset ${metric.accent}`}

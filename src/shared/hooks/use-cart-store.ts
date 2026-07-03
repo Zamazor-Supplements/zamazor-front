@@ -17,6 +17,7 @@ interface CartStore {
 	removeItem: (productId: string) => void;
 	updateQuantity: (productId: string, quantity: number) => void;
 	clearCart: () => void;
+	mergeGuestCart: (guestItems: CartItem[]) => Promise<void>;
 	syncWithBackend: () => Promise<void>;
 	totalItems: () => number;
 	subtotal: () => number;
@@ -89,6 +90,40 @@ export const useCartStore = create<CartStore>()(
 				}
 
 				set({ items: [] });
+			},
+			mergeGuestCart: async (guestItems) => {
+				const auth = useAuthStore.getState();
+				if (auth.status !== AuthStatus.Authenticated) {
+					return;
+				}
+
+				const uniqueGuestItems = guestItems.reduce<CartItem[]>((acc, item) => {
+					if (!item?.product?.id || item.quantity <= 0) {
+						return acc;
+					}
+
+					const existingIndex = acc.findIndex((entry) => entry.product.id === item.product.id);
+					if (existingIndex > -1) {
+						acc[existingIndex] = {
+							...acc[existingIndex],
+							quantity: acc[existingIndex].quantity + item.quantity,
+						};
+						return acc;
+					}
+
+					acc.push(item);
+					return acc;
+				}, []);
+
+				if (uniqueGuestItems.length === 0) {
+					await get().syncWithBackend();
+					return;
+				}
+
+				await Promise.allSettled(
+					uniqueGuestItems.map((item) => cartService.addToCart(item.product.id, item.quantity)),
+				);
+				await get().syncWithBackend();
 			},
 			syncWithBackend: async () => {
 				const auth = useAuthStore.getState();

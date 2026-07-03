@@ -9,6 +9,7 @@ import { AuthStatus } from "../types";
 export const userService = {
 	fetchCurrentUser: async (options?: { syncCommerceState?: boolean }) => {
 		const syncCommerceState = options?.syncCommerceState ?? true;
+		const guestCartSnapshot = syncCommerceState ? [...useCartStore.getState().items] : [];
 
 		const response = await privateApiRequest<User>(
 			{ url: API_ENDPOINTS.AUTH.ME, method: "GET" },
@@ -29,7 +30,7 @@ export const userService = {
 		useAuthStore.setState({ user, status: AuthStatus.Authenticated });
 
 		if (syncCommerceState) {
-			useCartStore.getState().syncWithBackend().catch((err) => {
+			useCartStore.getState().mergeGuestCart(guestCartSnapshot).catch((err) => {
 				console.warn("Failed to sync cart after fetching user:", err);
 			});
 		}

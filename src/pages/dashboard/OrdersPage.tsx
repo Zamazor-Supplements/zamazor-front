@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/core/config/constants";
@@ -59,7 +59,7 @@ const formatShippingDetails = (order: BackendOrder | null | undefined) => {
 	const city = (order?.shippingCity || parsed.city || "").trim();
 	const country = (order?.shippingCountry || parsed.country || "Morocco").trim();
 	const phone = (order?.phone || parsed.phone || "").trim();
-	const phoneLabel = phone ? `${country.toLowerCase() === "morocco" ? "🇲🇦 " : ""}${phone}` : "";
+	const phoneLabel = phone;
 
 	return {
 		street,
@@ -68,7 +68,7 @@ const formatShippingDetails = (order: BackendOrder | null | undefined) => {
 		phone,
 		fullAddress: [street, city, country].filter(Boolean).join(", "),
 		phoneLabel,
-		tooltipLabel: [street, city, country, phone ? `Phone: ${phoneLabel}` : ""].filter(Boolean).join(" â€¢ "),
+		tooltipLabel: [street, city, country, phone ? `Phone: ${phoneLabel}` : ""].filter(Boolean).join(" • "),
 	};
 };
 
