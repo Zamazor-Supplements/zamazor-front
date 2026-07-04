@@ -106,9 +106,23 @@ export const CategoriesPage = () => {
 		setLoading(true);
 		try {
 			const response = await dashboardService.getCategories();
-			setCategoryAnalytics(response);
+			if (response) {
+				setCategoryAnalytics(response);
+				return;
+			}
+
+			const categories = await productService.getCategories();
+			setCategoryAnalytics(
+				categories.map((category) => ({
+					id: category.id,
+					label: category.label,
+					productCount: 0,
+				})),
+			);
+			toast.warning("Category analytics unavailable. Showing category list without product counts.");
 		} catch (error) {
 			console.error("Failed to load categories page data:", error);
+			setCategoryAnalytics([]);
 			toast.error("Failed to refresh categories.");
 		} finally {
 			setLoading(false);
