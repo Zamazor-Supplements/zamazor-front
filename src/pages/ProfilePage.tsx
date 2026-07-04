@@ -1,7 +1,8 @@
 ﻿import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { profileSchema, type ProfileFormValues } from "@/features/auth/schemas/profileSchema";
+import { createProfileSchema, type ProfileFormValues } from "@/features/auth/schemas/profileSchema";
 import CONFIG from "@/core/config/constants";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import { useAuthStore } from "@/features/auth/stores/authStore";
@@ -38,6 +39,7 @@ import {
 
 export const ProfilePage = () => {
 	const { language, t } = useLanguage();
+	const localizedProfileSchema = useMemo(() => createProfileSchema(language), [language]);
 	useDocumentTitle(`${t("profile.title")} | ${CONFIG.APP_NAME}`);
 
 	const user = useAuthStore((state) => state.user);
@@ -46,11 +48,11 @@ export const ProfilePage = () => {
 	const handleSignOut = async () => {
 		try {
 			await authService.logout();
-			toast.success(language === "fr" ? "DÃ©connexion rÃ©ussie." : "Signed out successfully.");
+			toast.success(language === "fr" ? "Déconnexion réussie." : "Signed out successfully.");
 			navigate(APP_ROUTES.HOME);
 		} catch (error) {
 			console.error("Logout error:", error);
-			toast.error(language === "fr" ? "Erreur de dÃ©connexion." : "Failed to sign out.");
+			toast.error(language === "fr" ? "Erreur de déconnexion." : "Failed to sign out.");
 		}
 	};
 
@@ -65,7 +67,7 @@ export const ProfilePage = () => {
 	const [isCancelingOrder, setIsCancelingOrder] = useState(false);
 
 	const { register, handleSubmit, setValue, formState: { errors } } = useForm<ProfileFormValues>({
-		resolver: zodResolver(profileSchema),
+		resolver: zodResolver(localizedProfileSchema),
 		defaultValues: {
 			fullName: "",
 			street: "",
@@ -230,6 +232,25 @@ export const ProfilePage = () => {
 		return { fullAddress, phoneLabel };
 	};
 
+	const getLocalizedOrderStatusLabel = (status: string) => {
+		if (language !== "fr") {
+			return getOrderStatusMeta(status).label;
+		}
+
+		const labels: Record<string, string> = {
+			PENDING: "En attente",
+			PAID: "Payée",
+			CONFIRMED: "Confirmée",
+			PROCESSING: "En préparation",
+			SHIPPED: "Expédiée",
+			DELIVERED: "Livrée",
+			CANCELED: "Annulée",
+			REFUNDED: "Remboursée",
+		};
+
+		return labels[status] || status;
+	};
+
 	return (
 		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8">
 			<div className="mx-auto max-w-5xl">
@@ -242,7 +263,7 @@ export const ProfilePage = () => {
 								{language === "fr" ? `Bonjour, ${user?.fullName || "Utilisateur"}` : `Hello, ${user?.fullName || "User"}`}
 							</h1>
 							<p className="text-sm text-emerald-100/75 mt-1">
-								{language === "fr" ? "GÃ©rez vos coordonnÃ©es, adresses de livraison et la rÃ©gularitÃ© de vos commandes." : "Manage your settings, billing details, and clean stack consistency."}
+								{language === "fr" ? t("profile.desc") : "Manage your settings, billing details, and clean stack consistency."}
 							</p>
 						</div>
 					</div>
@@ -285,17 +306,17 @@ export const ProfilePage = () => {
 								</span>
 									<div className="min-w-0">
 										<h3 className="text-[1.05rem] font-black tracking-tight text-slate-950">
-											{language === "fr" ? "Account Summary" : "Account Summary"}
+											{language === "fr" ? t("profile.accountSummary") : "Account Summary"}
 										</h3>
 										<p className="mt-1 text-sm leading-6 text-slate-500">
-											{language === "fr" ? "Votre profil connecté et l'adresse enregistrée." : "Your signed-in profile and saved address."}
+											{language === "fr" ? t("profile.accountSummaryDesc") : "Your signed-in profile and saved address."}
 										</p>
 									</div>
 								</div>
 
 								<div className="mt-5 rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-900/5">
 									<span className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 block">
-										{language === "fr" ? "Registered Email" : "Registered Email"}
+										{language === "fr" ? t("profile.registeredEmail") : "Registered Email"}
 									</span>
 									<span className="mt-1 block truncate text-sm font-semibold text-slate-800">
 										{user?.email || ""}
@@ -319,7 +340,7 @@ export const ProfilePage = () => {
 						{/* Form Details Area */}
 						<div className="bg-white rounded-3xl border border-emerald-900/5 p-6 sm:p-8 shadow-xs md:col-span-2">
 							<h2 className="font-playfair text-2xl text-slate-950 mb-6 pb-3 border-b border-slate-100">
-								{language === "fr" ? "ParamÃ¨tres Personnels" : "Personal Settings"}
+								{language === "fr" ? t("profile.personalSettings") : "Personal Settings"}
 							</h2>
 							<form onSubmit={handleSubmit(handleProfileSubmit)} className="space-y-6">
 								{/* Name */}
@@ -340,7 +361,7 @@ export const ProfilePage = () => {
 								{/* Read-Only Email */}
 								<div>
 									<label className="text-xs font-black uppercase text-slate-400 tracking-wider block mb-1.5">
-										{language === "fr" ? "Adresse E-mail (Non modifiable)" : "Email Address (Cannot be modified)"}
+										{language === "fr" ? t("profile.emailReadonly") : "Email Address (Cannot be modified)"}
 									</label>
 									<Input
 										type="email"
@@ -361,15 +382,15 @@ export const ProfilePage = () => {
 												<div className="min-w-0">
 													<div className="flex flex-wrap items-center gap-2">
 														<h3 className="text-[1.05rem] font-black tracking-tight text-slate-950">
-															{language === "fr" ? "Shipping Address" : "Shipping Address"}
+															{language === "fr" ? t("profile.shippingAddress") : "Shipping Address"}
 														</h3>
 														<span className="inline-flex items-center rounded-full border border-emerald-900/10 bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-800">
-															{language === "fr" ? "Primary" : "Primary"}
+															{language === "fr" ? t("profile.primary") : "Primary"}
 														</span>
 													</div>
 													<p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">
 														{language === "fr"
-															? "Modifiez l'adresse utilisée pour les commandes, la livraison et le pré-remplissage au checkout."
+															? t("profile.shippingAddressDesc")
 															: "Edit the address used for orders, delivery, and checkout autofill."}
 													</p>
 												</div>
@@ -469,17 +490,17 @@ export const ProfilePage = () => {
 						{isLoadingOrders ? (
 							<div className="flex flex-col items-center justify-center py-12">
 								<Loader2 className="size-8 animate-spin text-emerald-800" />
-								<p className="mt-3 text-sm text-slate-500">{language === "fr" ? "RÃ©cupÃ©ration de vos commandes..." : "Retrieving your order records..."}</p>
+								<p className="mt-3 text-sm text-slate-500">{language === "fr" ? t("profile.loadingOrders") : "Retrieving your order records..."}</p>
 							</div>
 						) : orders.length === 0 ? (
 							<div className="text-center py-12">
 								<ShoppingBag className="size-16 text-emerald-900/20 mx-auto mb-4" />
 								<h3 className="text-xl font-playfair text-slate-900">{t("profile.emptyOrders")}</h3>
 								<p className="mt-2 text-sm text-slate-500 max-w-sm mx-auto">
-									{language === "fr" ? "CrÃ©ez votre routine bien-Ãªtre et passez votre premiÃ¨re commande." : "Build your daily wellness routine and check out your first order."}
+									{language === "fr" ? t("profile.emptyOrdersDesc") : "Build your daily wellness routine and check out your first order."}
 								</p>
 								<Button asChild className="mt-6 bg-emerald-900 hover:bg-emerald-950 text-white rounded-xl">
-									<Link to={APP_ROUTES.SHOP}>{language === "fr" ? "Parcourir les Formules" : "Browse formulas"}</Link>
+									<Link to={APP_ROUTES.SHOP}>{language === "fr" ? t("profile.browseFormulas") : "Browse formulas"}</Link>
 								</Button>
 							</div>
 						) : (
@@ -493,10 +514,10 @@ export const ProfilePage = () => {
 											<div className="space-y-1">
 												<div className="flex items-center gap-2">
 													<span className="font-mono text-sm font-bold text-slate-950">
-														{language === "fr" ? "Commande #" : "Order #"}{order.id.slice(0, 8).toUpperCase()}
+														{language === "fr" ? t("profile.orderPrefix") : "Order #"}{order.id.slice(0, 8).toUpperCase()}
 													</span>
 													<span className={`rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${getOrderStatusMeta(order.status).badgeClass}`}>
-														{getOrderStatusMeta(order.status).label}
+														{getLocalizedOrderStatusLabel(order.status)}
 													</span>
 												</div>
 												<div className="flex items-center gap-1.5 text-xs text-slate-400">
@@ -506,7 +527,7 @@ export const ProfilePage = () => {
 											</div>
 
 												<div className="text-right">
-													<span className="text-xs text-slate-400 uppercase font-black tracking-wider block">{language === "fr" ? "Montant Total" : "Total Amount"}</span>
+													<span className="text-xs text-slate-400 uppercase font-black tracking-wider block">{language === "fr" ? t("profile.totalAmount") : "Total Amount"}</span>
 													<span className="text-lg font-extrabold text-emerald-950">{parsePrice(order.total).toFixed(2)} MAD</span>
 												</div>
 											</div>
@@ -543,7 +564,7 @@ export const ProfilePage = () => {
 
 										<div className="mt-4 rounded-2xl border border-slate-100 bg-white p-4">
 											<p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
-												{language === "fr" ? "Shipping Details" : "Shipping Details"}
+												{language === "fr" ? t("profile.shippingDetails") : "Shipping Details"}
 											</p>
 											<div className="mt-2 space-y-1 text-sm">
 												<p className="font-semibold text-slate-900">

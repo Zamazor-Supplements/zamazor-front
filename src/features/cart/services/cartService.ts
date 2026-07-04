@@ -29,7 +29,9 @@ function isMissingCartError(error: unknown) {
 }
 
 export const cartService = {
-	getCart: async (): Promise<{ product: Product; quantity: number }[] | null> => {
+	getCart: async (): Promise<
+		{ product: Product; quantity: number }[] | null
+	> => {
 		try {
 			const response = await privateApiRequest<BackendCart>(
 				{
@@ -50,7 +52,9 @@ export const cartService = {
 			if (response && response.items) {
 				const mappedItems = await Promise.all(
 					response.items.map(async (item) => {
-						const product = await productService.getProductById(item.product.id);
+						const product = await productService.getProductById(
+							item.product.id,
+						);
 						return {
 							product: product || {
 								id: item.product.id,
@@ -61,7 +65,7 @@ export const cartService = {
 							},
 							quantity: item.quantity,
 						};
-					})
+					}),
 				);
 				return mappedItems;
 			}
@@ -97,28 +101,9 @@ export const cartService = {
 
 	removeFromCart: async (productId: string): Promise<boolean> => {
 		try {
-			// First get cart to resolve the itemId for this productId
-			const cart = await privateApiRequest<BackendCart>(
-				{
-					url: API_ENDPOINTS.CARTS.ROOT,
-					method: "GET",
-				},
-				{ ignoreErrors: true },
-			);
-
-			if (isSystemError(cart) || !cart || !cart.items) {
-				return false;
-			}
-
-			const item = cart.items.find((i) => i.product && i.product.id === productId);
-			if (!item) {
-				console.warn(`Product ${productId} not found in backend cart during deletion.`);
-				return false;
-			}
-
 			const response = await privateApiRequest<unknown>(
 				{
-					url: API_ENDPOINTS.CARTS.ITEM_DETAILS(item.id),
+					url: API_ENDPOINTS.CARTS.ITEM_DETAILS(productId),
 					method: "DELETE",
 				},
 				{ ignoreErrors: true },
@@ -136,29 +121,14 @@ export const cartService = {
 		}
 	},
 
-	updateCartItemQuantity: async (productId: string, quantity: number): Promise<boolean> => {
+	updateCartItemQuantity: async (
+		productId: string,
+		quantity: number,
+	): Promise<boolean> => {
 		try {
-			const cart = await privateApiRequest<BackendCart>(
-				{
-					url: API_ENDPOINTS.CARTS.ROOT,
-					method: "GET",
-				},
-				{ ignoreErrors: true },
-			);
-
-			if (isSystemError(cart) || !cart || !cart.items) {
-				return false;
-			}
-
-			const item = cart.items.find((i) => i.product && i.product.id === productId);
-			if (!item) {
-				console.warn(`Product ${productId} not found in backend cart during quantity update.`);
-				return false;
-			}
-
 			const response = await privateApiRequest<unknown>(
 				{
-					url: API_ENDPOINTS.CARTS.ITEM_DETAILS(item.id),
+					url: API_ENDPOINTS.CARTS.ITEM_DETAILS(productId),
 					method: "PATCH",
 					data: { quantity },
 				},

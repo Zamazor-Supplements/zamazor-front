@@ -40,7 +40,6 @@ import cardMindImg from "@/assets/images/card_mind.png";
 const productProtein = `${CONFIG.API_BASE_URL}/images/product_protein.png`;
 const productGreens = `${CONFIG.API_BASE_URL}/images/product_greens.png`;
 const productHydra = `${CONFIG.API_BASE_URL}/images/product_hydra.png`;
-import { useProductStore } from "@/features/products/stores/productStore";
 import {
 	productService,
 	type BackendCategory,
@@ -54,37 +53,37 @@ import { useLanguage } from "@/shared/context/LanguageContext";
 const getHeroSlides = (language: string) => [
 	{
 		image: heroProtein,
-		kicker: language === "fr" ? "Performance vÃƒÂ©gÃƒÂ©tale" : "Plant-powered performance",
-		title: language === "fr" ? "Des complÃƒÂ©ments propres pour l'ÃƒÂ©nergie, la force et la rÃƒÂ©cupÃƒÂ©ration." : "Clean supplements for energy, strength, and recovery.",
-		copy: language === "fr" ? "CrÃƒÂ©ez votre stack quotidien avec des formules transparentes, un excellent goÃƒÂ»t et des ingrÃƒÂ©dients choisis pour de vraies routines." : "Build your daily stack with transparent formulas, great taste, and ingredients chosen for real routines.",
+		kicker: language === "fr" ? "Performance végétale" : "Plant-powered performance",
+		title: language === "fr" ? "Des compléments propres pour l'énergie, la force et la récupération." : "Clean supplements for energy, strength, and recovery.",
+		copy: language === "fr" ? "Créez votre stack quotidien avec des formules transparentes, un excellent goût et des ingrédients choisis pour de vraies routines." : "Build your daily stack with transparent formulas, great taste, and ingredients chosen for real routines.",
 		cta: language === "fr" ? "Acheter les meilleures ventes" : "Shop best sellers",
 		accent: "bg-emerald-500",
 		product: "GreenFuel Protein",
-		type: language === "fr" ? "LactosÃƒÂ©rum + lÃƒÂ©gumes" : "Whey + greens",
+		type: language === "fr" ? "Lactosérum + légumes" : "Whey + greens",
 		price: "390 MAD",
 		theme: "emerald",
 	},
 	{
 		image: heroGreens,
-		kicker: language === "fr" ? "ClartÃƒÂ© matinale" : "Morning clarity",
-		title: language === "fr" ? "Commencez concentrÃƒÂ© sans coup de barre dÃƒÂ» au sucre." : "Start focused without the sugar crash.",
-		copy: language === "fr" ? "Hydratation, ÃƒÂ©lectrolytes, adaptogÃƒÂ¨nes et superaliments conÃƒÂ§us pour allÃƒÂ©ger vos journÃƒÂ©es bien remplies." : "Hydration, electrolytes, adaptogens, and greens designed to help busy days feel lighter.",
-		cta: language === "fr" ? "CrÃƒÂ©er mon stack" : "Build my stack",
+		kicker: language === "fr" ? "Clarté matinale" : "Morning clarity",
+		title: language === "fr" ? "Commencez concentré sans coup de barre dû au sucre." : "Start focused without the sugar crash.",
+		copy: language === "fr" ? "Hydratation, électrolytes, adaptogènes et superaliments conçus pour alléger vos journées bien remplies." : "Hydration, electrolytes, adaptogens, and greens designed to help busy days feel lighter.",
+		cta: language === "fr" ? "Créer mon stack" : "Build my stack",
 		accent: "bg-lime-500",
 		product: "Daily Greens",
-		type: language === "fr" ? "MÃƒÂ©lange de superaliments" : "Superfood blend",
+		type: language === "fr" ? "Mélange de superaliments" : "Superfood blend",
 		price: "320 MAD",
 		theme: "lime",
 	},
 	{
 		image: heroRecovery,
-		kicker: language === "fr" ? "Une rÃƒÂ©cupÃƒÂ©ration qui suit le rythme" : "Recovery that keeps up",
-		title: language === "fr" ? "Dormez plus profondÃƒÂ©ment, rÃƒÂ©cupÃƒÂ©rez plus vite, revenez plus fort." : "Sleep deeper, recover faster, come back stronger.",
-		copy: language === "fr" ? "Favorisez le repos, la rÃƒÂ©paration musculaire et la rÃƒÂ©gularitÃƒÂ© avec des essentiels propres pour l'entraÃƒÂ®nement et le bien-ÃƒÂªtre quotidien." : "Support rest, muscle repair, and consistency with clean essentials for training and everyday wellness.",
-		cta: language === "fr" ? "Explorer la rÃƒÂ©cupÃƒÂ©ration" : "Explore recovery",
+		kicker: language === "fr" ? "Une récupération qui suit le rythme" : "Recovery that keeps up",
+		title: language === "fr" ? "Dormez plus profondément, récupérez plus vite, revenez plus fort." : "Sleep deeper, recover faster, come back stronger.",
+		copy: language === "fr" ? "Favorisez le repos, la réparation musculaire et la régularité avec des essentiels propres pour l'entraînement et le bien-être quotidien." : "Support rest, muscle repair, and consistency with clean essentials for training and everyday wellness.",
+		cta: language === "fr" ? "Explorer la récupération" : "Explore recovery",
 		accent: "bg-teal-500",
 		product: "Night Repair",
-		type: language === "fr" ? "Complexe de magnÃƒÂ©sium" : "Magnesium complex",
+		type: language === "fr" ? "Complexe de magnésium" : "Magnesium complex",
 		price: "280 MAD",
 		theme: "teal",
 	},
@@ -93,28 +92,28 @@ const getHeroSlides = (language: string) => [
 const getDetailedStackSteps = (language: string) => [
 	{
 		time: "08:00 AM",
-		moment: language === "fr" ? "DÃ‰BUT DE MATINÃ‰E" : "MORNING START",
-		title: language === "fr" ? "RÃ©veil propre" : "Wake up clean",
-		copy: language === "fr" ? "Daily Greens et Hydra Charge aident votre matinÃ©e Ã  dÃ©marrer avec des minÃ©raux actifs, des enzymes digestives et une concentration stable." : "Daily Greens and Hydra Charge help your morning start with active minerals, digestive enzymes, and steady focus.",
+		moment: language === "fr" ? "DÉBUT DE MATINÉE" : "MORNING START",
+		title: language === "fr" ? "Réveil propre" : "Wake up clean",
+		copy: language === "fr" ? "Daily Greens et Hydra Charge aident votre matinée à démarrer avec des minéraux actifs, des enzymes digestives et une concentration stable." : "Daily Greens and Hydra Charge help your morning start with active minerals, digestive enzymes, and steady focus.",
 		products: ["Daily Greens", "Hydra Charge"],
 		icon: BatteryChargingIcon,
 		color: "bg-emerald-500 text-white shadow-emerald-500/20"
 	},
 	{
 		time: "02:00 PM",
-		moment: language === "fr" ? "ENTRAÃŽNEMENT & CONCENTRATION" : "TRAINING & FOCUS",
-		title: language === "fr" ? "S'entraÃ®ner avec intention" : "Train with intent",
-		copy: language === "fr" ? "Les mÃ©langes de protÃ©ines et les BCAAs de performance favorisent la synthÃ¨se musculaire, l'endurance et la rÃ©cupÃ©ration les jours d'entraÃ®nement." : "Protein blends and performance BCAAs support muscle synthesis, stamina, and recovery on training days.",
+		moment: language === "fr" ? "ENTRAÎNEMENT & CONCENTRATION" : "TRAINING & FOCUS",
+		title: language === "fr" ? "S'entraîner avec intention" : "Train with intent",
+		copy: language === "fr" ? "Les mélanges de protéines et les BCAAs de performance favorisent la synthèse musculaire, l'endurance et la récupération les jours d'entraînement." : "Protein blends and performance BCAAs support muscle synthesis, stamina, and recovery on training days.",
 		products: ["GreenFuel Protein", "Pre-Workout Spark"],
 		icon: DumbbellIcon,
 		color: "bg-amber-500 text-white shadow-amber-500/20"
 	},
 	{
 		time: "09:30 PM",
-		moment: language === "fr" ? "REPOS & RÃ‰PARATION" : "REST & REPAIR",
+		moment: language === "fr" ? "REPOS & RÉPARATION" : "REST & REPAIR",
 		title: language === "fr" ? "Reconstruire la nuit" : "Rebuild at night",
-		copy: language === "fr" ? "Les formules de rÃ©cupÃ©ration Ã  libÃ©ration progressive et les minÃ©raux apaisants favorisent des cycles de sommeil plus profonds et la rÃ©paration cellulaire naturelle." : "Slow-release recovery formulas and soothing minerals support deeper sleep cycles and natural cellular repair.",
-		products: ["Night Repair", "Muscle Restore BCAAs"],
+		copy: language === "fr" ? "Les formules de récupération à libération progressive et les minéraux apaisants favorisent des cycles de sommeil plus profonds et la réparation cellulaire naturelle." : "Slow-release recovery formulas and soothing minerals support deeper sleep cycles and natural cellular repair.",
+	products: ["Night Repair", "Muscle Restore BCAAs"],
 		icon: MoonIcon,
 		color: "bg-indigo-600 text-white shadow-indigo-600/20"
 	}
@@ -123,74 +122,74 @@ const getDetailedStackSteps = (language: string) => [
 const getReviews = (language: string) => [
 	{
 		quote: language === "fr"
-			? "Les superaliments ont un goÃƒÂ»t frais, pas herbacÃƒÂ©. C'est la premiÃƒÂ¨re habitude de complÃƒÂ©ment que j'ai rÃƒÂ©ellement gardÃƒÂ©e."
+			? "Les superaliments ont un goût frais, pas herbacé. C'est la première habitude de complément que j'ai réellement gardée."
 			: "The greens taste fresh, not grassy. It is the first supplement habit I have actually kept.",
 		name: "Maya R.",
-		meta: language === "fr" ? "AbonnÃƒÂ© Daily Greens" : "Daily Greens subscriber",
+		meta: language === "fr" ? "Abonné Daily Greens" : "Daily Greens subscriber",
 	},
 	{
 		quote: language === "fr"
-			? "La protÃƒÂ©ine se mÃƒÂ©lange facilement et ne pÃƒÂ¨se pas sur l'estomac. Parfait aprÃƒÂ¨s l'entraÃƒÂ®nement du matin."
+			? "La protéine se mélange facilement et ne pèse pas sur l'estomac. Parfait après l'entraînement du matin."
 			: "Protein mixes smooth and does not feel heavy. Perfect after morning training.",
 		name: "Adam K.",
 		meta: "GreenFuel Protein",
 	},
 	{
 		quote: language === "fr"
-			? "Le stack de rÃƒÂ©cupÃƒÂ©ration a rendu mes soirÃƒÂ©es plus rÃƒÂ©guliÃƒÂ¨res. Simple, propre et facile ÃƒÂ  faire confiance."
+			? "Le stack de récupération a rendu mes soirées plus régulières. Simple, propre et facile à faire confiance."
 			: "The recovery stack made my evenings more consistent. Simple, clean, and easy to trust.",
 		name: "Nadia S.",
-		meta: language === "fr" ? "Pack RÃƒÂ©cupÃƒÂ©ration" : "Recovery bundle",
+		meta: language === "fr" ? "Pack Récupération" : "Recovery bundle",
 	},
 ];
 
 const getTrustItems = (language: string) => [
-	{ label: language === "fr" ? "Lots testÃƒÂ©s en laboratoire" : "Lab-tested batches", icon: BadgeCheckIcon },
+	{ label: language === "fr" ? "Lots testés en laboratoire" : "Lab-tested batches", icon: BadgeCheckIcon },
 	{ label: language === "fr" ? "Sans colorants artificiels" : "No artificial colors", icon: LeafIcon },
 	{ label: language === "fr" ? "Livraison rapide" : "Fast delivery", icon: TruckIcon },
 	{ label: language === "fr" ? "Abonnements faciles" : "Easy subscriptions", icon: PackageCheckIcon },
 ];
 
 const getMarqueeItems = (language: string) => [
-	{ name: language === "fr" ? "Frais & LÃƒÂ©ger" : "Fresh & Light", targetId: APP_ROUTES.SHOP },
-	{ name: language === "fr" ? "Vitamines & MinÃƒÂ©raux" : "Vitamins & Minerals", targetId: APP_ROUTES.SHOP },
-	{ name: language === "fr" ? "PrÃƒÂ©biotiques" : "Prebiotics", targetId: APP_ROUTES.SHOP },
+	{ name: language === "fr" ? "Frais & Léger" : "Fresh & Light", targetId: APP_ROUTES.SHOP },
+	{ name: language === "fr" ? "Vitamines & Minéraux" : "Vitamins & Minerals", targetId: APP_ROUTES.SHOP },
+	{ name: language === "fr" ? "Prébiotiques" : "Prebiotics", targetId: APP_ROUTES.SHOP },
 	{ name: language === "fr" ? "Antioxydants" : "Antioxidants", targetId: APP_ROUTES.SHOP },
 ];
 
 
 
 const getProofStats = (language: string) => [
-	{ value: "92%", label: language === "fr" ? "des clients se sont sentis plus rÃƒÂ©guliers aprÃƒÂ¨s 30 jours" : "customers felt more consistent after 30 days" },
-	{ value: "18g", label: language === "fr" ? "de protÃƒÂ©ines par portion dans notre mÃƒÂ©lange quotidien" : "protein per serving in our daily blend" },
-	{ value: "0g", label: language === "fr" ? "de sucre ajoutÃƒÂ© dans l'hydratation et les superaliments" : "added sugar in hydration and greens" },
-	{ value: "3rd", label: language === "fr" ? "testÃƒÂ© par un laboratoire tiers pour la qualitÃƒÂ© et la puretÃƒÂ©" : "party tested for quality and purity" },
+	{ value: "92%", label: language === "fr" ? "des clients se sont sentis plus réguliers après 30 jours" : "customers felt more consistent after 30 days" },
+	{ value: "18g", label: language === "fr" ? "de protéines par portion dans notre mélange quotidien" : "protein per serving in our daily blend" },
+	{ value: "0g", label: language === "fr" ? "de sucre ajouté dans l'hydratation et les superaliments" : "added sugar in hydration and greens" },
+	{ value: "3rd", label: language === "fr" ? "testé par un laboratoire tiers pour la qualité et la pureté" : "party tested for quality and purity" },
 ];
 
 const getComparisonData = (language: string) => [
 	{
-		feature: language === "fr" ? "Liste d'ingrÃƒÂ©dients transparente" : "Transparent ingredient list",
-		zamazor: { text: language === "fr" ? "Divulgation complÃƒÂ¨te ÃƒÂ  100%" : "100% full disclosure", type: "success" },
-		typical: { text: language === "fr" ? "Souvent cachÃƒÂ© dans des mÃƒÂ©langes brevetÃƒÂ©s" : "Often hidden in proprietary blends", type: "fail" }
+		feature: language === "fr" ? "Liste d'ingrédients transparente" : "Transparent ingredient list",
+		zamazor: { text: language === "fr" ? "Divulgation complète à 100%" : "100% full disclosure", type: "success" },
+		typical: { text: language === "fr" ? "Souvent caché dans des mélanges brevetés" : "Often hidden in proprietary blends", type: "fail" }
 	},
 	{
 		feature: language === "fr" ? "Accompagnement de routine" : "Routine guidance",
-		zamazor: { text: language === "fr" ? "Stacks personnalisÃƒÂ©s par objectif" : "Personalized stacks by goal", type: "success" },
+		zamazor: { text: language === "fr" ? "Stacks personnalisés par objectif" : "Personalized stacks by goal", type: "success" },
 		typical: { text: language === "fr" ? "Achat de produits uniquement" : "Product-only shopping", type: "fail" }
 	},
 	{
-		feature: language === "fr" ? "FlexibilitÃƒÂ© d'abonnement" : "Subscription flexibility",
+		feature: language === "fr" ? "Flexibilité d'abonnement" : "Subscription flexibility",
 		zamazor: { text: language === "fr" ? "Sauter, suspendre ou modifier en 30s" : "Skip, pause, or edit in 30 seconds", type: "success" },
-		typical: { text: language === "fr" ? "Cycles rigides et difficiles ÃƒÂ  annuler" : "Rigid, hard-to-cancel cycles", type: "fail" }
+		typical: { text: language === "fr" ? "Cycles rigides et difficiles à annuler" : "Rigid, hard-to-cancel cycles", type: "fail" }
 	},
 	{
-		feature: language === "fr" ? "Colorants & ÃƒÂ©dulcorants artificiels" : "Artificial colors & sweeteners",
-		zamazor: { text: language === "fr" ? "Jamais utilisÃƒÂ© (zÃƒÂ©ro artificiel)" : "Never used (zero artificials)", type: "success" },
-		typical: { text: language === "fr" ? "Couramment ajoutÃƒÂ©s pour le goÃƒÂ»t/la couleur" : "Commonly added for flavor/color", type: "fail" }
+		feature: language === "fr" ? "Colorants & édulcorants artificiels" : "Artificial colors & sweeteners",
+		zamazor: { text: language === "fr" ? "Jamais utilisé (zéro artificiel)" : "Never used (zero artificials)", type: "success" },
+		typical: { text: language === "fr" ? "Couramment ajoutés pour le goût/la couleur" : "Commonly added for flavor/color", type: "fail" }
 	},
 	{
-		feature: language === "fr" ? "ContrÃƒÂ´les labo tiers" : "Third-party lab checks",
-		zamazor: { text: language === "fr" ? "Chaque lot testÃƒÂ© + rapports publics" : "Every batch tested + public reports", type: "success" },
+		feature: language === "fr" ? "Contrôles labo tiers" : "Third-party lab checks",
+		zamazor: { text: language === "fr" ? "Chaque lot testé + rapports publics" : "Every batch tested + public reports", type: "success" },
 		typical: { text: language === "fr" ? "Rarely done or private" : "Rarely done or private", type: "fail" }
 	}
 ];
@@ -266,15 +265,15 @@ export const HomePage = () => {
 	const proofStats = getProofStats(language);
 	const comparisonData = getComparisonData(language);
 
-	const { products: storeProducts, fetchProducts } = useProductStore();
-	const products = storeProducts;
+	const [products, setProducts] = useState<Product[]>([]);
+	const [loadingProducts, setLoadingProducts] = useState(true);
 	const [categories, setCategories] = useState<BackendCategory[]>([]);
 	const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
 	const [activeCategoryId, setActiveCategoryId] = useState("all");
 	const [loadingCategoryProducts, setLoadingCategoryProducts] = useState(false);
 
 	const routineHighlights = useMemo(() => {
-		const pick = (category: string) => storeProducts.find((product) => product.category === category) || null;
+		const pick = (category: string) => products.find((product) => product.category === category) || null;
 		const resolveImage = (fallback: string, product: Product | null) => product?.image || fallback;
 
 		return [
@@ -307,11 +306,31 @@ export const HomePage = () => {
 				tone: "bg-amber-100 text-amber-800",
 			},
 		];
-	}, [language, storeProducts]);
+	}, [language, products]);
 
 	useEffect(() => {
-		void fetchProducts();
-	}, [fetchProducts]);
+		let isMounted = true;
+
+		const loadProducts = async () => {
+			setLoadingProducts(true);
+			try {
+				const result = await productService.getProductsPage({ page: 1, size: 100 });
+				if (isMounted) {
+					setProducts(result.items);
+				}
+			} finally {
+				if (isMounted) {
+					setLoadingProducts(false);
+				}
+			}
+		};
+
+		void loadProducts();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -339,7 +358,7 @@ export const HomePage = () => {
 	const [quizDiet, setQuizDiet] = useState<string>("vegan");
 
 	const recommendedProduct = useMemo(() => {
-		if (storeProducts.length === 0 || !quizFocus) return null;
+		if (products.length === 0 || !quizFocus) return null;
 		
 		let targetCategory = "Protein";
 		if (quizFocus === "performance") targetCategory = "Protein";
@@ -348,8 +367,8 @@ export const HomePage = () => {
 		else if (quizFocus === "energy") targetCategory = "Energy";
 		else if (quizFocus === "recovery") targetCategory = "Recovery";
 		
-		return storeProducts.find(p => p.category === targetCategory) || storeProducts[0];
-	}, [storeProducts, quizFocus]);
+		return products.find((p) => p.category === targetCategory) || products[0];
+	}, [products, quizFocus]);
 
 	const resetQuiz = () => {
 		setQuizStep("intro");
@@ -371,22 +390,27 @@ export const HomePage = () => {
 		[categories, language],
 	);
 	const displayedCategoryProducts =
-		activeCategoryId === "all" ? storeProducts : categoryProducts;
+		activeCategoryId === "all" ? products : categoryProducts;
 
 	useEffect(() => {
-		let isMounted = true;
-
 		if (activeCategoryId === "all") return;
+		let isMounted = true;
 
 		const loadCategoryProducts = async () => {
 			setLoadingCategoryProducts(true);
-			const result = await productService.getProductsByCategoryPage(activeCategoryId, {
-				page: 1,
-				size: 12,
-			});
-			if (isMounted) {
-				setCategoryProducts(result.items);
-				setLoadingCategoryProducts(false);
+			setCategoryProducts([]);
+			try {
+				const result = await productService.getProductsByCategoryPage(activeCategoryId, {
+					page: 1,
+					size: 12,
+				});
+				if (isMounted) {
+					setCategoryProducts(result.items);
+				}
+			} finally {
+				if (isMounted) {
+					setLoadingCategoryProducts(false);
+				}
 			}
 		};
 
@@ -616,13 +640,13 @@ export const HomePage = () => {
 			<section className="bg-[#fcfdfa] py-20 border-b border-emerald-900/10">
 				<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
 					<span className="text-xs font-black uppercase tracking-widest text-emerald-800">
-						{language === "fr" ? "Conseiller en ComplÃƒÂ©ments Intelligent" : "Smart Supplement Finder"}
+						{language === "fr" ? "Conseiller en Compléments Intelligent" : "Smart Supplement Finder"}
 					</span>
 					<h2 className="mt-3 text-3xl font-playfair font-normal leading-tight text-slate-950 sm:text-4xl">
-						{language === "fr" ? "DÃƒÂ©couvrez votre stack de complÃƒÂ©ments biologiques personnalisÃƒÂ©." : "Discover your personalized organic supplement stack."}
+						{language === "fr" ? "Découvrez votre stack de compléments biologiques personnalisé." : "Discover your personalized organic supplement stack."}
 					</h2>
 					<p className="mt-3 text-slate-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-						{language === "fr" ? "RÃƒÂ©pondez ÃƒÂ  notre questionnaire de 30 secondes pour trouver les plantes et protÃƒÂ©ines propres adaptÃƒÂ©es ÃƒÂ  votre niveau d'activitÃƒÂ©." : "Take our 30-second science-backed advisor quiz to find the perfect clean botanicals and proteins mapped for your activity level."}
+						{language === "fr" ? "Répondez à notre questionnaire de 30 secondes pour trouver les plantes et protéines propres adaptées à votre niveau d'activité." : "Take our 30-second science-backed advisor quiz to find the perfect clean botanicals and proteins mapped for your activity level."}
 					</p>
 
 					{/* Quiz Box */}
@@ -633,16 +657,16 @@ export const HomePage = () => {
 							<div className="flex flex-col items-center justify-center text-center py-10 my-auto w-full">
 								<BrainIcon className="size-16 text-emerald-800 mb-6 animate-pulse" />
 								<h3 className="text-2xl font-playfair text-slate-950 font-normal">
-									{language === "fr" ? "Trouvez Votre Formule Propre IdÃƒÂ©ale" : "Find Your Clean Formula Match"}
+									{language === "fr" ? "Trouvez Votre Formule Propre Idéale" : "Find Your Clean Formula Match"}
 								</h3>
 								<p className="text-slate-500 text-sm max-w-sm mt-3 leading-relaxed">
-									{language === "fr" ? "RÃƒÂ©pondez ÃƒÂ  trois questions rapides sur votre objectif de santÃƒÂ©, votre niveau d'activitÃƒÂ© et vos prÃƒÂ©fÃƒÂ©rences alimentaires." : "Answer three quick questions about your health focus, active schedule, and diet preferences."}
+									{language === "fr" ? "Répondez à trois questions rapides sur votre objectif de santé, votre niveau d'activité et vos préférences alimentaires." : "Answer three quick questions about your health focus, active schedule, and diet preferences."}
 								</p>
 								<Button
 									onClick={() => setQuizStep("focus")}
 									className="mt-8 bg-emerald-900 hover:bg-emerald-950 text-white font-bold h-12 px-8 rounded-full shadow-xs cursor-pointer"
 								>
-									{language === "fr" ? "DÃƒÂ©marrer le Questionnaire Ã¢â€ â€™" : "Start Advisor Quiz Ã¢â€ â€™"}
+									{language === "fr" ? "Démarrer le Questionnaire →" : "Start Advisor Quiz →"}
 								</Button>
 							</div>
 						)}
@@ -651,18 +675,18 @@ export const HomePage = () => {
 						{quizStep === "focus" && (
 							<div className="space-y-6 my-auto w-full">
 								<div>
-									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Ãƒâ€°tape 1 sur 3" : "Step 1 of 3"}</span>
+									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Étape 1 sur 3" : "Step 1 of 3"}</span>
 									<h3 className="text-xl sm:text-2xl font-playfair text-slate-950 font-normal mt-1">
-										{language === "fr" ? "Quel est votre objectif principal de bien-ÃƒÂªtre ou de fitness ?" : "What is your primary wellness or fitness focus?"}
+										{language === "fr" ? "Quel est votre objectif principal de bien-être ou de fitness ?" : "What is your primary wellness or fitness focus?"}
 									</h3>
 								</div>
 								<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 									{[
-										{ id: "performance", label: language === "fr" ? "Croissance Musculaire & Force" : "Muscle Growth & Strength", icon: DumbbellIcon, desc: language === "fr" ? "ProtÃƒÂ©ines biologiques de qualitÃƒÂ©" : "Premium organic proteins" },
+										{ id: "performance", label: language === "fr" ? "Croissance Musculaire & Force" : "Muscle Growth & Strength", icon: DumbbellIcon, desc: language === "fr" ? "Protéines biologiques de qualité" : "Premium organic proteins" },
 										{ id: "greens", label: language === "fr" ? "Micronutriments Quotidiens" : "Daily Micronutrients", icon: LeafIcon, desc: language === "fr" ? "Superaliments crus actifs" : "Raw active supergreens" },
-										{ id: "energy", label: language === "fr" ? "Endurance & Concentration Naturelles" : "Natural Stamina & Focus", icon: ZapIcon, desc: language === "fr" ? "Boost d'entraÃƒÂ®nement propre" : "Clean pre-workout spark" },
-										{ id: "recovery", label: language === "fr" ? "RÃƒÂ©cupÃƒÂ©ration Musculaire & Sommeil" : "Muscle Repair & Sleep", icon: MoonIcon, desc: language === "fr" ? "BCAAs biologiques de rÃƒÂ©cupÃƒÂ©ration" : "Organic recovery BCAAs" },
-										{ id: "wellness", label: language === "fr" ? "ImmunitÃƒÂ© & LongÃƒÂ©vitÃƒÂ©" : "Immunity & Longevity", icon: HeartPulseIcon, desc: language === "fr" ? "Extraits adaptogÃƒÂ¨nes apaisants" : "Adaptogen calm extracts" },
+										{ id: "energy", label: language === "fr" ? "Endurance & Concentration Naturelles" : "Natural Stamina & Focus", icon: ZapIcon, desc: language === "fr" ? "Boost d'entraînement propre" : "Clean pre-workout spark" },
+										{ id: "recovery", label: language === "fr" ? "Récupération Musculaire & Sommeil" : "Muscle Repair & Sleep", icon: MoonIcon, desc: language === "fr" ? "BCAAs biologiques de récupération" : "Organic recovery BCAAs" },
+										{ id: "wellness", label: language === "fr" ? "Immunité & Longévité" : "Immunity & Longevity", icon: HeartPulseIcon, desc: language === "fr" ? "Extraits adaptogènes apaisants" : "Adaptogen calm extracts" },
 									].map((opt) => (
 										<button
 											key={opt.id}
@@ -685,17 +709,17 @@ export const HomePage = () => {
 						{quizStep === "diet" && (
 							<div className="space-y-6 my-auto w-full">
 								<div>
-									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Ãƒâ€°tape 2 sur 3" : "Step 2 of 3"}</span>
+									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Étape 2 sur 3" : "Step 2 of 3"}</span>
 									<h3 className="text-xl sm:text-2xl font-playfair text-slate-950 font-normal mt-1">
-										{language === "fr" ? "SÃƒÂ©lectionnez votre prÃƒÂ©fÃƒÂ©rence alimentaire :" : "Select your primary dietary preference:"}
+										{language === "fr" ? "Sélectionnez votre préférence alimentaire :" : "Select your primary dietary preference:"}
 									</h3>
 								</div>
 								<div className="grid gap-3 sm:grid-cols-2">
 									{[
-										{ id: "vegan", label: language === "fr" ? "VÃƒÂ©gÃƒÂ©talien / Ãƒâ‚¬ Base de Plantes" : "Vegan / Plant-Based Only", desc: language === "fr" ? "Sans produits laitiers ni dÃƒÂ©rivÃƒÂ©s animaux" : "No dairy or animal derivatives" },
-										{ id: "organic", label: language === "fr" ? "Biologique & Sans OGM" : "Organic & Non-GMO First", desc: language === "fr" ? "Cultures crues bio certifiÃƒÂ©es les plus pures" : "Purest certified organic raw crops" },
-										{ id: "keto", label: language === "fr" ? "Keto / Faible en Glucides" : "Keto / Low-Carb Friendly", desc: language === "fr" ? "Graisses et minÃƒÂ©raux cÃƒÂ©to sans sucre" : "Sugar-free keto fats & minerals" },
-										{ id: "glutenFree", label: language === "fr" ? "Sans Gluten ni Soja" : "Gluten & Soy Free", desc: language === "fr" ? "MÃƒÂ©langes hypoallergÃƒÂ©niques sÃƒÂ»rs" : "Safe allergen-conscious blends" },
+										{ id: "vegan", label: language === "fr" ? "Végétalien / À Base de Plantes" : "Vegan / Plant-Based Only", desc: language === "fr" ? "Sans produits laitiers ni dérivés animaux" : "No dairy or animal derivatives" },
+										{ id: "organic", label: language === "fr" ? "Biologique & Sans OGM" : "Organic & Non-GMO First", desc: language === "fr" ? "Cultures crues bio certifiées les plus pures" : "Purest certified organic raw crops" },
+										{ id: "keto", label: language === "fr" ? "Keto / Faible en Glucides" : "Keto / Low-Carb Friendly", desc: language === "fr" ? "Graisses et minéraux céto sans sucre" : "Sugar-free keto fats & minerals" },
+										{ id: "glutenFree", label: language === "fr" ? "Sans Gluten ni Soja" : "Gluten & Soy Free", desc: language === "fr" ? "Mélanges hypoallergéniques sûrs" : "Safe allergen-conscious blends" },
 									].map((opt) => (
 										<button
 											key={opt.id}
@@ -727,16 +751,16 @@ export const HomePage = () => {
 						{quizStep === "activity" && (
 							<div className="space-y-6 my-auto w-full">
 								<div>
-									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Ãƒâ€°tape 3 sur 3" : "Step 3 of 3"}</span>
+									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Étape 3 sur 3" : "Step 3 of 3"}</span>
 									<h3 className="text-xl sm:text-2xl font-playfair text-slate-950 font-normal mt-1">
-										{language === "fr" ? "Quel est votre niveau d'activitÃƒÂ© physique actuel ?" : "What is your current physical activity level?"}
+										{language === "fr" ? "Quel est votre niveau d'activité physique actuel ?" : "What is your current physical activity level?"}
 									</h3>
 								</div>
 								<div className="grid gap-3 sm:grid-cols-3">
 									{[
-										{ id: "sedentary", label: language === "fr" ? "LÃƒÂ©gÃƒÂ¨rement Actif" : "Light Active", desc: language === "fr" ? "1-2 sÃƒÂ©ances courtes/semaine" : "1-2 short sessions/week" },
-										{ id: "moderate", label: language === "fr" ? "ModÃƒÂ©rÃƒÂ©ment Actif" : "Moderately Active", desc: language === "fr" ? "3-4 entraÃƒÂ®nements standard/semaine" : "3-4 standard workouts/week" },
-										{ id: "intense", label: language === "fr" ? "ExtrÃƒÂªmement Actif" : "Extremely Active", desc: language === "fr" ? "5+ entraÃƒÂ®nements de haute intensitÃƒÂ©/semaine" : "5+ high intensity workouts/week" },
+										{ id: "sedentary", label: language === "fr" ? "Légèrement Actif" : "Light Active", desc: language === "fr" ? "1-2 séances courtes/semaine" : "1-2 short sessions/week" },
+										{ id: "moderate", label: language === "fr" ? "Modérément Actif" : "Moderately Active", desc: language === "fr" ? "3-4 entraînements standard/semaine" : "3-4 standard workouts/week" },
+										{ id: "intense", label: language === "fr" ? "Extrêmement Actif" : "Extremely Active", desc: language === "fr" ? "5+ entraînements de haute intensité/semaine" : "5+ high intensity workouts/week" },
 									].map((opt) => (
 										<button
 											key={opt.id}
@@ -764,7 +788,7 @@ export const HomePage = () => {
 								<div>
 									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Votre Recommandation" : "Your Recommendation"}</span>
 									<h3 className="text-xl sm:text-2xl font-playfair text-slate-950 font-normal mt-1">
-										{language === "fr" ? "Voici votre formule propre personnalisÃƒÂ©e :" : "Here is your personalized clean formula match:"}
+										{language === "fr" ? "Voici votre formule propre personnalisée :" : "Here is your personalized clean formula match:"}
 									</h3>
 								</div>
 
@@ -785,7 +809,7 @@ export const HomePage = () => {
 											</h4>
 											<p className="text-xs text-slate-500 mt-2 leading-relaxed">
 												{language === "fr" ? (
-													<>BasÃƒÂ© sur vos objectifs pour <strong className="text-emerald-950 font-sans">{quizFocus}</strong> et votre rythme actif, cette formule premium apporte des nutriments propres et biodisponibles sans aucun produit synthÃƒÂ©tique.</>
+													<>Basé sur vos objectifs pour <strong className="text-emerald-950 font-sans">{quizFocus}</strong> et votre rythme actif, cette formule premium apporte des nutriments propres et biodisponibles sans aucun produit synthétique.</>
 												) : (
 													<>Based on your wellness goals for <strong className="text-emerald-950 font-sans">{quizFocus}</strong> and active schedule, this premium clean formula delivers clean, bioavailable nourishment with zero synthetics.</>
 												)}
@@ -798,7 +822,7 @@ export const HomePage = () => {
 												<Button
 													onClick={() => {
 														addItem(recommendedProduct);
-														toast.success(language === "fr" ? `${recommendedProduct.name} ajoutÃƒÂ© au panier !` : `${recommendedProduct.name} added to cart!`);
+														toast.success(language === "fr" ? `${recommendedProduct.name} ajouté au panier !` : `${recommendedProduct.name} added to cart!`);
 													}}
 													className="flex-1 sm:flex-initial h-10 px-5 bg-emerald-900 hover:bg-emerald-950 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
 												>
@@ -810,7 +834,7 @@ export const HomePage = () => {
 													onClick={() => navigate(`/product/${recommendedProduct.id}`)}
 													className="h-10 px-4 rounded-xl border-emerald-900/15 text-emerald-800 hover:bg-emerald-50 cursor-pointer animate-in duration-200"
 												>
-													{language === "fr" ? "DÃƒÂ©tails" : "Details"}
+													{language === "fr" ? "Détails" : "Details"}
 												</Button>
 											</div>
 										</div>
@@ -819,7 +843,7 @@ export const HomePage = () => {
 
 								<div className="flex justify-end pt-2">
 									<Button variant="ghost" onClick={resetQuiz} className="text-slate-500 hover:bg-slate-50 rounded-xl cursor-pointer text-xs font-bold uppercase tracking-wider">
-										{language === "fr" ? "Recommencer le questionnaire Ã¢â€ Â" : "Retake Quiz \u2190"}
+										{language === "fr" ? "Recommencer le questionnaire ↝?" : "Retake Quiz \u2190"}
 									</Button>
 								</div>
 							</div>
@@ -835,8 +859,8 @@ export const HomePage = () => {
 					<div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-9">
 						<div className="flex-1">
 							<p className="text-xs font-black uppercase tracking-widest text-emerald-700">{language === "fr" ? "Meilleures ventes" : "Best sellers"}</p>
-							<h2 className="mt-2 text-3xl font-playfair font-normal tracking-tight text-slate-950 sm:text-4xl">{language === "fr" ? "Formules ÃƒÂ  fort impact." : "High-impact formulas."}</h2>
-							<p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">{language === "fr" ? "Chaque produit est conÃƒÂ§u pour s'intÃƒÂ©grer facilement dans votre quotidien : un but clair, des ingrÃƒÂ©dients propres et des saveurs agrÃƒÂ©ables." : "Each product is built to feel easy in real life: clear purpose, clean ingredients, and flavors that make consistency simpler."}</p>
+							<h2 className="mt-2 text-3xl font-playfair font-normal tracking-tight text-slate-950 sm:text-4xl">{language === "fr" ? "Formules à fort impact." : "High-impact formulas."}</h2>
+							<p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">{language === "fr" ? "Chaque produit est conçu pour s'intégrer facilement dans votre quotidien : un but clair, des ingrédients propres et des saveurs agréables." : "Each product is built to feel easy in real life: clear purpose, clean ingredients, and flavors that make consistency simpler."}</p>
 						</div>
 						<div className="flex items-center gap-1.5 self-start sm:self-end">
 							<Button
@@ -864,70 +888,106 @@ export const HomePage = () => {
 						ref={productSliderRef}
 						className="flex overflow-x-auto gap-6 pb-6 scroll-smooth snap-x snap-mandatory scrollbar-none"
 					>
-						{products.map((product) => (
-							<motion.article
-								key={product.name}
-								whileHover={{ y: -8 }}
-								transition={{ duration: 0.12, ease: "easeOut" }}
-								onClick={() => navigate(`/product/${product.id}`)}
-								className="snap-start shrink-0 w-[290px] sm:w-[330px] rounded-[2rem] border border-emerald-950/5 bg-white p-4 shadow-md hover:shadow-lg transition-shadow duration-150 flex flex-col justify-between group cursor-pointer"
+						{loadingProducts ? (
+							<motion.div
+								key="products-loading"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="flex min-h-[420px] w-full items-center justify-center"
 							>
-								<div>
-									<div className="relative h-80 overflow-hidden rounded-[1.5rem] bg-white border border-gray-100/60">
-										<span className="absolute left-3 top-3 z-10 rounded-full bg-white/80 backdrop-blur-md px-3.5 py-1 text-xs font-semibold text-emerald-900 border border-white/20 shadow-sm">
-											{product.badge}
-										</span>
-										<button
-											type="button"
-											onClick={(e) => {
-												e.stopPropagation();
-												if (isBookmarked(product.id)) {
-													removeBookmark(product.id);
-													toast.success(language === "fr" ? `${product.name} retirÃƒÂ© des favoris.` : `Removed ${product.name} from wishlist.`);
-												} else {
-													addBookmark(product);
-													toast.success(language === "fr" ? `${product.name} ajoutÃƒÂ© aux favoris !` : `Added ${product.name} to wishlist!`);
-												}
-											}}
-											className="absolute right-3 top-3 z-10 size-9 rounded-full bg-white/95 text-slate-700 shadow-sm border border-slate-100 flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
-											title={isBookmarked(product.id) ? (language === "fr" ? "Retirer des favoris" : "Remove from Wishlist") : (language === "fr" ? "Ajouter aux favoris" : "Add to Wishlist")}
-										>
-											<HeartIcon className={cn("size-4 transition-colors", isBookmarked(product.id) ? "fill-rose-500 text-rose-500" : "text-slate-500")} />
-										</button>
-										<img 
-											src={product.image} 
-											alt={product.name} 
-											className="h-full w-full object-cover transition-transform duration-200 ease-out group-hover:scale-105" 
-										/>
-									</div>
-									<div className="mt-5 px-1">
-										<p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
-											{product.category}
-										</p>
-										<div className="mt-2 flex items-baseline justify-between gap-2">
-											<h3 className="text-xl font-playfair font-semibold leading-tight text-slate-950">
-												{product.name}
-											</h3>
-											<p className="text-base font-bold text-slate-900 shrink-0">{product.price}</p>
-										</div>
-										<p className="mt-1.5 text-sm text-slate-500 font-sans">{product.flavor}</p>
-									</div>
+								<div className="flex flex-col items-center gap-3 rounded-3xl border border-emerald-900/5 bg-white px-8 py-10 shadow-sm">
+									<div className="h-8 w-8 animate-spin rounded-full border-b-2 border-emerald-950" />
+									<p className="text-xs font-semibold text-slate-500">
+										{language === "fr" ? "Chargement des produits..." : "Loading products..."}
+									</p>
 								</div>
-								
-								<OriginButton 
-									variant="emerald"
-									onClick={(e) => {
-										e.stopPropagation();
-										addItem(product);
-										toast.success(language === "fr" ? `${product.name} ajoutÃƒÂ© au panier !` : `${product.name} added to cart!`);
-									}}
-									className="mt-5 w-full h-10 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+							</motion.div>
+						) : products.length === 0 ? (
+							<motion.div
+								key="products-empty"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="flex min-h-[420px] w-full items-center justify-center"
+							>
+								<div className="max-w-md rounded-3xl border border-dashed border-emerald-900/15 bg-white px-8 py-10 text-center shadow-sm">
+									<h3 className="text-lg font-playfair font-semibold text-slate-950">
+										{language === "fr" ? "Aucun produit disponible" : "No products available"}
+									</h3>
+									<p className="mt-2 text-sm leading-6 text-slate-500">
+										{language === "fr"
+											? "Les produits du backend s'afficheront ici dès qu'ils seront publiés."
+											: "Backend products will appear here as soon as they are published."}
+									</p>
+								</div>
+							</motion.div>
+						) : (
+							products.map((product) => (
+								<motion.article
+									key={product.id}
+									whileHover={{ y: -8 }}
+									transition={{ duration: 0.12, ease: "easeOut" }}
+									onClick={() => navigate(`/product/${product.id}`)}
+									className="snap-start shrink-0 w-[290px] sm:w-[330px] rounded-[2rem] border border-emerald-950/5 bg-white p-4 shadow-md hover:shadow-lg transition-shadow duration-150 flex flex-col justify-between group cursor-pointer"
 								>
-									<ShoppingBagIcon className="size-3.5" />
-									{t("common.addToCart")}
-								</OriginButton>
-							</motion.article>
-						))}
+									<div>
+										<div className="relative h-80 overflow-hidden rounded-[1.5rem] bg-white border border-gray-100/60">
+											<span className="absolute left-3 top-3 z-10 rounded-full bg-white/80 backdrop-blur-md px-3.5 py-1 text-xs font-semibold text-emerald-900 border border-white/20 shadow-sm">
+												{product.badge}
+											</span>
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													if (isBookmarked(product.id)) {
+														removeBookmark(product.id);
+														toast.success(language === "fr" ? `${product.name} retiré des favoris.` : `Removed ${product.name} from wishlist.`);
+													} else {
+														addBookmark(product);
+														toast.success(language === "fr" ? `${product.name} ajouté aux favoris !` : `Added ${product.name} to wishlist!`);
+													}
+												}}
+												className="absolute right-3 top-3 z-10 size-9 rounded-full bg-white/95 text-slate-700 shadow-sm border border-slate-100 flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
+												title={isBookmarked(product.id) ? (language === "fr" ? "Retirer des favoris" : "Remove from Wishlist") : (language === "fr" ? "Ajouter aux favoris" : "Add to Wishlist")}
+											>
+												<HeartIcon className={cn("size-4 transition-colors", isBookmarked(product.id) ? "fill-rose-500 text-rose-500" : "text-slate-500")} />
+											</button>
+											<img
+												src={product.image}
+												alt={product.name}
+												className="h-full w-full object-cover transition-transform duration-200 ease-out group-hover:scale-105"
+											/>
+										</div>
+										<div className="mt-5 px-1">
+											<p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+												{product.category}
+											</p>
+											<div className="mt-2 flex items-baseline justify-between gap-2">
+												<h3 className="text-xl font-playfair font-semibold leading-tight text-slate-950">
+													{product.name}
+												</h3>
+												<p className="text-base font-bold text-slate-900 shrink-0">{product.price}</p>
+											</div>
+											<p className="mt-1.5 text-sm text-slate-500 font-sans">{product.flavor}</p>
+										</div>
+									</div>
+
+									<OriginButton
+										variant="emerald"
+										onClick={(e) => {
+											e.stopPropagation();
+											addItem(product);
+											toast.success(language === "fr" ? `${product.name} ajouté au panier !` : `${product.name} added to cart!`);
+										}}
+										className="mt-5 w-full h-10 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+									>
+										<ShoppingBagIcon className="size-3.5" />
+										{t("common.addToCart")}
+									</OriginButton>
+								</motion.article>
+							))
+						)}
 					</div>
 
 					{/* Centered See All Products button at the bottom of the slider */}
@@ -955,7 +1015,7 @@ export const HomePage = () => {
 							{language === "fr" ? "Formulations scientifiques" : "Science-backed formulations"}
 						</h2>
 						<p className="mt-4 mx-auto max-w-2xl text-base leading-relaxed text-slate-500">
-							{language === "fr" ? "Nos mÃƒÂ©langes ciblÃƒÂ©s associent des ingrÃƒÂ©dients appuyÃƒÂ©s par la recherche avec une formulation soignÃƒÂ©e pour soutenir votre vitalitÃƒÂ©." : "Our targeted blends combine research-backed ingredients with thoughtful formulation to support lasting vitality, balance"}
+							{language === "fr" ? "Nos mélanges ciblés associent des ingrédients appuyés par la recherche avec une formulation soignée pour soutenir votre vitalité." : "Our targeted blends combine research-backed ingredients with thoughtful formulation to support lasting vitality, balance"}
 						</p>
 					</div>
 
@@ -979,7 +1039,7 @@ export const HomePage = () => {
 									{language === "fr" ? "Soutien Nutritionnel" : "Nutrient Support"}
 								</span>
 								<h3 className="mt-5 text-2xl sm:text-3xl font-playfair font-normal leading-tight text-white max-w-[240px]">
-									{language === "fr" ? "Soutenir l'ÃƒÂ©quilibre mÃƒÂ©tabolique" : "Support metabolic balance"}
+									{language === "fr" ? "Soutenir l'équilibre métabolique" : "Support metabolic balance"}
 								</h3>
 							</div>
 
@@ -1013,10 +1073,10 @@ export const HomePage = () => {
 							
 							<div className="relative z-10">
 								<span className="inline-block bg-white/10 backdrop-blur-md text-white border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold">
-									{language === "fr" ? "DÃƒÂ©fense Immunitaire" : "Immune Defense"}
+									{language === "fr" ? "Défense Immunitaire" : "Immune Defense"}
 								</span>
 								<h3 className="mt-5 text-2xl sm:text-3xl font-playfair font-normal leading-tight text-white max-w-[240px]">
-									{language === "fr" ? "Renforcer l'immunitÃƒÂ© naturelle" : "Strengthen natural immunity"}
+									{language === "fr" ? "Renforcer l'immunité naturelle" : "Strengthen natural immunity"}
 								</h3>
 							</div>
 
@@ -1053,7 +1113,7 @@ export const HomePage = () => {
 									{language === "fr" ? "Esprit & Concentration" : "Mind & Focus"}
 								</span>
 								<h3 className="mt-5 text-2xl sm:text-3xl font-playfair font-normal leading-tight text-white max-w-[240px]">
-									{language === "fr" ? "Favoriser la santÃƒÂ© cognitive" : "Promote cognitive health"}
+									{language === "fr" ? "Favoriser la santé cognitive" : "Promote cognitive health"}
 								</h3>
 							</div>
 
@@ -1087,9 +1147,9 @@ export const HomePage = () => {
 					<div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8">
 						<div className="flex-1">
 							<p className="text-xs font-black uppercase tracking-widest text-emerald-700">{language === "fr" ? "Explorer les formules" : "Explore formulas"}</p>
-							<h2 className="mt-2 text-3xl font-playfair font-normal tracking-tight text-slate-950 sm:text-4xl">{language === "fr" ? "Acheter par CatÃƒÂ©gorie." : "Shop by Category."}</h2>
+							<h2 className="mt-2 text-3xl font-playfair font-normal tracking-tight text-slate-950 sm:text-4xl">{language === "fr" ? "Acheter par Catégorie." : "Shop by Category."}</h2>
 							<p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500">
-								{language === "fr" ? "SÃƒÂ©lectionnez une catÃƒÂ©gorie pour filtrer. Chaque mÃƒÂ©lange est crÃƒÂ©ÃƒÂ© pour vous aider ÃƒÂ  atteindre vos objectifs de performance et de rÃƒÂ©cupÃƒÂ©ration." : "Select a category to filter. Each blend is created to help you reach target performance and recovery goals with zero fluff."}
+								{language === "fr" ? "Sélectionnez une catégorie pour filtrer. Chaque mélange est créé pour vous aider à atteindre vos objectifs de performance et de récupération." : "Select a category to filter. Each blend is created to help you reach target performance and recovery goals with zero fluff."}
 							</p>
 						</div>
 						<div className="flex items-center gap-1.5 self-start sm:self-end">
@@ -1117,17 +1177,7 @@ export const HomePage = () => {
 					{/* Category Tabs */}
 					<div className="flex overflow-x-auto gap-2.5 pb-4 scrollbar-none snap-x mb-8">
 						{categoryTabs.map((category) => {
-							const cat = category.label;
 							const isActive = activeCategoryId === category.id;
-							const catLabel = cat === "All"
-								? (language === "fr" ? "Tous" : "All")
-								: cat === "Protein" ? (language === "fr" ? "ProtÃƒÂ©ine" : "Protein")
-								: cat === "Greens" ? (language === "fr" ? "Superaliments" : "Greens")
-								: cat === "Energy" ? (language === "fr" ? "Ãƒâ€°nergie" : "Energy")
-								: cat === "Recovery" ? (language === "fr" ? "RÃƒÂ©cupÃƒÂ©ration" : "Recovery")
-								: cat === "Immunity" ? (language === "fr" ? "ImmunitÃƒÂ©" : "Immunity")
-								: cat === "Wellness" ? (language === "fr" ? "Bien-ÃƒÂªtre" : "Wellness")
-								: cat;
 							return (
 								<button
 									key={category.id}
@@ -1137,9 +1187,9 @@ export const HomePage = () => {
 										isActive
 											? "bg-emerald-950 text-white border-emerald-950 shadow-md shadow-emerald-950/10"
 											: "bg-white text-emerald-800 border-emerald-900/10 hover:bg-emerald-50 hover:text-emerald-950 hover:-translate-y-0.5"
-									)}
-								>
-									{catLabel}
+										)}
+									>
+									{category.label}
 								</button>
 							);
 						})}
@@ -1232,7 +1282,7 @@ export const HomePage = () => {
 											onClick={(e) => {
 												e.stopPropagation();
 												addItem(product);
-												toast.success(language === "fr" ? `${product.name} ajoutÃƒÂ© au panier !` : `${product.name} added to cart!`);
+												toast.success(language === "fr" ? `${product.name} ajouté au panier !` : `${product.name} added to cart!`);
 											}}
 											className="mt-5 w-full h-10 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
 										>
@@ -1257,10 +1307,10 @@ export const HomePage = () => {
 				<div className="grid gap-8 overflow-hidden rounded-[2rem] border border-emerald-900/10 bg-white p-5 shadow-xl shadow-emerald-950/5 lg:grid-cols-[0.9fr_1.1fr] lg:p-8">
 					<div className="lg:sticky lg:top-28">
 						<SectionHeading
-							kicker={language === "fr" ? "SÃƒÂ©lection ÃƒÂ©ditoriale" : "Editorial selection"}
-							title={language === "fr" ? "Une vitrine plus guidÃƒÂ©e pour acheter plus vite." : "A more guided shelf for faster shopping."}
+							kicker={language === "fr" ? "Sélection éditoriale" : "Editorial selection"}
+							title={language === "fr" ? "Une vitrine plus guidée pour acheter plus vite." : "A more guided shelf for faster shopping."}
 							copy={language === "fr"
-								? "Cette section met en avant les routines qui se lisent dÃ¢â‚¬â„¢un coup dÃ¢â‚¬â„¢Ã…â€œil, avec des cartes plus visuelles et une hiÃƒÂ©rarchie trÃƒÂ¨s propre."
+								? "Cette section met en avant les routines qui se lisent d’un coup d’œil, avec des cartes plus visuelles et une hiérarchie très propre."
 								: "This section puts the most shoppable routines front and center with clearer hierarchy and more visual cards."
 							}
 						/>
@@ -1269,7 +1319,7 @@ export const HomePage = () => {
 							{[
 								language === "fr" ? "Vue rapide des routines" : "Quick routine scan",
 								language === "fr" ? "Cartes produit plus visuelles" : "More visual product cards",
-								language === "fr" ? "AccÃƒÂ¨s direct ÃƒÂ  la boutique" : "Direct access to shop",
+								language === "fr" ? "Accès direct à la boutique" : "Direct access to shop",
 							].map((item) => (
 								<div key={item} className="flex items-center gap-3 rounded-2xl border border-emerald-900/6 bg-emerald-50/50 px-4 py-3 text-sm font-semibold text-slate-700">
 									<Check className="size-4 text-emerald-700" />
@@ -1313,7 +1363,7 @@ export const HomePage = () => {
 									/>
 									<div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
 									<span className={`absolute left-3 top-3 rounded-full border border-white/40 bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${item.tone}`}>
-										{item.product?.category || (language === "fr" ? "SÃƒÂ©lection" : "Selection")}
+										{item.product?.category || (language === "fr" ? "Sélection" : "Selection")}
 									</span>
 								</div>
 
@@ -1328,7 +1378,7 @@ export const HomePage = () => {
 											<p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
 												{language === "fr" ? "Produit en vedette" : "Featured product"}
 											</p>
-											<p className="mt-1 text-sm font-bold text-slate-900">{item.product?.name || (language === "fr" ? "Ãƒâ‚¬ dÃƒÂ©couvrir" : "Discover now")}</p>
+											<p className="mt-1 text-sm font-bold text-slate-900">{item.product?.name || (language === "fr" ? "À découvrir" : "Discover now")}</p>
 										</div>
 										{item.product && (
 											<p className="text-sm font-black text-emerald-900">{item.product.price}</p>
@@ -1373,9 +1423,9 @@ export const HomePage = () => {
 				<div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
 					<div>
 						<SectionHeading
-							kicker={language === "fr" ? "ConÃƒÂ§u pour la confiance" : "Built for trust"}
-							title={language === "fr" ? "L'achat de complÃƒÂ©ments bien-ÃƒÂªtre devrait rendre les preuves faciles ÃƒÂ  voir." : "Wellness shopping should make the evidence easy to see."}
-							copy={language === "fr" ? "Au lieu de vagues promesses, Zamazor explique chaque formule par des notes d'ingrÃƒÂ©dients claires, des conseils de routine et des contrÃƒÂ´les de qualitÃƒÂ©." : "Instead of vague promises, Zamazor explains each formula through clean ingredient notes, routine guidance, quality checks, and proof points that help customers choose with confidence."}
+							kicker={language === "fr" ? "Conçu pour la confiance" : "Built for trust"}
+							title={language === "fr" ? "L'achat de compléments bien-être devrait rendre les preuves faciles à voir." : "Wellness shopping should make the evidence easy to see."}
+							copy={language === "fr" ? "Au lieu de vagues promesses, Zamazor explique chaque formule par des notes d'ingrédients claires, des conseils de routine et des contrôles de qualité." : "Instead of vague promises, Zamazor explains each formula through clean ingredient notes, routine guidance, quality checks, and proof points that help customers choose with confidence."}
 						/>
 						<div className="mt-8 grid grid-cols-2 gap-3">
 							{proofStats.map((stat) => (
@@ -1411,30 +1461,30 @@ export const HomePage = () => {
 									{language === "fr" ? "Avant" : "Before"}
 								</p>
 								<h3 className="mt-3 text-2xl font-black text-slate-950">
-									{language === "fr" ? "ComplÃƒÂ©ments alÃƒÂ©atoires, rÃƒÂ©sultats flous." : "Random supplements, unclear results."}
+									{language === "fr" ? "Compléments aléatoires, résultats flous." : "Random supplements, unclear results."}
 								</h3>
 								<ul className="mt-5 space-y-3 text-sm text-slate-600">
-									<li>{language === "fr" ? "Plusieurs flacons avec des ingrÃƒÂ©dients redondants" : "Multiple bottles with overlapping ingredients"}</li>
-									<li>{language === "fr" ? "Pas d'ordre clair pour le matin ou les jours d'entraÃƒÂ®nement" : "No clear order for morning or training days"}</li>
+									<li>{language === "fr" ? "Plusieurs flacons avec des ingrédients redondants" : "Multiple bottles with overlapping ingredients"}</li>
+									<li>{language === "fr" ? "Pas d'ordre clair pour le matin ou les jours d'entraînement" : "No clear order for morning or training days"}</li>
 									<li>{language === "fr" ? "Difficile de savoir quoi recommander" : "Hard to know what to reorder"}</li>
 								</ul>
 							</div>
 							<div className="bg-emerald-950 p-5 text-white">
 								<p className="text-xs font-black uppercase text-lime-300">
-									{language === "fr" ? "AprÃƒÂ¨s" : "After"}
+									{language === "fr" ? "Après" : "After"}
 								</p>
 								<h3 className="mt-3 text-2xl font-black">
-									{language === "fr" ? "Un stack simple adaptÃƒÂ© ÃƒÂ  votre routine." : "A simple stack matched to your daily routine."}
+									{language === "fr" ? "Un stack simple adapté à votre routine." : "A simple stack matched to your daily routine."}
 								</h3>
 								<ul className="mt-5 space-y-3 text-sm text-emerald-50/80">
-									<li>{language === "fr" ? "Objectifs clairs pour l'ÃƒÂ©nergie, la force et la rÃƒÂ©cupÃƒÂ©ration" : "Clear goals for energy, strength, and recovery"}</li>
-									<li>{language === "fr" ? "ContrÃƒÂ´les d'abonnement faciles" : "Easy subscription controls"}</li>
-									<li>{language === "fr" ? "Preuve de formule affichÃƒÂ©e avant le paiement" : "Formula proof shown before checkout"}</li>
+									<li>{language === "fr" ? "Objectifs clairs pour l'énergie, la force et la récupération" : "Clear goals for energy, strength, and recovery"}</li>
+									<li>{language === "fr" ? "Contrôles d'abonnement faciles" : "Easy subscription controls"}</li>
+									<li>{language === "fr" ? "Preuve de formule affichée avant le paiement" : "Formula proof shown before checkout"}</li>
 								</ul>
 							</div>
 						</div>
 						<div className="grid grid-cols-3 border-t border-emerald-900/10 bg-white text-center">
-							{[(language === "fr" ? "Ãƒâ€°nergie" : "Energy"), (language === "fr" ? "Force" : "Strength"), (language === "fr" ? "RÃƒÂ©cupÃƒÂ©ration" : "Recovery")].map((label) => (
+							{[(language === "fr" ? "Énergie" : "Energy"), (language === "fr" ? "Force" : "Strength"), (language === "fr" ? "Récupération" : "Recovery")].map((label) => (
 								<div
 									key={label}
 									className="border-r border-emerald-900/10 p-4 last:border-r-0"
@@ -1460,8 +1510,8 @@ export const HomePage = () => {
 					<div>
 						<SectionHeading
 							kicker={language === "fr" ? "Comparez clairement" : "Compare clearly"}
-							title={language === "fr" ? "Des routines plus propres valent mieux que des placards encombrÃƒÂ©s." : "Cleaner routines beat crowded cabinets."}
-							copy={language === "fr" ? "DÃƒÂ©couvrez comment Zamazor simplifie votre stack de complÃƒÂ©ments par rapport aux boutiques de vitamines commerciales typiques." : "See how Zamazor simplifies your supplement stack compared to typical commercial vitamin stores."}
+							title={language === "fr" ? "Des routines plus propres valent mieux que des placards encombrés." : "Cleaner routines beat crowded cabinets."}
+							copy={language === "fr" ? "Découvrez comment Zamazor simplifie votre stack de compléments par rapport aux boutiques de vitamines commerciales typiques." : "See how Zamazor simplifies your supplement stack compared to typical commercial vitamin stores."}
 						/>
 						<div className="mt-8 space-y-4">
 							<div className="flex items-start gap-3">
@@ -1469,7 +1519,7 @@ export const HomePage = () => {
 									<Check className="size-3" />
 								</span>
 								<p className="text-sm text-slate-600 font-sans leading-relaxed">
-									<strong>{language === "fr" ? "Dosage scientifique :" : "Scientifically dosed:"}</strong>{language === "fr" ? " Pas de mÃƒÂ©langes brevetÃƒÂ©s de remplissage. Vous connaissez exactement le dosage en milligrammes de chaque ingrÃƒÂ©dient." : " No filler proprietary blends. You know exactly how many milligrams of every ingredient you ingest."}
+									<strong>{language === "fr" ? "Dosage scientifique :" : "Scientifically dosed:"}</strong>{language === "fr" ? " Pas de mélanges brevetés de remplissage. Vous connaissez exactement le dosage en milligrammes de chaque ingrédient." : " No filler proprietary blends. You know exactly how many milligrams of every ingredient you ingest."}
 								</p>
 							</div>
 							<div className="flex items-start gap-3">
@@ -1477,7 +1527,7 @@ export const HomePage = () => {
 									<Check className="size-3" />
 								</span>
 								<p className="text-sm text-slate-600 font-sans leading-relaxed">
-									<strong>{language === "fr" ? "ZÃƒÂ©ro cochonnerie artificielle :" : "Zero artificial junk:"}</strong>{language === "fr" ? " SucrÃƒÂ© naturellement, colorÃƒÂ© naturellement et facile ÃƒÂ  digÃƒÂ©rer." : " Naturally sweetened, naturally colored, and easy on your digestion."}
+									<strong>{language === "fr" ? "Zéro cochonnerie artificielle :" : "Zero artificial junk:"}</strong>{language === "fr" ? " Sucré naturellement, coloré naturellement et facile à digérer." : " Naturally sweetened, naturally colored, and easy on your digestion."}
 								</p>
 							</div>
 						</div>
@@ -1485,7 +1535,7 @@ export const HomePage = () => {
 
 					<div className="overflow-hidden rounded-2xl border border-emerald-900/10 shadow-sm">
 						<div className="grid grid-cols-[1.2fr_1fr_1fr] bg-slate-950 text-xs sm:text-sm font-bold text-white items-center">
-							<div className="p-4 sm:p-5">{language === "fr" ? "CaractÃƒÂ©ristique" : "Feature"}</div>
+							<div className="p-4 sm:p-5">{language === "fr" ? "Caractéristique" : "Feature"}</div>
 							<div className="bg-emerald-900/40 p-4 sm:p-5 text-center text-lime-300 font-extrabold border-x border-white/5">
 								Zamazor
 							</div>
@@ -1526,13 +1576,13 @@ export const HomePage = () => {
 					<div className="lg:sticky lg:top-28">
 						<SectionHeading
 							kicker={language === "fr" ? "Stack quotidien" : "Daily stack"}
-							title={language === "fr" ? "Une meilleure routine est plus simple quand les ÃƒÂ©tapes sont claires." : "A better routine is easier when the steps are obvious."}
-							copy={language === "fr" ? "Les stacks de Zamazor sont conÃƒÂ§us autour des moments qui comptent le plus : l'ÃƒÂ©nergie matinale, l'entraÃƒÂ®nement ciblÃƒÂ© et la rÃƒÂ©cupÃƒÂ©ration nocturne." : "Zamazor stacks are designed around the moments that matter most: morning energy, focused training, and real recovery at night."}
+							title={language === "fr" ? "Une meilleure routine est plus simple quand les étapes sont claires." : "A better routine is easier when the steps are obvious."}
+							copy={language === "fr" ? "Les stacks de Zamazor sont conçus autour des moments qui comptent le plus : l'énergie matinale, l'entraînement ciblé et la récupération nocturne." : "Zamazor stacks are designed around the moments that matter most: morning energy, focused training, and real recovery at night."}
 						/>
 						<div className="mt-8 rounded-2xl bg-emerald-50/50 border border-emerald-900/5 p-6">
 							<h4 className="font-playfair text-lg font-bold text-emerald-950">{language === "fr" ? "Pourquoi choisir les stacks" : "Why Stacking Works"}</h4>
 							<p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
-								{language === "fr" ? "Prendre des vitamines au hasard rÃƒÂ©duit l'absorption et crÃƒÂ©e de la friction dans les habitudes. En regroupant les nutriments complÃƒÂ©mentaires le matin, ÃƒÂ  l'entraÃƒÂ®nement et le soir, vous gagnez en rÃƒÂ©gularitÃƒÂ© et en efficacitÃƒÂ©." : "Taking vitamins at random times reduces absorption and creates habit friction. By grouping complementary nutrients into fixed morning, training, and evening windows, you build consistency and amplify efficacy."}
+								{language === "fr" ? "Prendre des vitamines au hasard réduit l'absorption et crée de la friction dans les habitudes. En regroupant les nutriments complémentaires le matin, à l'entraînement et le soir, vous gagnez en régularité et en efficacité." : "Taking vitamins at random times reduces absorption and creates habit friction. By grouping complementary nutrients into fixed morning, training, and evening windows, you build consistency and amplify efficacy."}
 							</p>
 						</div>
 					</div>
@@ -1564,7 +1614,7 @@ export const HomePage = () => {
 									<div className="flex-1">
 										<div className="flex flex-wrap items-center justify-between gap-2">
 											<span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md">
-												{language === "fr" ? `Ãƒâ€°tape ${index + 1} \u2022 ${moment}` : `Step ${index + 1} \u2022 ${moment}`}
+												{language === "fr" ? `Étape ${index + 1} \u2022 ${moment}` : `Step ${index + 1} \u2022 ${moment}`}
 											</span>
 											<span className="text-xs font-bold text-slate-500 font-mono">
 												{time}
@@ -1580,7 +1630,7 @@ export const HomePage = () => {
 
 										{/* Interactive Supplement tags */}
 										<div className="mt-4 flex flex-wrap gap-1.5 items-center">
-											<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">{language === "fr" ? "RecommandÃƒÂ© :" : "Recommended:"}</span>
+											<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">{language === "fr" ? "Recommandé :" : "Recommended:"}</span>
 											{products.map((prod) => (
 												<span
 													key={prod}
@@ -1597,7 +1647,7 @@ export const HomePage = () => {
 					</div>
 				</div>
 			</motion.section>
-\t\t\t<motion.section
+			<motion.section
 				id="reviews"
 				variants={sectionLift}
 				initial="hidden"
@@ -1608,7 +1658,7 @@ export const HomePage = () => {
 			>
 				<SectionHeading
 					kicker={language === "fr" ? "Avis clients" : "Customer love"}
-					title={language === "fr" ? "ConÃƒÂ§u pour ceux qui veulent un bien-ÃƒÂªtre en toute simplicitÃƒÂ©." : "Designed for people who want wellness to feel simple."}
+					title={language === "fr" ? "Conçu pour ceux qui veulent un bien-être en toute simplicité." : "Designed for people who want wellness to feel simple."}
 				/>
 
 				<div className="mt-9 grid gap-5 md:grid-cols-3">
@@ -1652,31 +1702,31 @@ export const HomePage = () => {
 				className="bg-[#fcfdfa] border-t border-b border-emerald-900/5"
 			>
 				<FAQSection
-					title={language === "fr" ? "Support des ComplÃƒÂ©ments & Commandes" : "Supplement & Order Support"}
-					subtitle={language === "fr" ? "Questions FrÃƒÂ©quemment PosÃƒÂ©es" : "Frequently Asked Questions"}
-					description={language === "fr" ? "RÃƒÂ©ponses rapides aux questions courantes sur nos ingrÃƒÂ©dients biologiques, la livraison, les abonnements et les normes de sÃƒÂ©curitÃƒÂ©." : "Quick answers to common questions about our organic ingredients, shipping, subscriptions, and safety standards."}
+					title={language === "fr" ? "Support des Compléments & Commandes" : "Supplement & Order Support"}
+					subtitle={language === "fr" ? "Questions Fréquemment Posées" : "Frequently Asked Questions"}
+					description={language === "fr" ? "Réponses rapides aux questions courantes sur nos ingrédients biologiques, la livraison, les abonnements et les normes de sécurité." : "Quick answers to common questions about our organic ingredients, shipping, subscriptions, and safety standards."}
 					buttonLabel={language === "fr" ? "Aller au Centre d'Aide" : "Go to Help Center"}
 					onButtonClick={() => {
 						navigate(APP_ROUTES.HELP);
 					}}
 					faqsLeft={[
 						{
-							question: language === "fr" ? "Les formules de complÃƒÂ©ments Zamazor sont-elles certifiÃƒÂ©es biologiques et sans OGM ?" : "Are Zamazor supplement formulas certified organic and non-GMO?",
-							answer: language === "fr" ? "Oui, tous nos mÃƒÂ©langes sont formulÃƒÂ©s avec des extraits de plantes et minÃƒÂ©raux 100% biologiques, sans OGM et propres. Nous n'utilisons jamais de colorants, d'arÃƒÂ´mes, d'ÃƒÂ©dulcorants artificiels ou de liants chimiques synthÃƒÂ©tiques." : "Yes, all our supplement blends are crafted using 100% organic, non-GMO, clean botanical extracts and minerals. We never use artificial colors, flavors, sweeteners, or synthetic chemical binders.",
+							question: language === "fr" ? "Les formules de compléments Zamazor sont-elles certifiées biologiques et sans OGM ?" : "Are Zamazor supplement formulas certified organic and non-GMO?",
+							answer: language === "fr" ? "Oui, tous nos mélanges sont formulés avec des extraits de plantes et minéraux 100% biologiques, sans OGM et propres. Nous n'utilisons jamais de colorants, d'arômes, d'édulcorants artificiels ou de liants chimiques synthétiques." : "Yes, all our supplement blends are crafted using 100% organic, non-GMO, clean botanical extracts and minerals. We never use artificial colors, flavors, sweeteners, or synthetic chemical binders.",
 						},
 						{
-							question: language === "fr" ? "Comment dois-je conserver mes boÃƒÂ®tes de complÃƒÂ©ments Zamazor ?" : "How do I store Zamazor supplement canisters?",
-							answer: language === "fr" ? "Nous recommandons de conserver vos boÃƒÂ®tes dans un endroit frais et sec, ÃƒÂ  l'abri de la lumiÃƒÂ¨re directe du soleil et de la chaleur. Veillez ÃƒÂ  bien refermer le couvercle aprÃƒÂ¨s chaque utilisation pour ÃƒÂ©viter l'humiditÃƒÂ©." : "We recommend storing your canisters in a cool, dry pantry or cabinet, away from direct sunlight and heat. Always ensure the lid is sealed tightly after each serving to keep moisture out.",
+							question: language === "fr" ? "Comment dois-je conserver mes boîtes de compléments Zamazor ?" : "How do I store Zamazor supplement canisters?",
+							answer: language === "fr" ? "Nous recommandons de conserver vos boîtes dans un endroit frais et sec, à l'abri de la lumière directe du soleil et de la chaleur. Veillez à bien refermer le couvercle après chaque utilisation pour éviter l'humidité." : "We recommend storing your canisters in a cool, dry pantry or cabinet, away from direct sunlight and heat. Always ensure the lid is sealed tightly after each serving to keep moisture out.",
 						},
 						{
-							question: language === "fr" ? "Puis-je combiner diffÃƒÂ©rentes formules Zamazor dans un mÃƒÂªme shake ?" : "Can I combine different Zamazor formulas in one shake?",
-							answer: language === "fr" ? "Absolument ! Nos produits sont conÃƒÂ§us pour se complÃƒÂ©ter mutuellement. MÃƒÂ©langer notre protÃƒÂ©ine vÃƒÂ©gÃƒÂ©tale avec notre mÃƒÂ©lange de superaliments dans votre smoothie du matin est un excellent choix riche en nutriments." : "Absolutely! Our products are designed to complement each other. Mixing our clean Protein powder with the organic Greens blend in your morning smoothie is a popular and nutrient-dense choice.",
+							question: language === "fr" ? "Puis-je combiner différentes formules Zamazor dans un même shake ?" : "Can I combine different Zamazor formulas in one shake?",
+							answer: language === "fr" ? "Absolument ! Nos produits sont conçus pour se compléter mutuellement. Mélanger notre protéine végétale avec notre mélange de superaliments dans votre smoothie du matin est un excellent choix riche en nutriments." : "Absolutely! Our products are designed to complement each other. Mixing our clean Protein powder with the organic Greens blend in your morning smoothie is a popular and nutrient-dense choice.",
 						},
 					]}
 					faqsRight={[
 						{
 							question: language === "fr" ? "Comment fonctionne l'abonnement ?" : "How does the subscription plan work?",
-							answer: language === "fr" ? "Notre programme d'abonnement livre automatiquement vos formules prÃƒÂ©fÃƒÂ©rÃƒÂ©es ÃƒÂ  votre porte tous les 30 jours. Vous bÃƒÂ©nÃƒÂ©ficiez d'une rÃƒÂ©duction de 10% sur chaque commande et pouvez suspendre, sauter ou annuler ÃƒÂ  tout moment." : "Our subscription plan delivers your favorite supplement formulas to your door every 30 days automatically. You receive a 10% discount on every order and can pause, skip, or cancel at any time.",
+							answer: language === "fr" ? "Notre programme d'abonnement livre automatiquement vos formules préférées à votre porte tous les 30 jours. Vous bénéficiez d'une réduction de 10% sur chaque commande et pouvez suspendre, sauter ou annuler à tout moment." : "Our subscription plan delivers your favorite supplement formulas to your door every 30 days automatically. You receive a 10% discount on every order and can pause, skip, or cancel at any time.",
 						},
 						{
 							question: language === "fr" ? "Quelle est votre politique de livraison ?" : "What is your shipping policy?",
@@ -1684,7 +1734,7 @@ export const HomePage = () => {
 						},
 						{
 							question: language === "fr" ? "Proposez-vous une garantie de satisfaction ?" : "Do you offer a satisfaction guarantee?",
-							answer: language === "fr" ? "Oui, nous sommes fiers de nos formules propres. Nous offrons une garantie de remboursement de 30 jours. Si vous n'ÃƒÂªtes pas entiÃƒÂ¨rement satisfait de votre stack, contactez-nous pour obtenir un remboursement rapide." : "Yes, we stand behind our clean formulas. We offer a 30-day money-back guarantee. If you are not completely satisfied with your supplement stack, contact us for a hassle-free refund.",
+							answer: language === "fr" ? "Oui, nous sommes fiers de nos formules propres. Nous offrons une garantie de remboursement de 30 jours. Si vous n'êtes pas entièrement satisfait de votre stack, contactez-nous pour obtenir un remboursement rapide." : "Yes, we stand behind our clean formulas. We offer a 30-day money-back guarantee. If you are not completely satisfied with your supplement stack, contact us for a hassle-free refund.",
 						},
 					]}
 				/>

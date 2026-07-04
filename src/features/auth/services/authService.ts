@@ -35,6 +35,7 @@ export const authService = {
 	},
 
 	login: async (data: LoginRequest) => {
+		const guestCartSnapshot = [...useCartStore.getState().items];
 		const response = await publicApiRequest<LoginResponse>(
 			{
 				url: API_ENDPOINTS.AUTH.LOGIN,
@@ -64,7 +65,7 @@ export const authService = {
 		});
 		tokenManager.setAccessToken(accessToken);
 
-		useCartStore.getState().syncWithBackend().catch((err) => {
+		useCartStore.getState().mergeGuestCart(guestCartSnapshot).catch((err) => {
 			console.warn("Failed to sync cart after login:", err);
 		});
 
