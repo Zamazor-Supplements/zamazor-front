@@ -34,12 +34,6 @@ import { OriginButton } from "@/shared/components/ui/origin-button";
 import heroProtein from "@/assets/images/hero_protein.png";
 import heroGreens from "@/assets/images/hero_greens.png";
 import heroRecovery from "@/assets/images/hero_recovery.png";
-import cardNutrientImg from "@/assets/images/card_nutrient.png";
-import cardImmuneImg from "@/assets/images/card_immune.png";
-import cardMindImg from "@/assets/images/card_mind.png";
-const productProtein = `${CONFIG.API_BASE_URL}/images/product_protein.png`;
-const productGreens = `${CONFIG.API_BASE_URL}/images/product_greens.png`;
-const productHydra = `${CONFIG.API_BASE_URL}/images/product_hydra.png`;
 import {
 	productService,
 	type BackendCategory,
@@ -48,6 +42,12 @@ import { useBookmarkStore } from "@/features/products/stores/bookmarkStore";
 import { useCartStore } from "@/shared/hooks/use-cart-store";
 import { toast } from "sonner";
 import { useLanguage } from "@/shared/context/LanguageContext";
+import {
+	buildQuizChoices,
+	getQuizChoiceCopy,
+	getRecommendedQuizProduct,
+	type QuizTarget,
+} from "@/shared/utils/product-quiz";
 
 
 const getHeroSlides = (language: string) => [
@@ -190,7 +190,7 @@ const getComparisonData = (language: string) => [
 	{
 		feature: language === "fr" ? "Contrôles labo tiers" : "Third-party lab checks",
 		zamazor: { text: language === "fr" ? "Chaque lot testé + rapports publics" : "Every batch tested + public reports", type: "success" },
-		typical: { text: language === "fr" ? "Rarely done or private" : "Rarely done or private", type: "fail" }
+		typical: { text: language === "fr" ? "Rarement fait ou gardé privé" : "Rarely done or private", type: "fail" }
 	}
 ];
 
@@ -278,35 +278,102 @@ export const HomePage = () => {
 
 		return [
 			{
-				title: language === "fr" ? "Mornings that feel lighter." : "Mornings that feel lighter.",
-				copy: language === "fr" ? "Micronutriments, hydratation, and a cleaner first hour." : "Micronutrients, hydration, and a cleaner first hour.",
+				title: language === "fr" ? "Des matinées plus légères." : "Mornings that feel lighter.",
+				copy: language === "fr" ? "Micronutriments, hydratation et une première heure plus nette." : "Micronutrients, hydration, and a cleaner first hour.",
 				product: pick("Greens"),
 				image: resolveImage(heroGreens, pick("Greens")),
 				tone: "bg-lime-100 text-lime-800",
 			},
 			{
-				title: language === "fr" ? "Protein with a calm finish." : "Protein with a calm finish.",
-				copy: language === "fr" ? "A simple daily protein card for strength and consistency." : "A simple daily protein card for strength and consistency.",
+				title: language === "fr" ? "Une protéine douce jusqu'à la fin." : "Protein with a calm finish.",
+				copy: language === "fr" ? "Une carte protéinée simple pour soutenir la force et la régularité." : "A simple daily protein card for strength and consistency.",
 				product: pick("Protein"),
 				image: resolveImage(heroProtein, pick("Protein")),
 				tone: "bg-emerald-100 text-emerald-800",
 			},
 			{
-				title: language === "fr" ? "Recovery after the work is done." : "Recovery after the work is done.",
-				copy: language === "fr" ? "Evening support that feels soft, focused, and easy to repeat." : "Evening support that feels soft, focused, and easy to repeat.",
+				title: language === "fr" ? "Récupérer une fois l'effort terminé." : "Recovery after the work is done.",
+				copy: language === "fr" ? "Un soutien du soir doux, ciblé et facile à répéter." : "Evening support that feels soft, focused, and easy to repeat.",
 				product: pick("Recovery"),
 				image: resolveImage(heroRecovery, pick("Recovery")),
 				tone: "bg-teal-100 text-teal-800",
 			},
 			{
-				title: language === "fr" ? "Energy without the noise." : "Energy without the noise.",
-				copy: language === "fr" ? "A cleaner way to stay switched on for the day ahead." : "A cleaner way to stay switched on for the day ahead.",
+				title: language === "fr" ? "De l'énergie sans agitation." : "Energy without the noise.",
+				copy: language === "fr" ? "Une façon plus propre de rester alerte pour la journée." : "A cleaner way to stay switched on for the day ahead.",
 				product: pick("Energy"),
 				image: resolveImage(heroGreens, pick("Energy")),
 				tone: "bg-amber-100 text-amber-800",
 			},
 		];
 	}, [language, products]);
+
+	const formulationCards = useMemo(() => {
+		const featuredCategories: QuizTarget[] = ["Protein", "Greens", "Energy"];
+
+		return featuredCategories
+			.map((category) => {
+				const product = products.find((item) => item.category === category) || null;
+				if (!product) return null;
+
+				const labelMap: Record<QuizTarget, {
+					badgeFr: string;
+					badgeEn: string;
+					titleFr: string;
+					titleEn: string;
+					copyFr: string;
+					copyEn: string;
+				}> = {
+					Protein: {
+						badgeFr: "Protéines",
+						badgeEn: "Protein formula",
+						titleFr: "Formule de force et récupération",
+						titleEn: "Strength and recovery formula",
+						copyFr: "Un produit réel du catalogue, sélectionné pour l'équilibre entre performance et récupération.",
+						copyEn: "A real catalog product selected for the balance between performance and recovery.",
+					},
+					Greens: {
+						badgeFr: "Vitamines et minéraux",
+						badgeEn: "Micronutrient support",
+						titleFr: "Soutien quotidien plus léger",
+						titleEn: "Lighter daily support",
+						copyFr: "Un produit du backend pensé pour les matinées plus stables et une meilleure routine.",
+						copyEn: "A backend product built for steadier mornings and a cleaner daily routine.",
+					},
+					Energy: {
+						badgeFr: "Pré-entraînement",
+						badgeEn: "Training energy",
+						titleFr: "Énergie propre et focus",
+						titleEn: "Clean energy and focus",
+						copyFr: "Une formule réelle du catalogue pour les séances où il faut rester alerte et régulier.",
+						copyEn: "A real catalog formula for sessions where you need to stay alert and consistent.",
+					},
+					Recovery: {
+						badgeFr: "Récupération",
+						badgeEn: "Recovery support",
+						titleFr: "Repos et réparation",
+						titleEn: "Rest and repair",
+						copyFr: "Un produit du catalogue pensé pour soutenir le repos et la récupération après l'effort.",
+						copyEn: "A catalog product built to support rest and recovery after effort.",
+					},
+					Wellness: {
+						badgeFr: "Bien-être",
+						badgeEn: "Wellness support",
+						titleFr: "Soutien quotidien",
+						titleEn: "Daily wellness support",
+						copyFr: "Une formule du catalogue pour garder une routine simple, propre et régulière.",
+						copyEn: "A catalog formula for keeping your routine simple, clean, and consistent.",
+					},
+				};
+
+				return {
+					category,
+					product,
+					...labelMap[category],
+				};
+			})
+			.filter((card): card is NonNullable<typeof card> => Boolean(card));
+	}, [products]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -352,28 +419,28 @@ export const HomePage = () => {
 	const [activeSlide, setActiveSlide] = useState(0);
 	const slide = heroSlides[activeSlide];
 
-	// Supplement Quiz State
-	const [quizStep, setQuizStep] = useState<"intro" | "focus" | "diet" | "activity" | "result">("intro");
-	const [quizFocus, setQuizFocus] = useState<"performance" | "greens" | "wellness" | "energy" | "recovery" | "">("");
-	const [quizDiet, setQuizDiet] = useState<string>("vegan");
+	const [quizStep, setQuizStep] = useState<"intro" | "category" | "result">("intro");
+	const [quizTarget, setQuizTarget] = useState<QuizTarget | "">("");
+	const quizChoices = useMemo(() => buildQuizChoices(products), [products]);
+	const quizIcons: Record<QuizTarget, LucideIcon> = {
+		Protein: DumbbellIcon,
+		Greens: LeafIcon,
+		Energy: ZapIcon,
+		Recovery: MoonIcon,
+		Wellness: HeartPulseIcon,
+	};
 
 	const recommendedProduct = useMemo(() => {
-		if (products.length === 0 || !quizFocus) return null;
-		
-		let targetCategory = "Protein";
-		if (quizFocus === "performance") targetCategory = "Protein";
-		else if (quizFocus === "greens") targetCategory = "Greens";
-		else if (quizFocus === "wellness") targetCategory = "Wellness";
-		else if (quizFocus === "energy") targetCategory = "Energy";
-		else if (quizFocus === "recovery") targetCategory = "Recovery";
-		
-		return products.find((p) => p.category === targetCategory) || products[0];
-	}, [products, quizFocus]);
+		return getRecommendedQuizProduct(products, quizTarget);
+	}, [products, quizTarget]);
+	const selectedQuizChoice = useMemo(
+		() => quizChoices.find((choice) => choice.id === quizTarget) || null,
+		[quizChoices, quizTarget],
+	);
 
 	const resetQuiz = () => {
 		setQuizStep("intro");
-		setQuizFocus("");
-		setQuizDiet("vegan");
+		setQuizTarget("");
 	};
 
 	const productSliderRef = useRef<HTMLDivElement>(null);
@@ -640,13 +707,15 @@ export const HomePage = () => {
 			<section className="bg-[#fcfdfa] py-20 border-b border-emerald-900/10">
 				<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
 					<span className="text-xs font-black uppercase tracking-widest text-emerald-800">
-						{language === "fr" ? "Conseiller en Compléments Intelligent" : "Smart Supplement Finder"}
+						{language === "fr" ? "Sélecteur de catégorie" : "Category finder"}
 					</span>
 					<h2 className="mt-3 text-3xl font-playfair font-normal leading-tight text-slate-950 sm:text-4xl">
-						{language === "fr" ? "Découvrez votre stack de compléments biologiques personnalisé." : "Discover your personalized organic supplement stack."}
+						{language === "fr" ? "Trouvez rapidement la bonne catégorie." : "Find the right category quickly."}
 					</h2>
 					<p className="mt-3 text-slate-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-						{language === "fr" ? "Répondez à notre questionnaire de 30 secondes pour trouver les plantes et protéines propres adaptées à votre niveau d'activité." : "Take our 30-second science-backed advisor quiz to find the perfect clean botanicals and proteins mapped for your activity level."}
+						{language === "fr"
+							? "Choisissez la catégorie qui vous intéresse, puis ouvrez un produit réel du catalogue."
+							: "Choose the category you need, then open a real product from the catalog."}
 					</p>
 
 					{/* Quiz Box */}
@@ -657,125 +726,81 @@ export const HomePage = () => {
 							<div className="flex flex-col items-center justify-center text-center py-10 my-auto w-full">
 								<BrainIcon className="size-16 text-emerald-800 mb-6 animate-pulse" />
 								<h3 className="text-2xl font-playfair text-slate-950 font-normal">
-									{language === "fr" ? "Trouvez Votre Formule Propre Idéale" : "Find Your Clean Formula Match"}
+									{language === "fr" ? "Trouvez la bonne catégorie" : "Find the right category"}
 								</h3>
 								<p className="text-slate-500 text-sm max-w-sm mt-3 leading-relaxed">
-									{language === "fr" ? "Répondez à trois questions rapides sur votre objectif de santé, votre niveau d'activité et vos préférences alimentaires." : "Answer three quick questions about your health focus, active schedule, and diet preferences."}
+									{language === "fr" ? "Choisissez simplement ce que vous cherchez. Le quiz vous montrera un produit réel du catalogue." : "Just pick what you are looking for. The quiz will show a real product from the catalog."}
 								</p>
 								<Button
-									onClick={() => setQuizStep("focus")}
+									onClick={() => setQuizStep("category")}
 									className="mt-8 bg-emerald-900 hover:bg-emerald-950 text-white font-bold h-12 px-8 rounded-full shadow-xs cursor-pointer"
 								>
-									{language === "fr" ? "Démarrer le Questionnaire →" : "Start Advisor Quiz →"}
+									{language === "fr" ? "Choisir une catégorie →" : "Choose a category →"}
 								</Button>
 							</div>
-						)}
-
-						{/* Step 1: FOCUS */}
-						{quizStep === "focus" && (
+						)}						{/* Step: CATEGORY */}
+						{quizStep === "category" && (
 							<div className="space-y-6 my-auto w-full">
 								<div>
-									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Étape 1 sur 3" : "Step 1 of 3"}</span>
+									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">
+										{language === "fr" ? "Étape 1 sur 1" : "Step 1 of 1"}
+									</span>
 									<h3 className="text-xl sm:text-2xl font-playfair text-slate-950 font-normal mt-1">
-										{language === "fr" ? "Quel est votre objectif principal de bien-être ou de fitness ?" : "What is your primary wellness or fitness focus?"}
+										{language === "fr" ? "Quelle catégorie correspond à votre besoin ?" : "Which category matches what you need?"}
 									</h3>
 								</div>
-								<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-									{[
-										{ id: "performance", label: language === "fr" ? "Croissance Musculaire & Force" : "Muscle Growth & Strength", icon: DumbbellIcon, desc: language === "fr" ? "Protéines biologiques de qualité" : "Premium organic proteins" },
-										{ id: "greens", label: language === "fr" ? "Micronutriments Quotidiens" : "Daily Micronutrients", icon: LeafIcon, desc: language === "fr" ? "Superaliments crus actifs" : "Raw active supergreens" },
-										{ id: "energy", label: language === "fr" ? "Endurance & Concentration Naturelles" : "Natural Stamina & Focus", icon: ZapIcon, desc: language === "fr" ? "Boost d'entraînement propre" : "Clean pre-workout spark" },
-										{ id: "recovery", label: language === "fr" ? "Récupération Musculaire & Sommeil" : "Muscle Repair & Sleep", icon: MoonIcon, desc: language === "fr" ? "BCAAs biologiques de récupération" : "Organic recovery BCAAs" },
-										{ id: "wellness", label: language === "fr" ? "Immunité & Longévité" : "Immunity & Longevity", icon: HeartPulseIcon, desc: language === "fr" ? "Extraits adaptogènes apaisants" : "Adaptogen calm extracts" },
-									].map((opt) => (
-										<button
-											key={opt.id}
-											onClick={() => {
-												setQuizFocus(opt.id as "performance" | "greens" | "wellness" | "energy" | "recovery");
-												setQuizStep("diet");
-											}}
-											className="p-4 bg-white rounded-2xl border border-emerald-900/10 hover:border-emerald-700 hover:bg-emerald-50/20 text-left transition-all duration-150 cursor-pointer group shadow-2xs hover:shadow-xs"
-										>
-											<opt.icon className="size-6 text-emerald-800 mb-3 group-hover:scale-110 transition-transform" />
-											<p className="text-sm font-bold text-slate-900 leading-tight">{opt.label}</p>
-											<p className="text-[11px] text-slate-400 mt-1">{opt.desc}</p>
-										</button>
-									))}
-								</div>
-							</div>
-						)}
-
-						{/* Step 2: DIET */}
-						{quizStep === "diet" && (
-							<div className="space-y-6 my-auto w-full">
-								<div>
-									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Étape 2 sur 3" : "Step 2 of 3"}</span>
-									<h3 className="text-xl sm:text-2xl font-playfair text-slate-950 font-normal mt-1">
-										{language === "fr" ? "Sélectionnez votre préférence alimentaire :" : "Select your primary dietary preference:"}
-									</h3>
-								</div>
-								<div className="grid gap-3 sm:grid-cols-2">
-									{[
-										{ id: "vegan", label: language === "fr" ? "Végétalien / À Base de Plantes" : "Vegan / Plant-Based Only", desc: language === "fr" ? "Sans produits laitiers ni dérivés animaux" : "No dairy or animal derivatives" },
-										{ id: "organic", label: language === "fr" ? "Biologique & Sans OGM" : "Organic & Non-GMO First", desc: language === "fr" ? "Cultures crues bio certifiées les plus pures" : "Purest certified organic raw crops" },
-										{ id: "keto", label: language === "fr" ? "Keto / Faible en Glucides" : "Keto / Low-Carb Friendly", desc: language === "fr" ? "Graisses et minéraux céto sans sucre" : "Sugar-free keto fats & minerals" },
-										{ id: "glutenFree", label: language === "fr" ? "Sans Gluten ni Soja" : "Gluten & Soy Free", desc: language === "fr" ? "Mélanges hypoallergéniques sûrs" : "Safe allergen-conscious blends" },
-									].map((opt) => (
-										<button
-											key={opt.id}
-											onClick={() => {
-												setQuizDiet(opt.id);
-												setQuizStep("activity");
-											}}
-											className={cn(
-												"p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer group shadow-2xs",
-												quizDiet === opt.id
-													? "bg-emerald-900 border-emerald-900 text-white"
-													: "bg-white border-emerald-900/10 hover:border-emerald-700 hover:bg-emerald-50/20"
-											)}
-										>
-											<p className={cn("text-sm font-bold leading-tight", quizDiet === opt.id ? "text-white" : "text-slate-900")}>{opt.label}</p>
-											<p className={cn("text-[11px] mt-1", quizDiet === opt.id ? "text-emerald-100" : "text-slate-400")}>{opt.desc}</p>
-										</button>
-									))}
-								</div>
+								{loadingProducts ? (
+									<div className="rounded-2xl border border-dashed border-emerald-900/15 bg-white p-6 text-center">
+										<p className="text-sm text-slate-500">
+											{language === "fr" ? "Les produits du catalogue sont encore en chargement." : "The catalog products are still loading."}
+										</p>
+									</div>
+								) : quizChoices.length === 0 ? (
+									<div className="rounded-2xl border border-dashed border-emerald-900/15 bg-white p-6 text-center">
+										<p className="text-sm text-slate-500">
+											{language === "fr"
+												? "Aucune catégorie correspondante n'est encore disponible dans le catalogue."
+												: "No matching category is available in the catalog yet."}
+										</p>
+									</div>
+								) : (
+									<div className="grid gap-3 sm:grid-cols-2">
+										{quizChoices.map((choice) => {
+											const Icon = quizIcons[choice.id];
+											const { label, description } = getQuizChoiceCopy(choice, language);
+											return (
+												<button
+													key={choice.id}
+													onClick={() => {
+														setQuizTarget(choice.id);
+														setQuizStep("result");
+													}}
+													className="p-4 bg-white rounded-2xl border border-emerald-900/10 hover:border-emerald-700 hover:bg-emerald-50/20 text-left transition-all duration-150 cursor-pointer shadow-2xs group"
+												>
+													<div className="flex items-start gap-3">
+														<div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+															<Icon className="size-5" />
+														</div>
+														<div className="min-w-0 flex-1">
+															<div className="flex items-center justify-between gap-2">
+																<p className="text-sm font-bold text-slate-900 leading-tight">{label}</p>
+																<span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-500">
+																	{choice.productCount}
+																</span>
+															</div>
+															<p className="mt-1 text-[11px] text-slate-400">{description}</p>
+															<p className="mt-2 text-[11px] font-semibold text-emerald-800">
+																{choice.sampleProduct ? choice.sampleProduct.name : (language === "fr" ? "Produit disponible" : "Available product")}
+															</p>
+														</div>
+													</div>
+												</button>
+											);
+										})}
+									</div>
+								)}
 								<div className="flex justify-between items-center pt-4">
-									<Button variant="ghost" onClick={() => setQuizStep("focus")} className="text-emerald-900 hover:bg-emerald-50 rounded-xl cursor-pointer">
-										&larr; {language === "fr" ? "Retour" : "Back"}
-									</Button>
-								</div>
-							</div>
-						)}
-
-						{/* Step 3: ACTIVITY */}
-						{quizStep === "activity" && (
-							<div className="space-y-6 my-auto w-full">
-								<div>
-									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Étape 3 sur 3" : "Step 3 of 3"}</span>
-									<h3 className="text-xl sm:text-2xl font-playfair text-slate-950 font-normal mt-1">
-										{language === "fr" ? "Quel est votre niveau d'activité physique actuel ?" : "What is your current physical activity level?"}
-									</h3>
-								</div>
-								<div className="grid gap-3 sm:grid-cols-3">
-									{[
-										{ id: "sedentary", label: language === "fr" ? "Légèrement Actif" : "Light Active", desc: language === "fr" ? "1-2 séances courtes/semaine" : "1-2 short sessions/week" },
-										{ id: "moderate", label: language === "fr" ? "Modérément Actif" : "Moderately Active", desc: language === "fr" ? "3-4 entraînements standard/semaine" : "3-4 standard workouts/week" },
-										{ id: "intense", label: language === "fr" ? "Extrêmement Actif" : "Extremely Active", desc: language === "fr" ? "5+ entraînements de haute intensité/semaine" : "5+ high intensity workouts/week" },
-									].map((opt) => (
-										<button
-											key={opt.id}
-											onClick={() => {
-												setQuizStep("result");
-											}}
-											className="p-4 bg-white rounded-2xl border border-emerald-900/10 hover:border-emerald-700 hover:bg-emerald-50/20 text-left transition-all duration-150 cursor-pointer shadow-2xs group"
-										>
-											<p className="text-sm font-bold text-slate-900 leading-tight group-hover:text-emerald-800 transition-colors">{opt.label}</p>
-											<p className="text-[11px] text-slate-400 mt-1.5">{opt.desc}</p>
-										</button>
-									))}
-								</div>
-								<div className="flex justify-between items-center pt-4">
-									<Button variant="ghost" onClick={() => setQuizStep("diet")} className="text-emerald-900 hover:bg-emerald-50 rounded-xl cursor-pointer">
+									<Button variant="ghost" onClick={() => setQuizStep("intro")} className="text-emerald-900 hover:bg-emerald-50 rounded-xl cursor-pointer">
 										&larr; {language === "fr" ? "Retour" : "Back"}
 									</Button>
 								</div>
@@ -783,35 +808,48 @@ export const HomePage = () => {
 						)}
 
 						{/* Step: RESULT */}
-						{quizStep === "result" && recommendedProduct && (
+						{quizStep === "result" && recommendedProduct && selectedQuizChoice && (
 							<div className="space-y-6 w-full animate-slide-up">
 								<div>
-									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">{language === "fr" ? "Votre Recommandation" : "Your Recommendation"}</span>
+									<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">
+										{language === "fr" ? "Votre recommandation" : "Your recommendation"}
+									</span>
 									<h3 className="text-xl sm:text-2xl font-playfair text-slate-950 font-normal mt-1">
-										{language === "fr" ? "Voici votre formule propre personnalisée :" : "Here is your personalized clean formula match:"}
+										{language === "fr"
+											? "Voici un produit réel du catalogue qui correspond à votre catégorie."
+											: "Here is a real catalog product that matches your category."}
 									</h3>
 								</div>
 
 								<div className="flex flex-col md:flex-row gap-6 p-4 sm:p-6 bg-white rounded-2xl border border-emerald-900/10 shadow-md">
-									{/* Image */}
 									<div className="size-28 sm:size-36 shrink-0 bg-slate-50 border border-slate-100 rounded-xl p-2 flex items-center justify-center mx-auto md:mx-0">
 										<img src={recommendedProduct.image} alt={recommendedProduct.name} className="h-full object-contain" />
 									</div>
 
-									{/* Info */}
 									<div className="flex-1 text-center md:text-left flex flex-col justify-between">
 										<div>
 											<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider bg-emerald-50 border border-emerald-900/5 px-2.5 py-0.5 rounded-full inline-block">
-												{recommendedProduct.category}
+												{language === "fr" ? selectedQuizChoice.labelFr : selectedQuizChoice.labelEn}
 											</span>
-											<h4 className="text-xl font-playfair font-bold text-slate-955 mt-1.5">
+											<h4 className="text-xl font-playfair font-bold text-slate-950 mt-1.5">
 												{recommendedProduct.name}
 											</h4>
 											<p className="text-xs text-slate-500 mt-2 leading-relaxed">
 												{language === "fr" ? (
-													<>Basé sur vos objectifs pour <strong className="text-emerald-950 font-sans">{quizFocus}</strong> et votre rythme actif, cette formule premium apporte des nutriments propres et biodisponibles sans aucun produit synthétique.</>
+													<>
+														Cette sélection vient de la catégorie{" "}
+														<strong className="text-emerald-950 font-sans">{selectedQuizChoice.labelFr}</strong>
+														, avec {selectedQuizChoice.productCount} produit
+														{selectedQuizChoice.productCount > 1 ? "s" : ""} disponible
+														{selectedQuizChoice.productCount > 1 ? "s" : ""} dans le catalogue.
+													</>
 												) : (
-													<>Based on your wellness goals for <strong className="text-emerald-950 font-sans">{quizFocus}</strong> and active schedule, this premium clean formula delivers clean, bioavailable nourishment with zero synthetics.</>
+													<>
+														This pick comes from the{" "}
+														<strong className="text-emerald-950 font-sans">{selectedQuizChoice.labelEn}</strong>{" "}
+														category, which has {selectedQuizChoice.productCount} product
+														{selectedQuizChoice.productCount > 1 ? "s" : ""} in the catalog.
+													</>
 												)}
 											</p>
 										</div>
@@ -841,9 +879,45 @@ export const HomePage = () => {
 									</div>
 								</div>
 
-								<div className="flex justify-end pt-2">
-									<Button variant="ghost" onClick={resetQuiz} className="text-slate-500 hover:bg-slate-50 rounded-xl cursor-pointer text-xs font-bold uppercase tracking-wider">
-										{language === "fr" ? "Recommencer le questionnaire ↝?" : "Retake Quiz \u2190"}
+								<div className="flex justify-between gap-3 pt-2">
+									<Button
+										variant="ghost"
+										onClick={() => setQuizStep("category")}
+										className="text-slate-500 hover:bg-slate-50 rounded-xl cursor-pointer text-xs font-bold uppercase tracking-wider"
+									>
+										{language === "fr" ? "Choisir une autre catégorie" : "Choose another category"}
+									</Button>
+									<Button
+										variant="ghost"
+										onClick={resetQuiz}
+										className="text-slate-500 hover:bg-slate-50 rounded-xl cursor-pointer text-xs font-bold uppercase tracking-wider"
+									>
+										{language === "fr" ? "Recommencer" : "Start over"}
+									</Button>
+								</div>
+							</div>
+						)}
+
+						{quizStep === "result" && (!recommendedProduct || !selectedQuizChoice) && (
+							<div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+								<p className="max-w-sm text-sm leading-relaxed text-slate-500">
+									{language === "fr"
+										? "Nous n'avons pas encore trouvé de produit correspondant. Choisissez une autre catégorie ou réessayez après la synchronisation du catalogue."
+										: "We could not find a matching product yet. Choose another category or try again once the catalog finishes syncing."}
+								</p>
+								<div className="flex flex-wrap justify-center gap-2">
+									<Button
+										onClick={() => setQuizStep("category")}
+										className="bg-emerald-900 hover:bg-emerald-950 text-white rounded-xl font-bold cursor-pointer"
+									>
+										{language === "fr" ? "Choisir une catégorie" : "Choose a category"}
+									</Button>
+									<Button
+										variant="ghost"
+										onClick={resetQuiz}
+										className="text-slate-500 hover:bg-slate-50 rounded-xl cursor-pointer"
+									>
+										{language === "fr" ? "Recommencer" : "Start over"}
 									</Button>
 								</div>
 							</div>
@@ -1015,121 +1089,110 @@ export const HomePage = () => {
 							{language === "fr" ? "Formulations scientifiques" : "Science-backed formulations"}
 						</h2>
 						<p className="mt-4 mx-auto max-w-2xl text-base leading-relaxed text-slate-500">
-							{language === "fr" ? "Nos mélanges ciblés associent des ingrédients appuyés par la recherche avec une formulation soignée pour soutenir votre vitalité." : "Our targeted blends combine research-backed ingredients with thoughtful formulation to support lasting vitality, balance"}
+							{language === "fr"
+								? "Nos mélanges ciblés s'appuient sur de vrais produits du backend pour soutenir votre vitalité avec des choix précis."
+								: "Our targeted blends now feature real backend products to support vitality with sharper, more accurate picks."}
 						</p>
 					</div>
 
 					<div className="grid gap-8 md:grid-cols-3">
-						{/* Card 1: Nutrient Support */}
-						<motion.div
-							initial={{ opacity: 0, y: 30 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							viewport={{ once: true }}
-							transition={{ duration: 0.34 }}
-							className="relative overflow-hidden rounded-[2.5rem] aspect-[4/5] p-6 sm:p-8 flex flex-col justify-between shadow-lg border border-emerald-900/10 group cursor-pointer"
-						>
-							<div
-								className="absolute inset-0 bg-cover bg-center transition-transform duration-150 ease-out group-hover:scale-105"
-								style={{ backgroundImage: `url(${cardNutrientImg})` }}
-							/>
-							<div className="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-emerald-950/20 to-black/35 group-hover:from-emerald-950/80 group-hover:via-emerald-950/30 transition-colors duration-150" />
-							
-							<div className="relative z-10">
-								<span className="inline-block bg-white/10 backdrop-blur-md text-white border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold">
-									{language === "fr" ? "Soutien Nutritionnel" : "Nutrient Support"}
-								</span>
-								<h3 className="mt-5 text-2xl sm:text-3xl font-playfair font-normal leading-tight text-white max-w-[240px]">
-									{language === "fr" ? "Soutenir l'équilibre métabolique" : "Support metabolic balance"}
-								</h3>
-							</div>
-
-							<div className="relative z-10 flex items-end justify-between mt-auto">
-								<button
-									onClick={() => navigate(APP_ROUTES.SHOP)}
-									className="bg-lime-300 text-emerald-950 hover:bg-lime-400 font-bold px-6 py-3 rounded-full text-xs sm:text-sm transition-all duration-150 transform active:scale-95 shadow-md shadow-lime-950/20"
+						{loadingProducts ? (
+							Array.from({ length: 3 }).map((_, index) => (
+								<div
+									key={index}
+									className="relative overflow-hidden rounded-[2.5rem] aspect-[4/5] border border-emerald-900/10 bg-white p-6 sm:p-8 shadow-lg"
 								>
-									{language === "fr" ? "Acheter" : "Shop Now"}
-								</button>
-
-								<div className="h-20 w-16 sm:h-24 sm:w-20 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden p-1.5 transition-transform duration-150 group-hover:scale-125">
-									<img src={productProtein} alt="Protein canister" className="h-full w-full object-contain" />
+									<div className="h-full animate-pulse rounded-[2rem] bg-emerald-50/70" />
 								</div>
-							</div>
-						</motion.div>
+							))
+						) : formulationCards.length > 0 ? (
+							formulationCards.map((item, index) => {
+								const summary =
+									item.product.description?.trim() ||
+									(language === "fr"
+										? "Produit réel synchronisé depuis le backend."
+										: "Real product synced from the backend.");
+								const shortSummary = summary.length > 118 ? `${summary.slice(0, 115).trimEnd()}...` : summary;
 
-						{/* Card 2: Immune Defense */}
-						<motion.div
-							initial={{ opacity: 0, y: 30 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							viewport={{ once: true }}
-							transition={{ duration: 0.34, delay: 0.08 }}
-							className="relative overflow-hidden rounded-[2.5rem] aspect-[4/5] p-6 sm:p-8 flex flex-col justify-between shadow-lg border border-emerald-900/10 group cursor-pointer"
-						>
-							<div
-								className="absolute inset-0 bg-cover bg-center transition-transform duration-150 ease-out group-hover:scale-105"
-								style={{ backgroundImage: `url(${cardImmuneImg})` }}
-							/>
-							<div className="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-emerald-950/20 to-black/35 group-hover:from-emerald-950/80 group-hover:via-emerald-950/30 transition-colors duration-150" />
-							
-							<div className="relative z-10">
-								<span className="inline-block bg-white/10 backdrop-blur-md text-white border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold">
-									{language === "fr" ? "Défense Immunitaire" : "Immune Defense"}
-								</span>
-								<h3 className="mt-5 text-2xl sm:text-3xl font-playfair font-normal leading-tight text-white max-w-[240px]">
-									{language === "fr" ? "Renforcer l'immunité naturelle" : "Strengthen natural immunity"}
+								return (
+									<motion.article
+										key={item.product.id}
+										initial={{ opacity: 0, y: 30 }}
+										whileInView={{ opacity: 1, y: 0 }}
+										viewport={{ once: true }}
+										transition={{ duration: 0.34, delay: index * 0.08 }}
+										onClick={() => navigate(`/product/${item.product.id}`)}
+										className="relative overflow-hidden rounded-[2.5rem] aspect-[4/5] p-6 sm:p-8 flex flex-col justify-between shadow-lg border border-emerald-900/10 group cursor-pointer bg-slate-950"
+									>
+										<div
+											className="absolute inset-0 bg-cover bg-center transition-transform duration-150 ease-out group-hover:scale-105"
+											style={{
+												backgroundImage: item.product.image ? `url(${item.product.image})` : undefined,
+												backgroundColor: item.product.image ? undefined : "rgba(15, 23, 42, 0.96)",
+											}}
+										/>
+										<div className="absolute inset-0 bg-gradient-to-t from-emerald-950/85 via-emerald-950/30 to-black/40 group-hover:from-emerald-950/90 group-hover:via-emerald-950/35 transition-colors duration-150" />
+
+										<div className="relative z-10">
+											<span className="inline-block bg-white/10 backdrop-blur-md text-white border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold">
+												{language === "fr" ? item.badgeFr : item.badgeEn}
+											</span>
+											<h3 className="mt-5 text-2xl sm:text-3xl font-playfair font-normal leading-tight text-white max-w-[240px]">
+												{language === "fr" ? item.titleFr : item.titleEn}
+											</h3>
+										</div>
+
+										<div className="relative z-10 rounded-[1.5rem] border border-white/15 bg-white/92 p-4 shadow-xl shadow-black/10 backdrop-blur-sm">
+											<p className="text-xs uppercase tracking-[0.2em] text-emerald-800 font-black">
+												{item.product.category}
+											</p>
+											<h4 className="mt-1 text-lg font-semibold text-slate-950">
+												{item.product.name}
+											</h4>
+											<p className="mt-2 text-sm leading-6 text-slate-600">{shortSummary}</p>
+											<div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+												<span className="text-base font-black text-slate-950">{item.product.price}</span>
+												<div className="flex flex-wrap gap-2">
+													<OriginButton
+														variant="emerald"
+														onClick={(e) => {
+															e.stopPropagation();
+															addItem(item.product);
+															toast.success(language === "fr" ? `${item.product.name} ajouté au panier !` : `${item.product.name} added to cart!`);
+														}}
+														className="h-10 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+													>
+														<ShoppingBagIcon className="size-3.5" />
+														{t("common.addToCart")}
+													</OriginButton>
+													<Button
+														variant="outline"
+														onClick={(e) => {
+															e.stopPropagation();
+															navigate(`/product/${item.product.id}`);
+														}}
+														className="h-10 px-4 rounded-xl border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-950"
+													>
+														{language === "fr" ? "Voir" : "View"}
+													</Button>
+												</div>
+											</div>
+										</div>
+									</motion.article>
+								);
+							})
+						) : (
+							<div className="md:col-span-3 rounded-[2rem] border border-dashed border-emerald-900/15 bg-white px-8 py-10 text-center shadow-sm">
+								<h3 className="text-lg font-playfair font-semibold text-slate-950">
+									{language === "fr" ? "Aucune formulation disponible" : "No formulations available"}
 								</h3>
+								<p className="mt-2 text-sm leading-6 text-slate-500">
+									{language === "fr"
+										? "Les produits du backend n'ont pas encore été associés aux catégories clés."
+										: "Backend products have not yet been assigned to the core categories."}
+								</p>
 							</div>
-
-							<div className="relative z-10 flex items-end justify-between mt-auto">
-								<button
-									onClick={() => navigate(APP_ROUTES.SHOP)}
-									className="bg-lime-300 text-emerald-950 hover:bg-lime-400 font-bold px-6 py-3 rounded-full text-xs sm:text-sm transition-all duration-150 transform active:scale-95 shadow-md shadow-lime-950/20"
-								>
-									{language === "fr" ? "Acheter" : "Shop Now"}
-								</button>
-
-								<div className="h-20 w-16 sm:h-24 sm:w-20 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden p-1.5 transition-transform duration-150 group-hover:scale-125">
-									<img src={productGreens} alt="Greens canister" className="h-full w-full object-contain" />
-								</div>
-							</div>
-						</motion.div>
-
-						{/* Card 3: Mind & Focus */}
-						<motion.div
-							initial={{ opacity: 0, y: 30 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							viewport={{ once: true }}
-							transition={{ duration: 0.34, delay: 0.16 }}
-							className="relative overflow-hidden rounded-[2.5rem] aspect-[4/5] p-6 sm:p-8 flex flex-col justify-between shadow-lg border border-emerald-900/10 group cursor-pointer"
-						>
-							<div
-								className="absolute inset-0 bg-cover bg-center transition-transform duration-150 ease-out group-hover:scale-105"
-								style={{ backgroundImage: `url(${cardMindImg})` }}
-							/>
-							<div className="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-emerald-950/20 to-black/35 group-hover:from-emerald-950/80 group-hover:via-emerald-950/30 transition-colors duration-150" />
-							
-							<div className="relative z-10">
-								<span className="inline-block bg-white/10 backdrop-blur-md text-white border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold">
-									{language === "fr" ? "Esprit & Concentration" : "Mind & Focus"}
-								</span>
-								<h3 className="mt-5 text-2xl sm:text-3xl font-playfair font-normal leading-tight text-white max-w-[240px]">
-									{language === "fr" ? "Favoriser la santé cognitive" : "Promote cognitive health"}
-								</h3>
-							</div>
-
-							<div className="relative z-10 flex items-end justify-between mt-auto">
-								<button
-									onClick={() => navigate(APP_ROUTES.SHOP)}
-									className="bg-lime-300 text-emerald-950 hover:bg-lime-400 font-bold px-6 py-3 rounded-full text-xs sm:text-sm transition-all duration-150 transform active:scale-95 shadow-md shadow-lime-950/20"
-								>
-									{language === "fr" ? "Acheter" : "Shop Now"}
-								</button>
-
-								<div className="h-20 w-16 sm:h-24 sm:w-20 bg-white rounded-2xl flex items-center justify-center shadow-lg overflow-hidden p-1.5 transition-transform duration-150 group-hover:scale-125">
-									<img src={productHydra} alt="Hydra canister" className="h-full w-full object-contain" />
-								</div>
-							</div>
-						</motion.div>
+						)}
 					</div>
 				</div>
 			</section>
@@ -1226,11 +1289,11 @@ export const HomePage = () => {
 								>
 									<div className="max-w-md rounded-3xl border border-dashed border-emerald-900/15 bg-white px-8 py-10 text-center shadow-sm">
 										<h3 className="text-lg font-playfair font-semibold text-slate-950">
-											{language === "fr" ? "Aucun produit dans cette categorie" : "No products in this category"}
+											{language === "fr" ? "Aucun produit dans cette catégorie" : "No products in this category"}
 										</h3>
 										<p className="mt-2 text-sm leading-6 text-slate-500">
 											{language === "fr"
-												? "Les produits apparaitront ici des que le backend les associera a cette categorie."
+												? "Les produits apparaîtront ici dès que le backend les associera à cette catégorie."
 												: "Products will appear here as soon as the backend assigns items to this category."}
 										</p>
 									</div>
@@ -1255,7 +1318,7 @@ export const HomePage = () => {
 													{product.badge || product.category}
 												</span>
 												<img
-													src={product.image || productProtein}
+													src={product.image || heroProtein}
 													alt={product.name}
 													className="h-full w-full object-cover transition-transform duration-220 ease-out group-hover:scale-108"
 												/>
@@ -1310,7 +1373,7 @@ export const HomePage = () => {
 							kicker={language === "fr" ? "Sélection éditoriale" : "Editorial selection"}
 							title={language === "fr" ? "Une vitrine plus guidée pour acheter plus vite." : "A more guided shelf for faster shopping."}
 							copy={language === "fr"
-								? "Cette section met en avant les routines qui se lisent d’un coup d’œil, avec des cartes plus visuelles et une hiérarchie très propre."
+								? "Cette section met en avant les routines qui se lisent d'un coup d'œil, avec des cartes plus visuelles et une hiérarchie très propre."
 								: "This section puts the most shoppable routines front and center with clearer hierarchy and more visual cards."
 							}
 						/>
@@ -1758,4 +1821,3 @@ export const HomePage = () => {
 		</>
 	);
 };
-
