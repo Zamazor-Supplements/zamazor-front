@@ -14,12 +14,12 @@ import LoginPage from "@/pages/public/LoginPage";
 import { RegisterPage } from "@/pages/public/RegisterPage";
 import { ProductDetailPage } from "@/pages/public/ProductDetailPage";
 import { CartPage } from "@/pages/public/CartPage";
-import { CheckoutPage } from "@/pages/public/CheckoutPage";
+import { CheckoutPage } from "@/pages/protected/CheckoutPage";
 import { ShopPage } from "@/pages/public/ShopPage";
 import { WishlistPage } from "@/pages/public/WishlistPage";
 import { StaticInfoPage } from "@/pages/public/StaticInfoPage";
 import { FAQPage } from "@/pages/public/FAQPage";
-import { ProfilePage } from "@/pages/ProfilePage";
+import { ProfilePage } from "@/pages/protected/ProfilePage";
 import { useScrollToTop } from "@/shared/hooks/use-scroll-to-top";
 import { MainLayout } from "@/shared/layouts/MainLayout";
 

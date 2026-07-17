@@ -32,6 +32,7 @@ const translations: Record<Language, TranslationDictionary> = {
 			save: "Save Changes",
 			close: "Close",
 			loading: "Loading...",
+			adding: "Adding...",
 			noDescription: "No description provided.",
 			delete: "Delete",
 		},
@@ -39,13 +40,16 @@ const translations: Record<Language, TranslationDictionary> = {
 			hero: {
 				badge1: "100% CLEAN FORMULAS",
 				title1: "Fuel Your Highest Potential",
-				desc1: "Premium, zero-compromise plant proteins and organic nutrition designed to elevate your energy and recovery.",
+				desc1:
+					"Premium, zero-compromise plant proteins and organic nutrition designed to elevate your energy and recovery.",
 				badge2: "ZERO ARTIFICIAL SWEETENERS",
 				title2: "Matcha Botanical Green Energy",
-				desc2: "Harness clean cellular focus with organic ceremonial matcha blended with high-absorption plant enzymes.",
+				desc2:
+					"Harness clean cellular focus with organic ceremonial matcha blended with high-absorption plant enzymes.",
 				badge3: "DEEP SLEEP & REPAIR",
 				title3: "Nighttime Recovery Peptides",
-				desc3: "Calm your nervous system and repair muscle fibers overnight with rich minerals and tart cherry extracts.",
+				desc3:
+					"Calm your nervous system and repair muscle fibers overnight with rich minerals and tart cherry extracts.",
 				shopNow: "Shop Formulas",
 				quiz: "Take Wellness Quiz",
 			},
@@ -114,7 +118,8 @@ const translations: Record<Language, TranslationDictionary> = {
 			placeOrder: "Place Order",
 			orderSummary: "Order Summary",
 			successTitle: "Thank you for your order!",
-			successDesc: "Your clean stack order has been successfully placed. We've sent updates to your email.",
+			successDesc:
+				"Your clean stack order has been successfully placed. We've sent updates to your email.",
 			orderNumber: "Order ID",
 			delivery: "Delivery Method",
 			standardShipping: "Standard Insured (3-5 days)",
@@ -148,7 +153,7 @@ const translations: Record<Language, TranslationDictionary> = {
 			newProduct: "New Product",
 			editProduct: "Edit Product",
 			deleteConfirm: "Are you sure you want to delete this product?",
-		}
+		},
 	},
 	fr: {
 		nav: {
@@ -172,6 +177,7 @@ const translations: Record<Language, TranslationDictionary> = {
 			save: "Enregistrer",
 			close: "Fermer",
 			loading: "Chargement...",
+			adding: "Ajoutant...",
 			noDescription: "Aucune description fournie.",
 			delete: "Supprimer",
 		},
@@ -179,13 +185,16 @@ const translations: Record<Language, TranslationDictionary> = {
 			hero: {
 				badge1: "FORMULES 100% PROPRES",
 				title1: "Libérez Votre Plus Grand Potentiel",
-				desc1: "Protéines végétales de qualité supérieure et nutrition biologique conçues pour élever votre énergie et votre récupération.",
+				desc1:
+					"Protéines végétales de qualité supérieure et nutrition biologique conçues pour élever votre énergie et votre récupération.",
 				badge2: "SANS ÉDULCORANTS ARTIFICIELS",
 				title2: "Énergie Verte au Matcha Botanique",
-				desc2: "Exploitez une concentration cellulaire propre grâce à du matcha de cérémonie biologique mélangé à des enzymes végétales.",
+				desc2:
+					"Exploitez une concentration cellulaire propre grâce à du matcha de cérémonie biologique mélangé à des enzymes végétales.",
 				badge3: "SOMMEIL PROFOND & RÉPARATION",
 				title3: "Peptides de Récupération Nocturne",
-				desc3: "Calmez votre système nerveux et réparez vos fibres musculaires pendant la nuit grâce aux minéraux et extraits de cerise acidulée.",
+				desc3:
+					"Calmez votre système nerveux et réparez vos fibres musculaires pendant la nuit grâce aux minéraux et extraits de cerise acidulée.",
 				shopNow: "Découvrir les Formules",
 				quiz: "Faire le Quiz Bien-être",
 			},
@@ -254,7 +263,8 @@ const translations: Record<Language, TranslationDictionary> = {
 			placeOrder: "Passer la Commande",
 			orderSummary: "Résumé de la Commande",
 			successTitle: "Merci pour votre commande !",
-			successDesc: "Votre commande a été passée avec succès. Nous avons envoyé les détails de la commande par e-mail.",
+			successDesc:
+				"Votre commande a été passée avec succès. Nous avons envoyé les détails de la commande par e-mail.",
 			orderNumber: "ID de Commande",
 			delivery: "Mode de Livraison",
 			standardShipping: "Livraison Standard Assurée (3-5 jours)",
@@ -288,8 +298,8 @@ const translations: Record<Language, TranslationDictionary> = {
 			newProduct: "Nouveau Produit",
 			editProduct: "Modifier le Produit",
 			deleteConfirm: "Êtes-vous sûr de vouloir supprimer ce produit ?",
-		}
-	}
+		},
+	},
 };
 
 interface LanguageContextProps {
@@ -298,9 +308,13 @@ interface LanguageContextProps {
 	t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextProps | undefined>(
+	undefined,
+);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
+	children,
+}) => {
 	const [language, setLanguageState] = useState<Language>(() => {
 		const stored = localStorage.getItem("zamazor-language");
 		return (stored === "fr" || stored === "en" ? stored : "en") as Language;

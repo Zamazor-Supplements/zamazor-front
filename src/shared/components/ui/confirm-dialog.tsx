@@ -24,7 +24,7 @@ export const ConfirmDialog = ({
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs animate-in fade-in duration-200">
+		<div className="fixed inset-0 z-1000 flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs animate-in fade-in duration-200">
 			{/* Backdrop click close */}
 			<div className="absolute inset-0" onClick={onClose} />
 			

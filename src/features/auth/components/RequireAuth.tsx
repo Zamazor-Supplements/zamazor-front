@@ -5,7 +5,7 @@ import { AuthStatus } from "../types";
 import { notify } from "@/lib/notify";
 import { APP_ROUTES } from "@/core/routes/paths";
 
-const LoadingScreen = () => (
+export const LoadingScreen = () => (
 	<div
 		className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80"
 		role="status"
@@ -26,7 +26,10 @@ export const RequireAuth = ({ allowedRoles }: RequireAuthProps) => {
 	const user = useAuthStore((state) => state.user);
 	const location = useLocation();
 
-	if (status === AuthStatus.Loading) return <LoadingScreen />;
+	if (status === AuthStatus.Loading) {
+		console.debug("hello?");
+		return <LoadingScreen />;
+	}
 	if (status === AuthStatus.Unauthenticated) {
 		notify.error("Access Denied", {
 			id: "access-denied",

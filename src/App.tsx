@@ -2,37 +2,29 @@ import "./assets/styles/App.css";
 import router from "./core/routes/router";
 import { Toaster } from "sonner";
 import { RouterProvider } from "react-router";
-import { useEffect, useRef } from "react";
-import { userService } from "./features/auth/services/usersService";
+import { useEffect } from "react";
 import { LanguageProvider } from "./shared/context/LanguageContext";
-import { tokenManager } from "./features/auth/globals/tokenManager";
-import { useBookmarkStore } from "./features/products/stores/bookmarkStore";
+import { initAuth, useAuthStore } from "./features/auth/stores/authStore";
+import { LoadingScreen } from "./features/auth/components/RequireAuth";
+import { AuthStatus } from "./features/auth/types";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./core/config/queryClient";
 
 function App() {
-	const didBootstrapRef = useRef(false);
+	const authStatus = useAuthStore((state) => state.status);
 
 	useEffect(() => {
-		if (didBootstrapRef.current) {
-			return;
-		}
-
-		didBootstrapRef.current = true;
-
-		const bootstrap = async () => {
-			const syncCommerceState = !window.location.pathname.startsWith("/dashboard");
-			await userService.fetchCurrentUser({ syncCommerceState });
-			if (syncCommerceState && tokenManager.getAccessToken()) {
-				await useBookmarkStore.getState().syncWishlists();
-			}
-		};
-
-		void bootstrap();
+		initAuth();
 	}, []);
+
+	if (authStatus === AuthStatus.Loading) return <LoadingScreen />;
 
 	return (
 		<LanguageProvider>
-			<RouterProvider router={router} />
-			<Toaster position="bottom-left" />
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+				<Toaster position="bottom-left" />
+			</QueryClientProvider>
 		</LanguageProvider>
 	);
 }

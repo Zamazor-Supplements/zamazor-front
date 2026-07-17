@@ -1,4 +1,10 @@
-import React from "react";
+import {
+	forwardRef,
+	useEffect,
+	useRef,
+	useState,
+	type SubmitEvent,
+} from "react";
 import { Link, useNavigate } from "react-router";
 import logo from "@/assets/images/zamazor.svg";
 import { APP_ROUTES } from "@/core/routes/paths";
@@ -7,110 +13,144 @@ import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { useLanguage } from "@/shared/context/LanguageContext";
 import { OriginButton } from "@/shared/components/ui/origin-button";
-import { useCartStore } from "@/shared/hooks/use-cart-store";
-import { useBookmarkStore } from "@/features/products/stores/bookmarkStore";
 import { useAuthStore } from "@/features/auth/stores/authStore";
 import { AuthStatus } from "@/features/auth/types";
-import { productService } from "@/features/products/services/productService";
-import type { Product } from "@/features/products/types";
 import {
 	MenuIcon,
-	X as XIcon,
+	XIcon,
 	SearchIcon,
 	UserIcon,
 	ShoppingBagIcon,
-	Heart as HeartIcon,
+	HeartIcon,
 	Store,
 	Sparkles,
 	Layers,
 	MessageSquare,
 	Award,
 } from "lucide-react";
+import { useCartCount } from "@/services/cart/queries";
+import { useProductsQuery } from "@/features/products/hooks/use-product";
+import { useDebounce } from "../hooks/use-debounce";
+import { useWishlist } from "@/features/wishlists/hooks/use-wishlist";
 
+const BouncingCart = () => {
+	const count = useCartCount();
+	const navigate = useNavigate();
 
+	const [isCartBouncing, setIsCartBouncing] = useState(false);
+	const prevCountRef = useRef(count);
 
-export const Header = React.forwardRef<HTMLElement, { className?: string }>(
+	useEffect(() => {
+		const prevCount = prevCountRef.current;
+		prevCountRef.current = count;
+
+		if (count > prevCount) {
+			setIsCartBouncing(true);
+			const timer = setTimeout(() => setIsCartBouncing(false), 500);
+			return () => clearTimeout(timer);
+		}
+	}, [count]);
+
+	return (
+		<OriginButton
+			variant="emerald"
+			aria-label="Cart"
+			onClick={() => navigate(APP_ROUTES.CART)}
+			className={cn(
+				"h-9 w-9 p-0 rounded-full flex items-center justify-center relative cursor-pointer transition-all duration-300",
+				isCartBouncing
+					? "scale-115 bg-lime-300 text-emerald-950 shadow-md animate-bounce"
+					: "",
+			)}
+		>
+			<ShoppingBagIcon className="size-4.5" />
+			{count > 0 && (
+				<span
+					className={cn(
+						"absolute -top-1 -right-1 bg-lime-300 text-emerald-950 font-sans font-black text-[9px] size-4.5 rounded-full flex items-center justify-center shadow-xs transition-transform duration-300",
+						isCartBouncing ? "scale-110 bg-emerald-950 text-white" : "",
+					)}
+				>
+					{count}
+				</span>
+			)}
+		</OriginButton>
+	);
+};
+
+export const Header = forwardRef<HTMLElement, { className?: string }>(
 	({ className }, ref) => {
 		const navigate = useNavigate();
 		const { language, setLanguage, t } = useLanguage();
-		const cartItems = useCartStore((state) => state.items);
-		const cartCount = React.useMemo(() => {
-			return cartItems.reduce((sum, item) => sum + item.quantity, 0);
-		}, [cartItems]);
-		const bookmarkCount = useBookmarkStore((state) => state.bookmarks.length);
-		const [searchVal, setSearchVal] = React.useState("");
-		const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-		const [isCartBouncing, setIsCartBouncing] = React.useState(false);
-		const prevCountRef = React.useRef(cartCount);
+		const wishlistProductsCount = useWishlist().data?.length ?? 0;
+		const [search, setSearch] = useState<string | undefined>(undefined);
+		const debouncedSearchVal = useDebounce(search?.trim(), 500);
+		const { data: suggestions, isPending: isLoadingSuggestions } =
+			useProductsQuery(
+				{
+					q: debouncedSearchVal,
+					size: 5,
+				},
+				{
+					enabled: !!debouncedSearchVal?.trim(),
+				},
+			);
 
-		React.useEffect(() => {
-			if (cartCount > prevCountRef.current) {
-				setIsCartBouncing(true);
-				const timer = setTimeout(() => setIsCartBouncing(false), 500);
-				return () => clearTimeout(timer);
-			}
-			prevCountRef.current = cartCount;
-		}, [cartCount]);
-
-		const [suggestions, setSuggestions] = React.useState<Product[]>([]);
-		const [showSuggestions, setShowSuggestions] = React.useState(false);
-		const [showMobileSuggestions, setShowMobileSuggestions] = React.useState(false);
-		const [loadingSuggestions, setLoadingSuggestions] = React.useState(false);
-
-		const searchRef = React.useRef<HTMLDivElement>(null);
-		const mobileSearchRef = React.useRef<HTMLDivElement>(null);
-
+		const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 		const { user, status } = useAuthStore();
 		const isAuthenticated = status === AuthStatus.Authenticated;
 
+		const [showSuggestions, setShowSuggestions] = useState(false);
+		const [showMobileSuggestions, setShowMobileSuggestions] = useState(false);
+
+		const searchRef = useRef<HTMLDivElement>(null);
+		const mobileSearchRef = useRef<HTMLDivElement>(null);
+
 		// Click outside Suggestion Dropdown close listener
-		React.useEffect(() => {
-			const handleClickOutside = (event: MouseEvent) => {
-				if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+		useEffect(() => {
+			const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+				const targetNode = event.target as Node;
+
+				if (searchRef.current && !searchRef.current.contains(targetNode)) {
 					setShowSuggestions(false);
 				}
-				if (mobileSearchRef.current && !mobileSearchRef.current.contains(event.target as Node)) {
+
+				if (
+					mobileSearchRef.current &&
+					!mobileSearchRef.current.contains(targetNode)
+				) {
 					setShowMobileSuggestions(false);
 				}
 			};
-			document.addEventListener("mousedown", handleClickOutside);
-			return () => document.removeEventListener("mousedown", handleClickOutside);
-		}, []);
 
-		// Fetch autocomplete suggestions as the user types
-		React.useEffect(() => {
-			if (!searchVal.trim()) {
-				setSuggestions([]);
-				return;
-			}
-
-			const fetchSuggestions = async () => {
-				setLoadingSuggestions(true);
-				try {
-					const results = await productService.searchProducts(searchVal);
-					setSuggestions(results.slice(0, 5)); // Limit to 5 suggestions
-				} catch (err) {
-					console.warn("Failed to fetch suggestions:", err);
-				} finally {
-					setLoadingSuggestions(false);
+			const handleKeyDown = (event: KeyboardEvent) => {
+				if (event.key === "Escape") {
+					setShowSuggestions(false);
+					setShowMobileSuggestions(false);
 				}
 			};
 
-			const delayDebounce = setTimeout(() => {
-				fetchSuggestions();
-			}, 300);
+			document.addEventListener("mousedown", handleClickOutside);
+			document.addEventListener("touchstart", handleClickOutside);
+			document.addEventListener("keydown", handleKeyDown);
 
-			return () => clearTimeout(delayDebounce);
-		}, [searchVal]);
+			return () => {
+				document.removeEventListener("mousedown", handleClickOutside);
+				document.removeEventListener("touchstart", handleClickOutside);
+				document.removeEventListener("keydown", handleKeyDown);
+			};
+		}, []);
 
-		const handleSearchSubmit = (e: React.FormEvent) => {
+		const handleSearchSubmit = (e: SubmitEvent<HTMLFormElement>) => {
 			e.preventDefault();
-			if (searchVal.trim()) {
+			if (search && search.trim()) {
 				setMobileMenuOpen(false);
 				setShowSuggestions(false);
 				setShowMobileSuggestions(false);
-				navigate(`${APP_ROUTES.SHOP}?search=${encodeURIComponent(searchVal.trim())}`);
+				navigate(
+					`${APP_ROUTES.SHOP}?search=${encodeURIComponent(search.trim())}`,
+				);
 			}
 		};
 
@@ -119,13 +159,11 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 				ref={ref}
 				className={cn(
 					"sticky top-2 z-40 mx-auto mt-2 w-[calc(100%-2rem)] max-w-7xl rounded-3xl border border-emerald-900/10 bg-[#f7fbf3]/95 shadow-md backdrop-blur transition-all duration-300",
-					className
+					className,
 				)}
 			>
-
 				{/* Main Brand & Action Row */}
 				<div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 sm:px-6 lg:gap-6 lg:px-6">
-					
 					{/* Left: Mobile Menu Toggle & Brand Logo */}
 					<div className="flex items-center gap-2">
 						<Button
@@ -135,7 +173,11 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 							className="lg:hidden cursor-pointer"
 							onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
 						>
-							{mobileMenuOpen ? <XIcon className="size-5 text-emerald-900" /> : <MenuIcon className="size-5 text-emerald-900" />}
+							{mobileMenuOpen ? (
+								<XIcon className="size-5 text-emerald-900" />
+							) : (
+								<MenuIcon className="size-5 text-emerald-900" />
+							)}
 						</Button>
 
 						<Link
@@ -154,13 +196,19 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 					</div>
 
 					{/* Center: iHerb-style Wide Search Bar (Desktop Only) */}
-					<div ref={searchRef} className="hidden lg:block w-full max-w-2xl mx-auto relative">
-						<form onSubmit={handleSearchSubmit} className="relative flex w-full items-center">
+					<div
+						ref={searchRef}
+						className="hidden lg:block w-full max-w-2xl mx-auto relative"
+					>
+						<form
+							onSubmit={handleSearchSubmit}
+							className="relative flex w-full items-center"
+						>
 							<Input
 								type="search"
-								value={searchVal}
+								value={search}
 								onChange={(e) => {
-									setSearchVal(e.target.value);
+									setSearch(e.target.value);
 									setShowSuggestions(true);
 								}}
 								onFocus={() => setShowSuggestions(true)}
@@ -177,41 +225,51 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 						</form>
 
 						{/* Suggestions Dropdown */}
-						{showSuggestions && searchVal.trim() !== "" && (
-							<div className="absolute left-0 right-0 mt-2 bg-white/95 backdrop-blur-md rounded-2xl border border-emerald-900/10 shadow-lg z-50 overflow-hidden max-h-[380px] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-150">
-								{loadingSuggestions ? (
+						{showSuggestions && !!search?.trim() && (
+							<div className="absolute left-0 right-0 mt-2 bg-white/95 backdrop-blur-md rounded-2xl border border-emerald-900/10 shadow-lg z-50 overflow-hidden max-h-95 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-150">
+								{!suggestions || isLoadingSuggestions ? (
 									<div className="p-4 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
 										<div className="size-4 border-2 border-emerald-800 border-t-transparent rounded-full animate-spin" />
 										Searching formulas...
 									</div>
-								) : suggestions.length === 0 ? (
+								) : suggestions.items.length === 0 ? (
 									<div className="p-4 text-center text-xs text-slate-400">
-										No formulas match "{searchVal}"
+										No formulas match "{search}"
 									</div>
 								) : (
 									<div className="p-2 space-y-1">
 										<p className="px-3 py-1.5 text-[10px] font-black uppercase text-emerald-900/40 tracking-widest border-b border-emerald-900/5">
 											Suggested Products
 										</p>
-										{suggestions.map((product) => (
+										{suggestions.items.map((product) => (
 											<div
 												key={product.id}
 												onClick={() => {
 													navigate(`/product/${product.id}`);
 													setShowSuggestions(false);
-													setSearchVal("");
+													setSearch(undefined);
 												}}
 												className="flex items-center gap-3 p-2 rounded-xl hover:bg-emerald-50/50 cursor-pointer transition-colors"
 											>
 												<div className="size-11 shrink-0 bg-slate-50 rounded-lg border border-emerald-900/5 flex items-center justify-center p-1.5">
-													<img src={product.image} alt={product.name} className="h-full w-full object-contain" />
+													<img
+														src={product.imageUrl}
+														alt={product.name}
+														className="h-full w-full object-contain"
+													/>
 												</div>
 												<div className="flex-1 min-w-0">
-													<p className="text-xs font-bold text-slate-900 truncate leading-tight">{product.name}</p>
-													<p className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider mt-0.5">{product.category}</p>
+													<p className="text-xs font-bold text-slate-900 truncate leading-tight">
+														{product.name}
+													</p>
+													<p className="text-[10px] text-emerald-800 font-bold uppercase tracking-wider mt-0.5">
+														{product.category.label}
+													</p>
 												</div>
 												<div className="text-right">
-													<p className="text-xs font-black text-slate-950">{product.price}</p>
+													<p className="text-xs font-black text-slate-950">
+														{product.price} MAD
+													</p>
 												</div>
 											</div>
 										))}
@@ -223,7 +281,6 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 
 					{/* Right: User actions (Favorites, Account, Cart) */}
 					<div className="flex items-center justify-end gap-1 sm:gap-2.5">
-						
 						{/* Wishlist / Favorites (iHerb style) */}
 						{/* Wishlist / Favorites (iHerb style) */}
 						<Link
@@ -232,9 +289,9 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 							title="Wishlist"
 						>
 							<HeartIcon className="size-5" />
-							{bookmarkCount > 0 && (
+							{wishlistProductsCount > 0 && (
 								<span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-extrabold text-white ring-1 ring-white">
-									{bookmarkCount}
+									{wishlistProductsCount}
 								</span>
 							)}
 						</Link>
@@ -245,7 +302,9 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 								onClick={() => setLanguage("en")}
 								className={cn(
 									"h-6 px-2 text-[10px] font-bold rounded-full transition-all cursor-pointer",
-									language === "en" ? "bg-emerald-900 text-white shadow-xs" : "text-emerald-800 hover:bg-emerald-50/30"
+									language === "en"
+										? "bg-emerald-900 text-white shadow-xs"
+										: "text-emerald-800 hover:bg-emerald-50/30",
 								)}
 							>
 								EN
@@ -254,7 +313,9 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 								onClick={() => setLanguage("fr")}
 								className={cn(
 									"h-6 px-2 text-[10px] font-bold rounded-full transition-all cursor-pointer",
-									language === "fr" ? "bg-emerald-900 text-white shadow-xs" : "text-emerald-800 hover:bg-emerald-50/30"
+									language === "fr"
+										? "bg-emerald-900 text-white shadow-xs"
+										: "text-emerald-800 hover:bg-emerald-50/30",
 								)}
 							>
 								FR
@@ -265,12 +326,22 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 						{isAuthenticated ? (
 							<div className="hidden sm:flex items-center gap-1.5">
 								<OriginButton
-									onClick={() => navigate(user?.role === "ADMIN" ? APP_ROUTES.DASHBOARD : APP_ROUTES.PROFILE)}
+									onClick={() =>
+										navigate(
+											user.role === "ADMIN"
+												? APP_ROUTES.DASHBOARD
+												: APP_ROUTES.PROFILE,
+										)
+									}
 									variant="emerald"
 									className="h-9 px-4 rounded-full text-xs font-semibold items-center gap-1.5 cursor-pointer"
 								>
 									<UserIcon className="size-3.5" />
-									{user?.role === "ADMIN" ? t("nav.dashboard") : (user?.fullName ? user.fullName.trim().split(/\s+/)[0] : t("nav.profile"))}
+									{user.role === "ADMIN"
+										? t("nav.dashboard")
+										: user.fullName
+											? user.fullName.trim().split(/\s+/)[0]
+											: t("nav.profile")}
 								</OriginButton>
 							</div>
 						) : (
@@ -285,36 +356,21 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 						)}
 
 						{/* Cart count action button */}
-						<OriginButton
-							variant="emerald"
-							aria-label="Cart"
-							onClick={() => navigate(APP_ROUTES.CART)}
-							className={cn(
-								"h-9 w-9 p-0 rounded-full flex items-center justify-center relative cursor-pointer transition-all duration-300",
-								isCartBouncing ? "scale-115 bg-lime-300 text-emerald-950 shadow-md animate-bounce" : ""
-							)}
-						>
-							<ShoppingBagIcon className="size-4.5" />
-							{cartCount > 0 && (
-								<span className={cn(
-									"absolute -top-1 -right-1 bg-lime-300 text-emerald-950 font-sans font-black text-[9px] size-4.5 rounded-full flex items-center justify-center shadow-xs transition-transform duration-300",
-									isCartBouncing ? "scale-110 bg-emerald-950 text-white" : ""
-								)}>
-									{cartCount}
-								</span>
-							)}
-						</OriginButton>
+						<BouncingCart />
 					</div>
 				</div>
 
 				{/* 📱 Mobile Search Bar (Row 2 on Mobile - Persistent) */}
 				<div ref={mobileSearchRef} className="px-4 pb-3 lg:hidden relative">
-					<form onSubmit={handleSearchSubmit} className="relative flex w-full items-center">
+					<form
+						onSubmit={handleSearchSubmit}
+						className="relative flex w-full items-center"
+					>
 						<Input
 							type="search"
-							value={searchVal}
+							value={search}
 							onChange={(e) => {
-								setSearchVal(e.target.value);
+								setSearch(e.target.value);
 								setShowMobileSuggestions(true);
 							}}
 							onFocus={() => setShowMobileSuggestions(true)}
@@ -332,38 +388,48 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 					</form>
 
 					{/* Mobile Suggestions Dropdown */}
-					{showMobileSuggestions && searchVal.trim() !== "" && (
-						<div className="absolute left-4 right-4 mt-2 bg-white/95 backdrop-blur-md rounded-2xl border border-emerald-900/10 shadow-lg z-50 overflow-hidden max-h-[300px] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-150">
-							{loadingSuggestions ? (
+					{showMobileSuggestions && !!search?.trim() && (
+						<div className="absolute left-4 right-4 mt-2 bg-white/95 backdrop-blur-md rounded-2xl border border-emerald-900/10 shadow-lg z-50 overflow-hidden max-h-75 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-150">
+							{!suggestions || isLoadingSuggestions ? (
 								<div className="p-3 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
 									<div className="size-3.5 border-2 border-emerald-800 border-t-transparent rounded-full animate-spin" />
 									Searching...
 								</div>
-							) : suggestions.length === 0 ? (
+							) : suggestions.items.length === 0 ? (
 								<div className="p-3 text-center text-xs text-slate-400">
-									No formulas match "{searchVal}"
+									No formulas match "{search}"
 								</div>
 							) : (
 								<div className="p-1.5 space-y-1">
-									{suggestions.map((product) => (
+									{suggestions.items.map((product) => (
 										<div
 											key={product.id}
 											onClick={() => {
 												navigate(`/product/${product.id}`);
 												setShowMobileSuggestions(false);
-												setSearchVal("");
+												setSearch(undefined);
 											}}
 											className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-emerald-50/50 cursor-pointer transition-colors"
 										>
 											<div className="size-9 shrink-0 bg-slate-50 rounded-lg border border-emerald-900/5 flex items-center justify-center p-1">
-												<img src={product.image} alt={product.name} className="h-full w-full object-contain" />
+												<img
+													src={product.imageUrl}
+													alt={product.name}
+													className="h-full w-full object-contain"
+												/>
 											</div>
 											<div className="flex-1 min-w-0">
-												<p className="text-[11px] font-bold text-slate-900 truncate leading-tight">{product.name}</p>
-												<p className="text-[9px] text-emerald-800 font-bold uppercase tracking-wider">{product.category}</p>
+												<p className="text-[11px] font-bold text-slate-900 truncate leading-tight">
+													{product.name}
+												</p>
+												<p className="text-[9px] text-emerald-800 font-bold uppercase tracking-wider">
+													{product.category.label}
+												</p>
 											</div>
 											<div>
-												<p className="text-[11px] font-black text-slate-950">{product.price}</p>
+												<p className="text-[11px] font-black text-slate-950">
+													{product.price} MAD
+												</p>
 											</div>
 										</div>
 									))}
@@ -376,23 +442,38 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 				{/* Desktop quick links */}
 				<div className="hidden border-t border-emerald-900/5 bg-transparent py-2 px-6 lg:flex items-center justify-between font-sans">
 					<div className="flex items-center gap-1.5">
-						<Link to={APP_ROUTES.SHOP} className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors">
+						<Link
+							to={APP_ROUTES.SHOP}
+							className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors"
+						>
 							<Store className="size-3.5 text-emerald-850" />
 							{t("nav.shop")}
 						</Link>
-						<Link to="/#products" className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors">
+						<Link
+							to="/#products"
+							className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors"
+						>
 							<Sparkles className="size-3.5 text-emerald-850" />
 							Best Sellers
 						</Link>
-						<Link to="/#stack" className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors">
+						<Link
+							to="/#stack"
+							className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors"
+						>
 							<Layers className="size-3.5 text-emerald-850" />
 							Daily Stacks
 						</Link>
-						<Link to="/#reviews" className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors">
+						<Link
+							to="/#reviews"
+							className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors"
+						>
 							<MessageSquare className="size-3.5 text-emerald-850" />
 							Reviews
 						</Link>
-						<Link to="/#proof" className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors">
+						<Link
+							to="/#proof"
+							className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50/50 transition-colors"
+						>
 							<Award className="size-3.5 text-emerald-850" />
 							Clinical Results
 						</Link>
@@ -405,7 +486,6 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 				{/* 📱 Mobile Menu Drawer content */}
 				{mobileMenuOpen && (
 					<div className="border-t border-emerald-900/5 px-4 py-5 space-y-5 lg:hidden animate-in fade-in slide-in-from-top-3 duration-200">
-						
 						{/* Links list */}
 						<div className="flex flex-col gap-3 font-semibold text-slate-700 text-sm">
 							<Link
@@ -425,9 +505,9 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 									<HeartIcon className="size-4 text-emerald-850" />
 									Wishlist
 								</span>
-								{bookmarkCount > 0 && (
+								{wishlistProductsCount > 0 && (
 									<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-black text-white">
-										{bookmarkCount}
+										{wishlistProductsCount}
 									</span>
 								)}
 							</Link>
@@ -463,18 +543,29 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 							{isAuthenticated ? (
 								<div className="space-y-3">
 									<div className="px-3 text-xs text-slate-500 font-medium">
-										Signed in as <span className="font-bold text-slate-800">{user?.name}</span>
+										Signed in as{" "}
+										<span className="font-bold text-slate-800">
+											{user.fullName}
+										</span>
 									</div>
 									<div className="flex flex-col gap-2">
 										<OriginButton
 											onClick={() => {
 												setMobileMenuOpen(false);
-												navigate(user?.role === "ADMIN" ? APP_ROUTES.DASHBOARD : APP_ROUTES.PROFILE);
+												navigate(
+													user.role === "ADMIN"
+														? APP_ROUTES.DASHBOARD
+														: APP_ROUTES.PROFILE,
+												);
 											}}
 											variant="emerald"
 											className="w-full h-10 rounded-xl justify-center font-bold text-xs cursor-pointer"
 										>
-											{user?.role === "ADMIN" ? "Dashboard" : (user?.fullName ? user.fullName.trim().split(/\s+/)[0] : "Profile")}
+											{user.role === "ADMIN"
+												? "Dashboard"
+												: user.fullName
+													? user.fullName.trim().split(/\s+/)[0]
+													: "Profile"}
 										</OriginButton>
 									</div>
 								</div>
@@ -495,7 +586,7 @@ export const Header = React.forwardRef<HTMLElement, { className?: string }>(
 				)}
 			</header>
 		);
-	}
+	},
 );
 
 Header.displayName = "Header";

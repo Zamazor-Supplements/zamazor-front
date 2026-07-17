@@ -3,10 +3,11 @@ import { privateApiRequest } from "@/shared/utils/axiosPrivate";
 import {
 	categoryAnalyticsSchema,
 	dashboardOverviewSchema,
+	productAnalyticsSchema,
 	type CategoryAnalytics,
 	type DashboardOverview,
+	type ProductAnalytics,
 } from "../schemas/dashboardSchema";
-import { isSystemError } from "@/shared/types";
 
 export const dashboardService = {
 	getOverview: async () => {
@@ -15,14 +16,12 @@ export const dashboardService = {
 			method: "GET",
 		});
 
-		if (isSystemError(response)) {
-			console.error("Failed to fetch dashboard overview: ", response);
-			return null;
-		}
 		const parsed = dashboardOverviewSchema.safeParse(response);
 		if (!parsed.success) {
-			console.error("Dashboard overview data validation failed:", parsed.error);
-			return null;
+			throw new Error(
+				"Dashboard overview data validation failed:",
+				parsed.error,
+			);
 		}
 		return parsed.data;
 	},
@@ -32,14 +31,27 @@ export const dashboardService = {
 			method: "GET",
 		});
 
-		if (isSystemError(response)) {
-			console.error("Failed to fetch category analytics: ", response);
-			return null;
-		}
 		const parsed = categoryAnalyticsSchema.safeParse(response);
 		if (!parsed.success) {
-			console.error("Category analytics data validation failed:", parsed.error);
-			return null;
+			throw new Error(
+				"Category analytics data validation failed:",
+				parsed.error,
+			);
+		}
+		return parsed.data;
+	},
+	getProducts: async () => {
+		const response = await privateApiRequest<ProductAnalytics>({
+			url: API_ENDPOINTS.DASHBOARD.PRODUCT,
+			method: "GET",
+		});
+
+		const parsed = productAnalyticsSchema.safeParse(response);
+		if (!parsed.success) {
+			throw new Error(
+				"Product analytics data validation failed:",
+				parsed.error,
+			);
 		}
 		return parsed.data;
 	},

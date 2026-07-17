@@ -2,17 +2,15 @@ import { useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router";
 import { SidebarNav } from "@/shared/components/ui/dashboard-sidebar";
 import { Menu } from "lucide-react";
-import { authService } from "@/features/auth/services/authService";
-import { clearAuth } from "@/features/auth/stores/authStore";
-import { toast } from "sonner";
 import { APP_ROUTES } from "@/core/routes/paths";
+import { useLogoutMutation } from "@/features/auth/hooks/use-auth";
 
 export const DashboardLayout = () => {
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 	const navigate = useNavigate();
 	const location = useLocation();
+	const logoutMutation = useLogoutMutation();
 
-	// Determine active route based on path
 	const getActiveTab = () => {
 		const path = location.pathname;
 		if (path.endsWith("/products")) return "products";
@@ -23,20 +21,13 @@ export const DashboardLayout = () => {
 
 	const activeTab = getActiveTab();
 
-	const handleLogout = async () => {
-		try {
-			await authService.logout();
-			clearAuth();
-			toast.success("Successfully logged out.");
-		} catch (e) {
-			console.error("Logout failed:", e);
-			clearAuth();
-			toast.success("Logged out.");
-		}
-
-		navigate(APP_ROUTES.HOME);
+	const handleLogout = () => {
+		logoutMutation.mutate(undefined, {
+			onSuccess: () => {
+				navigate(APP_ROUTES.HOME);
+			},
+		});
 	};
-
 	return (
 		<div className="flex h-screen bg-slate-50 font-sans overflow-hidden text-slate-900">
 			{/* Desktop Sidebar */}

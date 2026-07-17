@@ -1,74 +1,83 @@
-import { useEffect, useState, useCallback, useMemo, useRef, type FormEvent } from "react";
+import { useEffect, useState, useRef, type SubmitEvent } from "react";
 import { motion } from "framer-motion";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/core/config/constants";
-import { productService } from "@/features/products/services/productService";
-import type { BackendCategory } from "@/features/products/services/productService";
-import { useProductStore } from "@/features/products/stores/productStore";
-import type { Product } from "@/features/products/types";
-import { toast } from "sonner";
+// import { productService } from "@/features/products/services/productService";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { ConfirmDialog } from "@/shared/components/ui/confirm-dialog";
 import { Tooltip } from "@/shared/components/ui/tooltip";
-import { Search, Plus, Trash2, Edit, ExternalLink, X, RefreshCw, Package, Layers, AlertTriangle, BadgeDollarSign } from "lucide-react";
+import {
+	Search,
+	Plus,
+	Trash2,
+	Edit,
+	ExternalLink,
+	X,
+	RefreshCw,
+	Package,
+	Layers,
+	AlertTriangle,
+	BadgeDollarSign,
+} from "lucide-react";
+import type { Product } from "@/features/products/schemas/productSchema";
+import {
+	useCategoriesQuery,
+	useCreateCategoryMutation,
+} from "@/features/products/hooks/use-category";
+import { useDashboardProducts } from "@/features/dashboard/hooks/use-dashboard";
+import {
+	useCreateProductMutation,
+	useDeleteProductMutation,
+	useProductsQuery,
+	useUpdateProductMutation,
+} from "@/features/products/hooks/use-product";
 
-const cardMotion = {
+const CARD_MOTION = {
 	initial: { opacity: 0, y: 16 },
 	animate: { opacity: 1, y: 0 },
 	transition: { duration: 0.35 },
 };
 
-const getSortedProducts = (items: Product[], sortBy: string) => {
-	const next = [...items];
-
-	if (sortBy === "newest") {
-		return next.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-	}
-
-	if (sortBy === "oldest") {
-		return next.sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime());
-	}
-
-	if (sortBy === "name-desc") {
-		return next.sort((a, b) => b.name.localeCompare(a.name));
-	}
-
-	if (sortBy === "price-asc") {
-		return next.sort(
-			(a, b) =>
-				parseFloat((a.price || "").replace(/[^0-9.]/g, "")) - parseFloat((b.price || "").replace(/[^0-9.]/g, "")),
-		);
-	}
-
-	if (sortBy === "price-desc") {
-		return next.sort(
-			(a, b) =>
-				parseFloat((b.price || "").replace(/[^0-9.]/g, "")) - parseFloat((a.price || "").replace(/[^0-9.]/g, "")),
-		);
-	}
-
-	return next.sort((a, b) => a.name.localeCompare(b.name));
-};
+// const getSortedProducts = (items: Product[], sortBy: string) => {
+// 	if (!items || items.length === 0) return [] satisfies Product[];
+// 	const next = [...items];
+// 	switch (sortBy) {
+// 		case "createdAt,desc":
+// 			return next.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+// 		case "oldest":
+// 			return next.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+// 		case "name-desc":
+// 			return next.sort((a, b) => b.name.localeCompare(a.name));
+// 		case "price-asc":
+// 			return next.sort((a, b) => a.price - b.price);
+// 		case "price-desc":
+// 			return next.sort((a, b) => b.price - a.price);
+// 		default:
+// 			return next.sort((a, b) => a.name.localeCompare(b.name));
+// 	}
+// };
 
 export const ProductsPage = () => {
 	useDocumentTitle(`Products Management | ${CONFIG.APP_NAME}`);
-	const fetchStoreProducts = useProductStore((state) => state.fetchProducts);
-	const removeStoreProduct = useProductStore((state) => state.removeProductById);
-
 	// Data states
-	const [products, setProducts] = useState<Product[]>([]);
-	const [tableProducts, setTableProducts] = useState<Product[]>([]);
-	const [tableTotalElements, setTableTotalElements] = useState(0);
-	const [tableTotalPages, setTableTotalPages] = useState(1);
-	const [highlightedProductId, setHighlightedProductId] = useState<string | null>(null);
-	const [categories, setCategories] = useState<BackendCategory[]>([]);
-	const [loading, setLoading] = useState(true);
+	const { data: categories } = useCategoriesQuery();
 	const highlightTimeoutRef = useRef<number | null>(null);
+
+	// Analytics State
+	const { data: analytics, isPending, refetch } = useDashboardProducts();
+
+	// Highlight state
+	const [highlightedProductId, setHighlightedProductId] = useState<
+		string | null
+	>(null);
 
 	// Modals states
 	const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+	const createProductMutation = useCreateProductMutation();
+	const updateProductMutation = useUpdateProductMutation();
+	const deleteProductMutation = useDeleteProductMutation();
 
 	// Confirm dialog state
 	const [confirmOpen, setConfirmOpen] = useState(false);
@@ -81,8 +90,8 @@ export const ProductsPage = () => {
 	// Product Form state
 	const [prodName, setProdName] = useState("");
 	const [prodDesc, setProdDesc] = useState("");
-	const [prodPrice, setProdPrice] = useState("");
-	const [prodStock, setProdStock] = useState("");
+	const [prodPrice, setProdPrice] = useState(0);
+	const [prodStock, setProdStock] = useState(0);
 	const [prodCategory, setProdCategory] = useState("");
 	const [newCategoryName, setNewCategoryName] = useState("");
 	const [categoryError, setCategoryError] = useState("");
@@ -90,6 +99,7 @@ export const ProductsPage = () => {
 	const [prodImagePreview, setProdImagePreview] = useState<string | null>(null);
 	const [prodSubmitting, setProdSubmitting] = useState(false);
 	const [categoryCreating, setCategoryCreating] = useState(false);
+	const createCategoryMutation = useCreateCategoryMutation();
 
 	// Validation states
 	const [nameError, setNameError] = useState("");
@@ -98,55 +108,44 @@ export const ProductsPage = () => {
 	const [imageError, setImageError] = useState("");
 
 	// Search, Filtering and Pagination
-	const [productSearch, setProductSearch] = useState("");
-	const [productPage, setProductPage] = useState(1);
-	const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("all");
-	const [sortBy, setSortBy] = useState("newest");
-	const productsPerPage = 10;
+	const [search, setSearch] = useState<string | undefined>(undefined);
+	const [currentPage, setCurrentPage] = useState(0);
+	const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<
+		string | undefined
+	>(undefined);
+	const [sortBy, setSortBy] = useState("createdAt,desc");
+	const PRODUCTS_PER_PAGE = 10;
+	const { data: productPage, refetch: refetchProducts } = useProductsQuery({
+		q: search,
+		page: currentPage,
+		categoryId: selectedCategoryFilter,
+		sort: sortBy,
+	});
 
 	const handleSearchChange = (value: string) => {
-		setProductSearch(value);
-		setProductPage(1);
+		setSearch(value);
+		setCurrentPage(0);
 	};
 
 	const handleCategoryFilterChange = (value: string) => {
 		setSelectedCategoryFilter(value);
-		setProductPage(1);
+		setCurrentPage(0);
 	};
 
 	const handleSortByChange = (value: string) => {
 		setSortBy(value);
-		setProductPage(1);
+		setCurrentPage(0);
 	};
 
-	const isFilterActive = productSearch !== "" || selectedCategoryFilter !== "all" || sortBy !== "newest";
+	const isFilterActive =
+		!!search?.trim() || !!selectedCategoryFilter || sortBy !== "createdAt,desc";
 
 	const handleResetFilters = () => {
-		setProductSearch("");
-		setSelectedCategoryFilter("all");
-		setSortBy("newest");
-		setProductPage(1);
+		setSearch(undefined);
+		setSelectedCategoryFilter(undefined);
+		setSortBy("createdAt,desc");
+		setCurrentPage(0);
 	};
-
-	const loadTableData = useCallback(async () => {
-		try {
-			const result = await productService.getProductsPage({
-				page: 1,
-				size: 1000,
-				query: productSearch.trim() || undefined,
-				categoryId: selectedCategoryFilter !== "all" ? selectedCategoryFilter : undefined,
-			});
-
-			setTableProducts(result.items);
-			setTableTotalElements(result.items.length);
-			setTableTotalPages(Math.max(1, Math.ceil(result.items.length / productsPerPage)));
-		} catch (error) {
-			console.error("Failed to load dashboard products table:", error);
-			setTableProducts([]);
-			setTableTotalElements(0);
-			setTableTotalPages(1);
-		}
-	}, [productSearch, productsPerPage, selectedCategoryFilter]);
 
 	useEffect(() => {
 		return () => {
@@ -156,35 +155,13 @@ export const ProductsPage = () => {
 		};
 	}, []);
 
-	const loadData = useCallback(async () => {
-		try {
-			const [prodsData, catsData] = await Promise.all([
-				fetchStoreProducts(true),
-				productService.getCategories(),
-			]);
-			setProducts(prodsData);
-			setCategories(catsData);
-			setProdCategory((current) => current || catsData[0]?.id || "");
-			await loadTableData();
-		} catch (error) {
-			console.error("Failed to load dashboard products data:", error);
-			toast.error("Failed to refresh product data.");
-		} finally {
-			setLoading(false);
-		}
-	}, [fetchStoreProducts, loadTableData]);
-
-	useEffect(() => {
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		loadData();
-	}, [loadData]);
-
-	useEffect(() => {
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		void loadTableData();
-	}, [loadTableData]);
-
-	const showConfirm = (title: string, desc: string, action: () => void, isDestructive = false, confirmText = "Continue") => {
+	const showConfirm = (
+		title: string,
+		desc: string,
+		action: () => void,
+		isDestructive = false,
+		confirmText = "Continue",
+	) => {
 		setConfirmTitle(title);
 		setConfirmDesc(desc);
 		setConfirmAction(() => action);
@@ -197,9 +174,9 @@ export const ProductsPage = () => {
 	const resetProductForm = () => {
 		setProdName("");
 		setProdDesc("");
-		setProdPrice("");
-		setProdStock("");
-		setProdCategory(categories[0]?.id || "");
+		setProdPrice(0);
+		setProdStock(0);
+		setProdCategory(categories?.[0]?.id || "");
 		setNewCategoryName("");
 		setCategoryError("");
 		setProdImage(null);
@@ -213,87 +190,40 @@ export const ProductsPage = () => {
 
 	const openNewProductModal = () => {
 		resetProductForm();
-		if (categories.length > 0) {
-			setProdCategory(categories[0].id);
-		}
 		setIsProductModalOpen(true);
 	};
 
 	const openEditProductModal = (product: Product) => {
 		setEditingProduct(product);
 		setProdName(product.name);
-		setProdDesc(product.description || product.flavor || "");
-		setProdPrice(product.price.replace(/[^0-9.]/g, ""));
-		setProdStock(product.stock !== undefined ? String(product.stock) : "100");
-
-		const matchCat = categories.find(c => c.label.toLowerCase() === product.category.toLowerCase());
-		setProdCategory(matchCat ? matchCat.id : categories[0]?.id || "");
+		setProdDesc(product.description ?? "");
+		setProdPrice(product.price);
+		setProdStock(product.stockQuantity);
+		setProdCategory(product.category.id);
 		setProdImage(null);
-		setProdImagePreview(product.image);
+		setProdImagePreview(product.imageUrl);
 		setIsProductModalOpen(true);
 	};
 
-	const appendImageForSubmit = async (formData: FormData) => {
-		if (prodImage) {
-			formData.append("image", prodImage);
-			return;
-		}
-
-		if (!editingProduct || !prodImagePreview) {
-			return;
-		}
-
-		try {
-			const response = await fetch(prodImagePreview);
-			if (!response.ok) return;
-
-			const blob = await response.blob();
-			const extension = blob.type.includes("png")
-				? "png"
-				: blob.type.includes("webp")
-					? "webp"
-					: "jpg";
-			const file = new File([blob], `product-image.${extension}`, { type: blob.type || "image/jpeg" });
-			formData.append("image", file);
-		} catch (error) {
-			console.warn("Failed to preserve existing product image during update:", error);
-		}
-	};
-
 	const createCategoryNow = async () => {
-		const label = newCategoryName.trim();
-		if (!label) {
-			setCategoryError("Category name is required.");
-			return;
-		}
-
-		const duplicate = categories.some((cat) => cat.label.toLowerCase() === label.toLowerCase());
-		if (duplicate) {
-			setCategoryError("That category already exists.");
+		const trimmedName = newCategoryName.trim();
+		if (!trimmedName) {
+			setCategoryError("Category name cannot be empty");
 			return;
 		}
 
 		setCategoryCreating(true);
-		try {
-			const created = await productService.createCategory(label);
-			if (!created) {
-				toast.error("Failed to create category.");
-				return;
-			}
+		setCategoryError("");
 
-			setCategories((current) => {
-				if (current.some((cat) => cat.id === created.id)) {
-					return current;
-				}
-				return [...current, created];
-			});
-			setProdCategory(created.id);
-			setNewCategoryName("");
-			setCategoryError("");
-			toast.success("Category created successfully.");
-		} catch (error) {
-			console.error("Category creation failed:", error);
-			toast.error("An error occurred while creating the category.");
+		try {
+			const newCategory = await createCategoryMutation.mutateAsync(trimmedName);
+
+			if (newCategory) {
+				setProdCategory(newCategory.id);
+				setNewCategoryName("");
+			}
+		} catch {
+			setCategoryError("Failed to create category. Please try again.");
 		} finally {
 			setCategoryCreating(false);
 		}
@@ -305,183 +235,137 @@ export const ProductsPage = () => {
 			newCategoryName.trim()
 				? `Do you want to create the category "${newCategoryName.trim()}" and assign it to this product?`
 				: "Do you want to create this category and assign it to this product?",
-			() => {
-				void createCategoryNow();
-			},
+			createCategoryNow,
 			false,
 			"Create Category",
 		);
 	};
 
-	const handleProductSubmit = async (e: FormEvent) => {
+	const handleProductSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		
-		let hasErrors = false;
-
-		// Validate product name
-		if (!prodName.trim()) {
-			setNameError("Product name is required.");
-			hasErrors = true;
-		} else {
-			setNameError("");
-		}
-
-		// Validate price
-		const parsedPrice = parseFloat(prodPrice);
-		if (isNaN(parsedPrice) || parsedPrice <= 0) {
-			setPriceError("Price must be a positive number.");
-			hasErrors = true;
-		} else {
-			setPriceError("");
-		}
-
-		// Validate stock quantity
-		const parsedStock = parseInt(prodStock);
-		if (isNaN(parsedStock) || parsedStock < 0) {
-			setStockError("Stock must be a non-negative integer.");
-			hasErrors = true;
-		} else {
-			setStockError("");
-		}
-
-		// Validate image presence for new products
-		if (!editingProduct && !prodImage) {
-			setImageError("Product thumbnail image is required.");
-			hasErrors = true;
-		} else {
-			setImageError("");
-		}
-
-		if (hasErrors) {
-			toast.error("Please correct the form errors before submitting.");
-			return;
-		}
-
 		setProdSubmitting(true);
-		try {
-			const formData = new FormData();
-			formData.append("name", prodName.trim());
-			formData.append("description", prodDesc.trim());
-			formData.append("price", parseFloat(prodPrice).toFixed(2));
-			formData.append("stockQuantity", String(parseInt(prodStock) || 0));
-			formData.append("categoryId", prodCategory);
-			await appendImageForSubmit(formData);
 
-			let result: Product | null = null;
-			if (editingProduct) {
-				result = await productService.updateProduct(editingProduct.id, formData);
-				if (result) toast.success("Product updated successfully!");
-			} else {
-				result = await productService.createProduct(formData);
-				if (result) toast.success("Product created successfully!");
+		const formData = new FormData();
+		formData.append("name", prodName.trim());
+		formData.append("description", prodDesc.trim());
+		formData.append("price", prodPrice.toString());
+		formData.append("stockQuantity", prodStock.toString());
+		formData.append("categoryId", prodCategory);
+		if (prodImage) formData.append("image", prodImage);
+
+		const product = editingProduct
+			? await updateProductMutation.mutateAsync({
+					id: editingProduct.id,
+					formData,
+				})
+			: await createProductMutation.mutateAsync(formData);
+
+		if (product) {
+			setIsProductModalOpen(false);
+			resetProductForm();
+			setSortBy("createdAt,desc");
+			setCurrentPage(0);
+			setHighlightedProductId(product.id);
+
+			if (highlightTimeoutRef.current !== null) {
+				window.clearTimeout(highlightTimeoutRef.current);
 			}
 
-			if (result) {
-				setIsProductModalOpen(false);
-				resetProductForm();
-				setSortBy("newest");
-				setProductPage(1);
-				setHighlightedProductId(result.id);
-				setTableProducts((current) => [result, ...current.filter((product) => product.id !== result.id)].slice(0, productsPerPage));
+			highlightTimeoutRef.current = window.setTimeout(() => {
+				setHighlightedProductId(null);
+				refetchProducts();
+			}, 2000);
 
-				if (highlightTimeoutRef.current !== null) {
-					window.clearTimeout(highlightTimeoutRef.current);
-				}
-
-				highlightTimeoutRef.current = window.setTimeout(() => {
-					setHighlightedProductId(null);
-					void loadTableData();
-				}, 2000);
-				await loadData();
-			} else {
-				toast.error("Failed to save product.");
-			}
-		} catch (error) {
-			console.error("Product submission failed:", error);
-			toast.error("An error occurred during submission.");
-		} finally {
-			setProdSubmitting(false);
+			await refetch();
 		}
+		setProdSubmitting(false);
 	};
 
 	const handleDeleteProduct = (productId: string) => {
-		const product = products.find((p) => p.id === productId);
+		const product = productPage?.items.find((p) => p.id === productId);
 		const productName = product ? product.name : "this product";
 
 		showConfirm(
 			"Delete Product",
 			`Are you sure you want to delete "${productName}"? This action cannot be undone and will permanently remove this item from the catalog.`,
 			async () => {
-				try {
-					const success = await productService.deleteProduct(productId);
-					if (success) {
-						const nextTotalElements = Math.max(0, tableTotalElements - 1);
-						const nextTotalPages = Math.max(1, Math.ceil(nextTotalElements / productsPerPage));
-
-						removeStoreProduct(productId);
-						setProducts((current) => current.filter((item) => item.id !== productId));
-						setTableProducts((current) => current.filter((item) => item.id !== productId));
-						setTableTotalElements(nextTotalElements);
-						setTableTotalPages(nextTotalPages);
-						setProductPage((current) => Math.min(current, nextTotalPages));
-						toast.success("Product deleted successfully.");
-						await loadData();
-					} else {
-						toast.error("Failed to delete product.");
-					}
-				} catch (error) {
-					console.error("Product deletion failed:", error);
-					toast.error("An error occurred while deleting.");
-				}
+				await deleteProductMutation.mutate(productId);
+				await refetch();
 			},
 			true,
-			"Delete"
+			"Delete",
 		);
 	};
 
-	const totalProductPages = tableTotalPages;
-	const paginatedProducts = useMemo(() => {
-		const sorted = getSortedProducts(tableProducts, sortBy);
-		const start = (productPage - 1) * productsPerPage;
-		return sorted.slice(start, start + productsPerPage);
-	}, [productPage, productsPerPage, sortBy, tableProducts]);
-
-	const totalProducts = products.length;
-	const totalCategories = categories.length;
-	const lowStockProducts = useMemo(
-		() => products.filter((product) => typeof product.stock === "number" && product.stock <= 10),
-		[products],
-	);
-	const averagePrice = useMemo(() => {
-		if (products.length === 0) return 0;
-		const total = products.reduce((sum, product) => {
-			const price = parseFloat((product.price || "").replace(/[^0-9.]/g, "")) || 0;
-			return sum + price;
-		}, 0);
-		return total / products.length;
-	}, [products]);
-
-	if (loading && products.length === 0) {
+	if (isPending || !analytics || !categories || !productPage) {
 		return (
-			<div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
-				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-950"></div>
-				<p className="text-xs text-slate-500 font-semibold">Loading catalog list...</p>
+			<div className="flex flex-col items-center justify-center min-h-100 gap-3">
+				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-950" />
+				<p className="text-xs text-slate-500 font-semibold">
+					Loading catalog list...
+				</p>
 			</div>
 		);
 	}
+
+	const tableTotalPages = productPage.totalPages;
+	const tableTotalElements = productPage.totalElements;
+
+	const start = currentPage * PRODUCTS_PER_PAGE + 1;
+	const end = Math.min(
+		(currentPage + 1) * PRODUCTS_PER_PAGE,
+		productPage.totalElements,
+	);
+
+	const analystsCards = [
+		{
+			label: "Total Products",
+			value: analytics.totalProducts,
+			subtitle: "Across the catalog",
+			accent: "bg-slate-50 text-slate-700",
+			icon: Package,
+		},
+		{
+			label: "Categories",
+			value: analytics.totalCategories,
+			subtitle: "Available product groups",
+			accent: "bg-teal-50 text-teal-700",
+			icon: Layers,
+		},
+		{
+			label: "Low Stock",
+			value: analytics.lowStockCount,
+			subtitle: "Needs attention",
+			accent: "bg-amber-50 text-amber-700",
+			icon: AlertTriangle,
+		},
+		{
+			label: "Avg Price",
+			value: `${analytics.averagePrice.toFixed(2)} MAD`,
+			subtitle: "Catalog average",
+			accent: "bg-lime-50 text-lime-700",
+			icon: BadgeDollarSign,
+		},
+	];
 
 	return (
 		<div className="space-y-6">
 			<div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 				<div className="space-y-1">
-					<p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">Products</p>
-					<h2 className="text-2xl font-playfair text-slate-950 sm:text-3xl">Product list</h2>
-					<p className="max-w-2xl text-sm text-slate-500">Manage catalog, pricing, and stock.</p>
+					<p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">
+						Products
+					</p>
+					<h2 className="text-2xl font-playfair text-slate-950 sm:text-3xl">
+						Product list
+					</h2>
+					<p className="max-w-2xl text-sm text-slate-500">
+						Manage catalog, pricing, and stock.
+					</p>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<Button
 						variant="outline"
-						onClick={() => void loadData()}
+						onClick={() => refetch()}
 						className="h-10 rounded-xl border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 text-xs font-semibold"
 					>
 						<RefreshCw className="mr-1.5 size-4" />
@@ -498,52 +382,31 @@ export const ProductsPage = () => {
 			</div>
 
 			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-				{[
-					{
-						label: "Total Products",
-						value: totalProducts.toString(),
-						subtitle: "Across the catalog",
-						accent: "bg-slate-50 text-slate-700",
-						icon: Package,
-					},
-					{
-						label: "Categories",
-						value: totalCategories.toString(),
-						subtitle: "Available product groups",
-						accent: "bg-teal-50 text-teal-700",
-						icon: Layers,
-					},
-					{
-						label: "Low Stock",
-						value: lowStockProducts.length.toString(),
-						subtitle: "Needs attention",
-						accent: "bg-amber-50 text-amber-700",
-						icon: AlertTriangle,
-					},
-					{
-						label: "Avg Price",
-						value: `${averagePrice.toFixed(2)} MAD`,
-						subtitle: "Catalog average",
-						accent: "bg-lime-50 text-lime-700",
-						icon: BadgeDollarSign,
-					},
-				].map((metric, index) => {
+				{analystsCards.map((metric, index) => {
 					const Icon = metric.icon;
 
 					return (
 						<motion.div
 							key={metric.label}
-							{...cardMotion}
+							{...CARD_MOTION}
 							transition={{ duration: 0.35, delay: index * 0.05 }}
 							className="relative overflow-hidden rounded-3xl border border-white bg-white p-5 shadow-[0_16px_36px_-28px_rgba(15,23,42,0.42)] ring-1 ring-slate-100 transition-shadow hover:shadow-[0_20px_50px_-30px_rgba(15,23,42,0.5)]"
 						>
 							<div className="flex items-start justify-between gap-4">
 								<div className="min-w-0">
-									<p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">{metric.label}</p>
-									<h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{metric.value}</h3>
-									<p className="mt-1 text-xs text-slate-500">{metric.subtitle}</p>
+									<p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+										{metric.label}
+									</p>
+									<h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+										{metric.value}
+									</h3>
+									<p className="mt-1 text-xs text-slate-500">
+										{metric.subtitle}
+									</p>
 								</div>
-								<div className={`grid size-12 shrink-0 place-items-center rounded-2xl ring-1 ring-inset ring-slate-200/70 ${metric.accent}`}>
+								<div
+									className={`grid size-12 shrink-0 place-items-center rounded-2xl ring-1 ring-inset ring-slate-200/70 ${metric.accent}`}
+								>
 									<Icon className="size-5" />
 								</div>
 							</div>
@@ -558,9 +421,12 @@ export const ProductsPage = () => {
 					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 max-w-2xl">
 						{/* Search Input */}
 						<div className="relative flex-1">
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" strokeWidth={1.7} />
+							<Search
+								className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400"
+								strokeWidth={1.7}
+							/>
 							<Input
-								value={productSearch}
+								value={search}
 								onChange={(e) => handleSearchChange(e.target.value)}
 								placeholder="Search products..."
 								className="pl-9 rounded-xl border-slate-200 focus-visible:ring-emerald-800 text-xs h-9 bg-slate-50/30 w-full"
@@ -571,7 +437,7 @@ export const ProductsPage = () => {
 						<select
 							value={selectedCategoryFilter}
 							onChange={(e) => handleCategoryFilterChange(e.target.value)}
-							className="h-9 rounded-xl border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-emerald-800 cursor-pointer min-w-[130px]"
+							className="h-9 rounded-xl border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-emerald-800 cursor-pointer min-w-32.5"
 						>
 							<option value="all">All Categories</option>
 							{categories.map((cat) => (
@@ -585,14 +451,14 @@ export const ProductsPage = () => {
 						<select
 							value={sortBy}
 							onChange={(e) => handleSortByChange(e.target.value)}
-							className="h-9 rounded-xl border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-emerald-800 cursor-pointer min-w-[150px]"
+							className="h-9 rounded-xl border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-emerald-800 cursor-pointer min-w-37.5"
 						>
-							<option value="newest">Latest first</option>
-							<option value="oldest">Oldest first</option>
-							<option value="name-asc">Sort by Name (A-Z)</option>
-							<option value="name-desc">Sort by Name (Z-A)</option>
-							<option value="price-asc">Price: Low to High</option>
-							<option value="price-desc">Price: High to Low</option>
+							<option value="createdAt,desc">Latest first</option>
+							<option value="createdAt,asc">Oldest first</option>
+							<option value="name,asc">Sort by Name (A-Z)</option>
+							<option value="name,desc">Sort by Name (Z-A)</option>
+							<option value="price,asc">Price: Low to High</option>
+							<option value="price,desc">Price: High to Low</option>
 						</select>
 
 						{/* Reset Filters button */}
@@ -612,28 +478,30 @@ export const ProductsPage = () => {
 						<div className="text-xs text-slate-500 font-bold font-sans">
 							{tableTotalElements === 0
 								? "No items match criteria"
-								: `Showing ${((productPage - 1) * productsPerPage) + 1}-${Math.min(productPage * productsPerPage, tableTotalElements)} of ${tableTotalElements} items`}
+								: `Showing ${start}-${end} of ${tableTotalElements} items`}
 						</div>
-						{totalProductPages > 1 && (
+						{tableTotalPages > 1 && (
 							<div className="flex items-center gap-1 border border-slate-100 rounded-lg p-0.5 bg-slate-50/50">
 								<Button
 									variant="outline"
 									size="icon"
-									disabled={productPage === 1}
-									onClick={() => setProductPage((p) => Math.max(1, p - 1))}
+									disabled={currentPage === 0}
+									onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
 									className="h-7 w-7 rounded-md border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-xs flex items-center justify-center active:scale-95 transition-all"
 									title="Previous Page"
 								>
 									&larr;
 								</Button>
-								<span className="text-[10px] font-bold text-slate-500 px-1.5 min-w-[55px] text-center">
-									{productPage} / {totalProductPages}
+								<span className="text-[10px] font-bold text-slate-500 px-1.5 min-w-13.75 text-center">
+									{currentPage} / {tableTotalPages}
 								</span>
 								<Button
 									variant="outline"
 									size="icon"
-									disabled={productPage === totalProductPages}
-									onClick={() => setProductPage((p) => Math.min(totalProductPages, p + 1))}
+									disabled={currentPage === tableTotalPages}
+									onClick={() =>
+										setCurrentPage((p) => Math.min(tableTotalPages, p + 1))
+									}
 									className="h-7 w-7 rounded-md border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-xs flex items-center justify-center active:scale-95 transition-all"
 									title="Next Page"
 								>
@@ -644,7 +512,7 @@ export const ProductsPage = () => {
 					</div>
 				</div>
 
-				<div className="overflow-x-auto min-h-[580px]">
+				<div className="overflow-x-auto min-h-145">
 					<table className="w-full text-left text-sm border-collapse">
 						<thead>
 							<tr className="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
@@ -658,23 +526,28 @@ export const ProductsPage = () => {
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-slate-100">
-							{paginatedProducts.length === 0 ? (
+							{productPage.items.length === 0 ? (
 								<tr>
-									<td colSpan={7} className="px-6 py-12 text-center text-slate-400 text-xs font-semibold">
+									<td
+										colSpan={7}
+										className="px-6 py-12 text-center text-slate-400 text-xs font-semibold"
+									>
 										No products match your filter.
 									</td>
 								</tr>
-								) : (
-								paginatedProducts.map((product) => (
+							) : (
+								productPage.items.map((product) => (
 									<tr
 										key={product.id}
 										className={`group transition-colors duration-150 hover:bg-slate-50/40 ${
-											highlightedProductId === product.id ? "bg-emerald-50/80" : ""
+											highlightedProductId === product.id
+												? "bg-emerald-50/80"
+												: ""
 										}`}
 									>
 										<td className="px-6 py-4">
 											<Tooltip content={product.id}>
-												<span className="text-[10px] font-sans text-slate-400 max-w-[70px] truncate select-all block cursor-help">
+												<span className="text-[10px] font-sans text-slate-400 max-w-17.5 truncate select-all block cursor-help">
 													{product.id}
 												</span>
 											</Tooltip>
@@ -682,41 +555,50 @@ export const ProductsPage = () => {
 										<td className="px-6 py-4">
 											<div className="flex items-center gap-3">
 												<div className="size-11 shrink-0 bg-slate-50 rounded-xl p-1.5 flex items-center justify-center border border-slate-100 group-hover:scale-105 transition-transform duration-200">
-													<img src={product.image} alt={product.name} className="h-full object-contain" />
+													<img
+														src={product.imageUrl}
+														alt={product.name}
+														className="h-full object-contain"
+													/>
 												</div>
 												<div>
-													<p className="font-bold text-slate-900 text-xs leading-normal">{product.name}</p>
-													<p className="text-[10px] text-slate-400 mt-0.5 max-w-[220px] truncate">{product.flavor}</p>
+													<p className="font-bold text-slate-900 text-xs leading-normal">
+														{product.name}
+													</p>
 												</div>
 											</div>
 										</td>
-										<td className="px-6 py-4 text-slate-500 text-xs max-w-[200px] truncate">
+										<td className="px-6 py-4 text-slate-500 text-xs max-w-50 truncate">
 											{product.description || "No description provided."}
 										</td>
 										<td className="px-6 py-4">
 											<span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-100 border border-slate-200/50 text-slate-700 px-2 py-0.5 rounded-md inline-block">
-												{product.category}
+												{product.category.label}
 											</span>
 										</td>
 										<td className="px-6 py-4 font-semibold text-slate-900 text-xs">
-											{product.price}
+											{product.price} MAD
 										</td>
 										<td className="px-6 py-4 font-semibold text-xs">
-											<span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md ${
-												(product.stock || 0) === 0
-													? "bg-rose-50 text-rose-700 border border-rose-100/50"
-													: (product.stock || 0) < 10
-													? "bg-amber-50 text-amber-700 border border-amber-100/50"
-													: "bg-emerald-50 text-emerald-800 border border-emerald-100/50"
-											}`}>
-												{product.stock !== undefined ? `${product.stock} units` : "0 units"}
+											<span
+												className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md ${
+													product.stockQuantity === 0
+														? "bg-rose-50 text-rose-700 border border-rose-100/50"
+														: product.stockQuantity < 10
+															? "bg-amber-50 text-amber-700 border border-amber-100/50"
+															: "bg-emerald-50 text-emerald-800 border border-emerald-100/50"
+												}`}
+											>
+												{product.stockQuantity} units
 											</span>
 										</td>
 										<td className="px-6 py-4 text-right">
 											<div className="flex items-center justify-end gap-1.5">
 												<Tooltip content="View in Store">
 													<button
-														onClick={() => window.open(`/product/${product.id}`, "_blank")}
+														onClick={() =>
+															window.open(`/product/${product.id}`, "_blank")
+														}
 														className="p-1.5 hover:bg-slate-100 hover:text-slate-900 rounded-lg text-slate-400 transition-colors cursor-pointer active:scale-95"
 													>
 														<ExternalLink className="size-3.5" />
@@ -748,27 +630,27 @@ export const ProductsPage = () => {
 				</div>
 
 				{/* Pagination footer */}
-				{totalProductPages > 1 && (
+				{tableTotalPages > 1 && (
 					<div className="p-4 border-t border-slate-100 bg-white flex items-center justify-center gap-2 select-none">
 						<Button
 							variant="outline"
 							size="icon"
-							disabled={productPage === 1}
-							onClick={() => setProductPage((p) => Math.max(1, p - 1))}
+							disabled={currentPage === 1}
+							onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
 							className="h-8 w-8 rounded-lg border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-xs flex items-center justify-center"
 						>
 							&larr;
 						</Button>
-						
-						{Array.from({ length: totalProductPages }).map((_, i) => {
+
+						{Array.from({ length: tableTotalPages }).map((_, i) => {
 							const pageNum = i + 1;
 							return (
 								<Button
 									key={pageNum}
-									variant={productPage === pageNum ? "default" : "outline"}
-									onClick={() => setProductPage(pageNum)}
+									variant={currentPage === pageNum ? "default" : "outline"}
+									onClick={() => setCurrentPage(pageNum)}
 									className={`h-8 w-8 rounded-lg font-bold cursor-pointer transition-all text-xs flex items-center justify-center ${
-										productPage === pageNum
+										currentPage === pageNum
 											? "bg-emerald-900 hover:bg-emerald-950 text-white border-emerald-900 shadow-sm"
 											: "border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900"
 									}`}
@@ -781,8 +663,10 @@ export const ProductsPage = () => {
 						<Button
 							variant="outline"
 							size="icon"
-							disabled={productPage === totalProductPages}
-							onClick={() => setProductPage((p) => Math.min(totalProductPages, p + 1))}
+							disabled={currentPage === tableTotalPages}
+							onClick={() =>
+								setCurrentPage((p) => Math.min(tableTotalPages, p + 1))
+							}
 							className="h-8 w-8 rounded-lg border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-xs flex items-center justify-center"
 						>
 							&rarr;
@@ -793,7 +677,7 @@ export const ProductsPage = () => {
 
 			{/* MODAL: CREATE OR UPDATE PRODUCT */}
 			{isProductModalOpen && (
-				<div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs">
+				<div className="fixed inset-0 z-999 flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs">
 					<div className="relative w-full max-w-xl bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
 						<button
 							onClick={() => {
@@ -812,7 +696,9 @@ export const ProductsPage = () => {
 						<form onSubmit={handleProductSubmit} className="space-y-4">
 							<div className="grid gap-4 sm:grid-cols-2">
 								<div className="space-y-1.5">
-									<label className="text-xs font-bold text-slate-600">Product Name *</label>
+									<label className="text-xs font-bold text-slate-600">
+										Product Name *
+									</label>
 									<Input
 										value={prodName}
 										onChange={(e) => {
@@ -823,10 +709,16 @@ export const ProductsPage = () => {
 										required
 										className={`rounded-xl border-emerald-900/10 focus-visible:ring-emerald-800 ${nameError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
 									/>
-									{nameError && <p className="text-[10px] font-semibold text-red-500 mt-0.5">{nameError}</p>}
+									{nameError && (
+										<p className="text-[10px] font-semibold text-red-500 mt-0.5">
+											{nameError}
+										</p>
+									)}
 								</div>
 								<div className="space-y-1.5">
-									<label className="text-xs font-bold text-slate-600">Category *</label>
+									<label className="text-xs font-bold text-slate-600">
+										Category *
+									</label>
 									<select
 										value={prodCategory}
 										onChange={(e) => setProdCategory(e.target.value)}
@@ -837,14 +729,16 @@ export const ProductsPage = () => {
 											<option key={cat.id} value={cat.id}>
 												{cat.label}
 											</option>
-											))}
+										))}
 									</select>
 								</div>
 							</div>
 
 							<div className="grid gap-3 sm:grid-cols-[1fr_auto]">
 								<div className="space-y-1.5">
-									<label className="text-xs font-bold text-slate-600">Add New Category</label>
+									<label className="text-xs font-bold text-slate-600">
+										Add New Category
+									</label>
 									<Input
 										value={newCategoryName}
 										onChange={(e) => {
@@ -854,7 +748,11 @@ export const ProductsPage = () => {
 										placeholder="e.g. Immune Support"
 										className={`rounded-xl border-emerald-900/10 focus-visible:ring-emerald-800 ${categoryError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
 									/>
-									{categoryError && <p className="text-[10px] font-semibold text-red-500 mt-0.5">{categoryError}</p>}
+									{categoryError && (
+										<p className="text-[10px] font-semibold text-red-500 mt-0.5">
+											{categoryError}
+										</p>
+									)}
 								</div>
 								<div className="flex items-end">
 									<Button
@@ -871,13 +769,15 @@ export const ProductsPage = () => {
 
 							<div className="grid gap-4 sm:grid-cols-2">
 								<div className="space-y-1.5">
-									<label className="text-xs font-bold text-slate-600">Price (MAD) *</label>
+									<label className="text-xs font-bold text-slate-600">
+										Price (MAD) *
+									</label>
 									<Input
 										type="number"
 										step="0.01"
 										value={prodPrice}
 										onChange={(e) => {
-											setProdPrice(e.target.value);
+											setProdPrice(+e.target.value);
 											const val = parseFloat(e.target.value);
 											if (!isNaN(val) && val > 0) setPriceError("");
 										}}
@@ -885,47 +785,67 @@ export const ProductsPage = () => {
 										required
 										className={`rounded-xl border-emerald-900/10 focus-visible:ring-emerald-800 ${priceError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
 									/>
-									{priceError && <p className="text-[10px] font-semibold text-red-500 mt-0.5">{priceError}</p>}
+									{priceError && (
+										<p className="text-[10px] font-semibold text-red-500 mt-0.5">
+											{priceError}
+										</p>
+									)}
 								</div>
 								<div className="space-y-1.5">
-									<label className="text-xs font-bold text-slate-600">Stock Quantity</label>
+									<label className="text-xs font-bold text-slate-600">
+										Stock Quantity
+									</label>
 									<Input
 										type="number"
 										value={prodStock}
 										onChange={(e) => {
-											setProdStock(e.target.value);
+											setProdStock(+e.target.value);
 											const stkVal = parseInt(e.target.value);
 											if (!isNaN(stkVal) && stkVal >= 0) setStockError("");
 										}}
 										placeholder="e.g. 100"
 										className={`rounded-xl border-emerald-900/10 focus-visible:ring-emerald-800 ${stockError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
 									/>
-									{stockError && <p className="text-[10px] font-semibold text-red-500 mt-0.5">{stockError}</p>}
+									{stockError && (
+										<p className="text-[10px] font-semibold text-red-500 mt-0.5">
+											{stockError}
+										</p>
+									)}
 								</div>
 							</div>
 
 							<div className="space-y-1.5">
-								<label className="text-xs font-bold text-slate-600">Description / Flavor Details</label>
+								<label className="text-xs font-bold text-slate-600">
+									Description / Flavor Details
+								</label>
 								<textarea
 									value={prodDesc}
 									onChange={(e) => setProdDesc(e.target.value)}
 									placeholder="Describe the product formula, flavor profiles, and wellness benefits..."
 									rows={3}
-									className="flex min-h-[80px] w-full rounded-xl border border-emerald-900/10 bg-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-800"
+									className="flex min-h-20 w-full rounded-xl border border-emerald-900/10 bg-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-800"
 								/>
 							</div>
 
 							<div className="space-y-2">
-								<label className="text-xs font-bold text-slate-600">Product Thumbnail *</label>
-								<div className={`relative group border-2 border-dashed rounded-2xl p-6 bg-slate-50/40 hover:bg-emerald-50/10 transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 min-h-[140px] ${
-									imageError 
-										? "border-red-500 hover:border-red-600" 
-										: "border-emerald-900/10 hover:border-emerald-800/50"
-								}`}>
+								<label className="text-xs font-bold text-slate-600">
+									Product Thumbnail *
+								</label>
+								<div
+									className={`relative group border-2 border-dashed rounded-2xl p-6 bg-slate-50/40 hover:bg-emerald-50/10 transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-2.5 min-h-35 ${
+										imageError
+											? "border-red-500 hover:border-red-600"
+											: "border-emerald-900/10 hover:border-emerald-800/50"
+									}`}
+								>
 									{prodImagePreview ? (
 										<div className="flex flex-col items-center gap-2">
 											<div className="size-20 rounded-xl overflow-hidden bg-white p-1 border border-slate-100 shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-												<img src={prodImagePreview} alt="Preview" className="h-full object-contain" />
+												<img
+													src={prodImagePreview}
+													alt="Preview"
+													className="h-full object-contain"
+												/>
 											</div>
 											<span className="text-[10px] font-bold text-slate-400 group-hover:text-emerald-800 transition-colors">
 												Click to replace image
@@ -937,8 +857,12 @@ export const ProductsPage = () => {
 												<Plus className="size-5" />
 											</div>
 											<div className="space-y-0.5">
-												<span className="text-xs font-bold text-slate-700 block">Upload Product Image</span>
-												<span className="text-[10px] text-slate-400 block">PNG, JPG, or WEBP up to 5MB</span>
+												<span className="text-xs font-bold text-slate-700 block">
+													Upload Product Image
+												</span>
+												<span className="text-[10px] text-slate-400 block">
+													PNG, JPG, or WEBP up to 5MB
+												</span>
 											</div>
 										</div>
 									)}
@@ -948,18 +872,6 @@ export const ProductsPage = () => {
 										onChange={(e) => {
 											const file = e.target.files?.[0];
 											if (file) {
-												// Validate file size (max 5MB)
-												const maxBytes = 5 * 1024 * 1024;
-												if (file.size > maxBytes) {
-													toast.error("File is too large. Image size must be less than 5MB.");
-													return;
-												}
-												// Validate file type
-												const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-												if (!validTypes.includes(file.type)) {
-													toast.error("Invalid file format. Please upload JPEG, PNG, or WEBP.");
-													return;
-												}
 												setProdImage(file);
 												setProdImagePreview(URL.createObjectURL(file));
 												setImageError("");
@@ -968,7 +880,11 @@ export const ProductsPage = () => {
 										className="absolute inset-0 opacity-0 cursor-pointer z-10 w-full h-full"
 									/>
 								</div>
-								{imageError && <p className="text-[10px] font-semibold text-red-500 mt-0.5">{imageError}</p>}
+								{imageError && (
+									<p className="text-[10px] font-semibold text-red-500 mt-0.5">
+										{imageError}
+									</p>
+								)}
 							</div>
 
 							<div className="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-6 animate-in fade-in duration-200">
@@ -988,7 +904,11 @@ export const ProductsPage = () => {
 									disabled={prodSubmitting}
 									className="h-10 px-5 bg-emerald-900 hover:bg-emerald-950 text-white rounded-xl font-bold cursor-pointer text-xs flex items-center gap-1.5 shadow-sm"
 								>
-									{prodSubmitting ? "Saving..." : editingProduct ? "Save Changes" : "Create Product"}
+									{prodSubmitting
+										? "Saving..."
+										: editingProduct
+											? "Save Changes"
+											: "Create Product"}
 								</Button>
 							</div>
 						</form>

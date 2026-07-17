@@ -1,81 +1,59 @@
 import { API_ENDPOINTS } from "@/core/config/apiEndpoints";
 import { privateApiRequest } from "@/shared/utils/axiosPrivate";
-import { isSystemError } from "@/shared/types";
-
-export interface BackendAddress {
-	id: string;
-	country: string;
-	city: string;
-	street: string;
-	phone: string;
-	isDefault: boolean;
-}
-
-export interface AddressRequest {
-	country: string;
-	city: string;
-	street: string;
-	phone: string;
-	isDefault?: boolean;
-}
+import {
+	addressSchema,
+	type Address,
+	type AddressRequest,
+} from "../schemas/addressSchema";
 
 export const addressService = {
-	getDefaultAddress: async (): Promise<BackendAddress | null> => {
-		try {
-			const response = await privateApiRequest<BackendAddress>({
+	getDefaultAddress: async () => {
+		const response = await privateApiRequest<Address | null>(
+			{
 				url: API_ENDPOINTS.ADDRESSES.ROOT,
 				method: "GET",
+			},
+			{ ignoreErrors: true },
+		);
+
+		const parsed = addressSchema.safeParse(response);
+		if (!parsed.success) {
+			throw new Error("Address data validation failed: ", {
+				cause: parsed.error,
 			});
-
-			if (isSystemError(response)) {
-				console.error("Get default address failed:", response);
-				return null;
-			}
-
-			return response && response.id ? response : null;
-		} catch (error) {
-			console.error("Get default address request failed:", error);
-			return null;
 		}
+		return parsed.data;
 	},
 
-	createDefaultAddress: async (payload: AddressRequest): Promise<BackendAddress | null> => {
-		try {
-			const response = await privateApiRequest<BackendAddress>({
-				url: API_ENDPOINTS.ADDRESSES.ROOT,
-				method: "POST",
-				data: payload,
+	createOrUpdateDefaultAddress: async (payload: AddressRequest) => {
+		const response = await privateApiRequest<Address>({
+			url: API_ENDPOINTS.ADDRESSES.ROOT,
+			method: "POST",
+			data: payload,
+		});
+
+		const parsed = addressSchema.safeParse(response);
+		if (!parsed.success) {
+			throw new Error("Address data validation failed: ", {
+				cause: parsed.error,
 			});
-
-			if (isSystemError(response)) {
-				console.error("Create default address failed:", response);
-				return null;
-			}
-
-			return response && response.id ? response : null;
-		} catch (error) {
-			console.error("Create default address request failed:", error);
-			return null;
 		}
+		return parsed.data;
 	},
 
-	updateDefaultAddress: async (payload: AddressRequest): Promise<BackendAddress | null> => {
-		try {
-			const response = await privateApiRequest<BackendAddress>({
-				url: API_ENDPOINTS.ADDRESSES.ROOT,
-				method: "PUT",
-				data: payload,
+	updateDefaultAddress: async (payload: AddressRequest) => {
+		const response = await privateApiRequest<Address>({
+			url: API_ENDPOINTS.ADDRESSES.ROOT,
+			method: "PUT",
+			data: payload,
+		});
+
+		const parsed = addressSchema.safeParse(response);
+		if (!parsed.success) {
+			throw new Error("Address data validation failed: ", {
+				cause: parsed.error,
 			});
-
-			if (isSystemError(response)) {
-				console.error("Update default address failed:", response);
-				return null;
-			}
-
-			return response && response.id ? response : null;
-		} catch (error) {
-			console.error("Update default address request failed:", error);
-			return null;
 		}
+		return parsed.data;
 	},
 };

@@ -6,7 +6,7 @@ const systemErrorSchema = z.object({
 	type: z.string().default("about:blank"),
 	status: z.number(),
 	title: z.string(),
-	detail: z.string().default(""),
+	detail: z.unknown(),
 	instance: z.string().optional(),
 	description: z.string().default(""),
 });
@@ -44,13 +44,29 @@ const TIMEOUT_ERROR = {
 	code: "REQUEST_TIMEOUT",
 } satisfies SystemError;
 
+const getErrorDetail = (error: unknown): unknown => {
+	if (isAxiosError(error)) {
+		const responseData = error.response?.data;
+
+		if (responseData) {
+			if (typeof responseData === "string") {
+				return responseData;
+			}
+			if (typeof responseData === "object" && responseData !== null)
+				return responseData;
+		}
+		return error.message || "The request failed unexpectedly.";
+	}
+	return error;
+};
+
 const createRuntimeError = (error: unknown) =>
 	({
 		type: "about:blank",
 		title: "Runtime Error",
 		description: "An unexpected error occurred.",
 		status: 500,
-		detail: error instanceof Error ? error.message : String(error),
+		detail: getErrorDetail(error),
 		code: "RUNTIME_ERROR",
 	}) satisfies SystemError;
 
@@ -60,7 +76,7 @@ const createUnexpectedError = (error: AxiosError) =>
 		title: error.response?.statusText?.trim() || "Server Error",
 		status: error.response?.status ?? 500,
 		description: "Unexpected server response.",
-		detail: error.message || "The request failed unexpectedly.",
+		detail: getErrorDetail(error),
 		code: "SYSTEM_ERROR",
 	}) satisfies SystemError;
 

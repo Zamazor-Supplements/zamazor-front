@@ -1,14 +1,7 @@
-import type { BackendAddress } from "@/features/addresses/services/addressService";
+import type { Address } from "../schemas/addressSchema";
 
-export interface ShippingAddressParts {
-	street: string;
-	city: string;
-	phone: string;
-	country: string;
-}
-
-export function parseShippingAddressFallback(shippingAddress?: string | null): ShippingAddressParts {
-	const empty: ShippingAddressParts = {
+export function parseShippingAddressFallback(shippingAddress?: string | null) {
+	const empty: Omit<Address, "id"> = {
 		street: "",
 		city: "",
 		phone: "",
@@ -19,10 +12,19 @@ export function parseShippingAddressFallback(shippingAddress?: string | null): S
 		return empty;
 	}
 
-	const parts = shippingAddress.split(",").map((part) => part.trim()).filter(Boolean);
-	const phonePart = parts.find((part) => part.toLowerCase().startsWith("phone:"));
+	const parts = shippingAddress
+		.split(",")
+		.map((part) => part.trim())
+		.filter(Boolean);
+	const phonePart = parts.find((part) =>
+		part.toLowerCase().startsWith("phone:"),
+	);
 	const countryPart = parts.find((part) => part.toLowerCase() === "morocco");
-	const cleanParts = parts.filter((part) => !part.toLowerCase().startsWith("phone:") && part.toLowerCase() !== "morocco");
+	const cleanParts = parts.filter(
+		(part) =>
+			!part.toLowerCase().startsWith("phone:") &&
+			part.toLowerCase() !== "morocco",
+	);
 
 	return {
 		street: cleanParts[0] || "",
@@ -32,13 +34,20 @@ export function parseShippingAddressFallback(shippingAddress?: string | null): S
 	};
 }
 
-export function buildShippingAddressString(parts: ShippingAddressParts): string {
-	const pieces = [parts.street.trim(), parts.city.trim(), parts.country.trim() || "Morocco"];
+export function buildShippingAddressString(parts: Omit<Address, "id">): string {
+	const pieces = [
+		parts.street.trim(),
+		parts.city.trim(),
+		parts.country.trim() || "Morocco",
+	];
 	const base = pieces.filter(Boolean).join(", ");
 	return parts.phone.trim() ? `${base}, Phone: ${parts.phone.trim()}` : base;
 }
 
-export function toAddressFormValues(address?: BackendAddress | null, fallback?: string | null): ShippingAddressParts {
+export function toAddressFormValues(
+	address: Omit<Address, "id">,
+	fallback?: string | null,
+): Omit<Address, "id"> {
 	const fallbackParts = parseShippingAddressFallback(fallback);
 
 	return {
@@ -47,4 +56,12 @@ export function toAddressFormValues(address?: BackendAddress | null, fallback?: 
 		phone: address?.phone || fallbackParts.phone,
 		country: address?.country || fallbackParts.country,
 	};
+}
+
+export function toAddressString(
+	address: Omit<Address, "id">,
+	fallback?: string | null,
+): string {
+	const parts = toAddressFormValues(address, fallback);
+	return buildShippingAddressString(parts);
 }

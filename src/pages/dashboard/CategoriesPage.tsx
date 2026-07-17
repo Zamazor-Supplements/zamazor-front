@@ -1,26 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/core/config/constants";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { ConfirmDialog } from "@/shared/components/ui/confirm-dialog";
-import { Tooltip } from "@/shared/components/ui/tooltip";
-import { productService } from "@/features/products/services/productService";
-import {
-	Edit,
-	FolderKanban,
-	Plus,
-	RefreshCw,
-	Search,
-	Trash2,
-	X,
-} from "lucide-react";
+import { FolderKanban, Plus, RefreshCw, X } from "lucide-react";
 import type { CategoryAnalytics } from "@/features/dashboard/schemas/dashboardSchema";
-import { dashboardService } from "@/features/dashboard/services/dashboardService";
-
-const CATEGORIES_PER_PAGE = 8;
+import CategoryTable from "@/features/dashboard/components/CategoryTable";
+import { useDashboardCategories } from "@/features/dashboard/hooks/use-dashboard";
+import {
+	useCreateCategoryMutation,
+	useUpdateCategoryMutation,
+} from "@/features/products/hooks/use-category";
 
 const cardMotion = {
 	initial: { opacity: 0, y: 16 },
@@ -37,11 +28,6 @@ const formatCount = (value: number) =>
 export const CategoriesPage = () => {
 	useDocumentTitle(`Categories Management | ${CONFIG.APP_NAME}`);
 
-	const [loading, setLoading] = useState(true);
-	const [search, setSearch] = useState("");
-	const [sortBy, setSortBy] = useState("label-asc");
-	const [page, setPage] = useState(1);
-
 	const [createOpen, setCreateOpen] = useState(false);
 	const [editOpen, setEditOpen] = useState(false);
 	const [editingCategory, setEditingCategory] = useState<
@@ -50,48 +36,14 @@ export const CategoriesPage = () => {
 	const [categoryName, setCategoryName] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [nameError, setNameError] = useState("");
-	const [categoryAnalytics, setCategoryAnalytics] =
-		useState<CategoryAnalytics | null>(null);
+	const {
+		data: categoryAnalytics,
+		isPending,
+		refetch,
+	} = useDashboardCategories();
 
-	const [confirmOpen, setConfirmOpen] = useState(false);
-	const [confirmTitle, setConfirmTitle] = useState("");
-	const [confirmDesc, setConfirmDesc] = useState("");
-	const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
-	const [confirmDestructive, setConfirmDestructive] = useState(false);
-	const [confirmText, setConfirmText] = useState("Continue");
-
-	const loadData = useCallback(async () => {
-		setLoading(true);
-		try {
-			const response = await dashboardService.getCategories();
-			setCategoryAnalytics(response);
-		} catch (error) {
-			console.error("Failed to load categories page data:", error);
-			toast.error("Failed to refresh categories.");
-		} finally {
-			setLoading(false);
-		}
-	}, []);
-
-	useEffect(() => {
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		void loadData();
-	}, [loadData]);
-
-	const showConfirm = (
-		title: string,
-		desc: string,
-		action: () => void,
-		isDestructive = false,
-		confirmLabel = "Continue",
-	) => {
-		setConfirmTitle(title);
-		setConfirmDesc(desc);
-		setConfirmAction(() => action);
-		setConfirmDestructive(isDestructive);
-		setConfirmText(confirmLabel);
-		setConfirmOpen(true);
-	};
+	const createCategoryMutation = useCreateCategoryMutation();
+	const updateCategoryMutation = useUpdateCategoryMutation();
 
 	const openCreate = () => {
 		setEditingCategory(null);
@@ -113,126 +65,28 @@ export const CategoriesPage = () => {
 		setEditingCategory(null);
 	};
 
-	const validateCategoryName = (value: string) => {
-		const next = value.trim();
-		if (!next) {
-			setNameError("Category name is required.");
-			return false;
-		}
-
-		const duplicate = categoryAnalytics?.some(
-			(category) =>
-				category.label.trim().toLowerCase() === next.toLowerCase() &&
-				category.id !== editingCategory?.id,
-		);
-
-		if (duplicate) {
-			setNameError("That category already exists.");
-			return false;
-		}
-
-		setNameError("");
-		return true;
-	};
-
 	const saveCategory = async () => {
-		if (!validateCategoryName(categoryName)) return;
-
 		setSubmitting(true);
+		const nextLabel = categoryName.trim();
 		try {
-			const nextLabel = categoryName.trim();
-			const result = editingCategory
-				? await productService.updateCategory(editingCategory.id, nextLabel)
-				: await productService.createCategory(nextLabel);
+			if (editingCategory)
+				await updateCategoryMutation.mutateAsync({
+					id: editingCategory.id,
+					label: nextLabel,
+				});
+			else await createCategoryMutation.mutateAsync(nextLabel);
 
-			if (!result) {
-				toast.error(
-					editingCategory
-						? "Failed to update category."
-						: "Failed to create category.",
-				);
-				return;
-			}
-
-			toast.success(
-				editingCategory
-					? "Category updated successfully."
-					: "Category created successfully.",
-			);
 			setCreateOpen(false);
 			setEditOpen(false);
 			resetForm();
-			await loadData();
-		} catch (error) {
-			console.error("Category save failed:", error);
-			toast.error("An error occurred while saving the category.");
+			setNameError("");
+			await refetch();
 		} finally {
 			setSubmitting(false);
 		}
 	};
 
-	const handleDelete = (category: CategoryAnalytics[number]) => {
-		showConfirm(
-			"Delete Category",
-			category.productCount > 0
-				? `Delete "${category.label}"? This category is currently linked to ${category.productCount} product(s).`
-				: `Delete "${category.label}"? This action cannot be undone.`,
-			async () => {
-				try {
-					const success = await productService.deleteCategory(category.id);
-					if (!success) {
-						toast.error("Failed to delete category.");
-						return;
-					}
-
-					toast.success("Category deleted successfully.");
-					await loadData();
-				} catch (error) {
-					console.error("Category deletion failed:", error);
-					toast.error("An error occurred while deleting.");
-				}
-			},
-			true,
-			"Delete",
-		);
-	};
-
-	const normalizedSearch = search.trim().toLowerCase();
-	const filteredCategories = useMemo(() => {
-		if (!categoryAnalytics) return [];
-		const next = categoryAnalytics.filter((category) => {
-			if (!normalizedSearch) return true;
-			return (
-				category.id.toLowerCase().includes(normalizedSearch) ||
-				category.label.toLowerCase().includes(normalizedSearch)
-			);
-		});
-
-		next.sort((a, b) => {
-			if (sortBy === "label-desc") return b.label.localeCompare(a.label);
-			if (sortBy === "products-desc")
-				return (b.productCount || 0) - (a.productCount || 0);
-			if (sortBy === "products-asc")
-				return (a.productCount || 0) - (b.productCount || 0);
-			return a.label.localeCompare(b.label);
-		});
-
-		return next;
-	}, [categoryAnalytics, normalizedSearch, sortBy]);
-
-	const totalPages = Math.max(
-		1,
-		Math.ceil(filteredCategories.length / CATEGORIES_PER_PAGE),
-	);
-	const safePage = Math.min(page, totalPages);
-	const paginatedCategories = useMemo(() => {
-		return filteredCategories.slice(
-			(safePage - 1) * CATEGORIES_PER_PAGE,
-			safePage * CATEGORIES_PER_PAGE,
-		);
-	}, [filteredCategories, safePage]);
-
-	if (loading || !categoryAnalytics) {
+	if (isPending || !categoryAnalytics) {
 		return (
 			<div className="flex min-h-105 flex-col items-center justify-center gap-3">
 				<div className="h-8 w-8 animate-spin rounded-full border-b-2 border-emerald-950" />
@@ -260,7 +114,7 @@ export const CategoriesPage = () => {
 				<div className="flex flex-wrap gap-2">
 					<Button
 						variant="outline"
-						onClick={() => void loadData()}
+						onClick={() => refetch()}
 						className="h-10 rounded-xl border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 text-xs font-semibold"
 					>
 						<RefreshCw className="mr-1.5 size-4" />
@@ -316,180 +170,11 @@ export const CategoriesPage = () => {
 				})}
 			</div>
 
-			<div className="overflow-hidden rounded-3xl border border-emerald-900/5 bg-white shadow-md">
-				<div className="flex flex-col gap-3 border-b border-slate-100 bg-white p-4 xl:flex-row xl:items-center xl:justify-between">
-					<div className="flex flex-1 flex-col gap-2.5 sm:flex-row sm:items-center max-w-3xl">
-						<div className="relative flex-1 min-w-0">
-							<Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
-							<Input
-								value={search}
-								onChange={(e) => {
-									setSearch(e.target.value);
-									setPage(1);
-								}}
-								placeholder="Search categories..."
-								className="h-10 rounded-xl border-slate-200 bg-slate-50/40 pl-9 text-xs focus-visible:ring-emerald-800"
-							/>
-						</div>
-
-						<select
-							value={sortBy}
-							onChange={(e) => {
-								setSortBy(e.target.value);
-								setPage(1);
-							}}
-							className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-emerald-800"
-						>
-							<option value="label-asc">Label A-Z</option>
-							<option value="label-desc">Label Z-A</option>
-							<option value="products-desc">Most products</option>
-							<option value="products-asc">Least products</option>
-						</select>
-
-						{(search !== "" || sortBy !== "label-asc") && (
-							<Button
-								variant="outline"
-								onClick={() => {
-									setSearch("");
-									setSortBy("label-asc");
-									setPage(1);
-								}}
-								className="h-10 shrink-0 rounded-xl border border-dashed border-red-200 bg-red-50/25 px-3 text-xs font-semibold text-red-600 transition-all duration-150 hover:bg-red-50 hover:text-red-700"
-							>
-								Reset
-								<X className="ml-1.5 size-3.5" />
-							</Button>
-						)}
-					</div>
-
-					<div className="flex items-center gap-2">
-						<div className="rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-2 text-xs font-bold text-slate-500">
-							{categoryAnalytics.length === 0
-								? "No categories found"
-								: `Showing ${Math.min(categoryAnalytics.length, (safePage - 1) * CATEGORIES_PER_PAGE + 1)}-${Math.min(
-										safePage * CATEGORIES_PER_PAGE,
-										filteredCategories.length,
-									)} of ${filteredCategories.length}`}
-						</div>
-						<div className="flex items-center gap-1 rounded-lg border border-slate-100 bg-slate-50/50 p-0.5 select-none">
-							<Button
-								variant="outline"
-								size="icon"
-								disabled={safePage === 1}
-								onClick={() => setPage((current) => Math.max(1, current - 1))}
-								className="h-7 w-7 rounded-md border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900 disabled:cursor-not-allowed disabled:opacity-40"
-								title="Previous page"
-							>
-								&larr;
-							</Button>
-							<span className="min-w-13.75 px-1.5 text-center text-[10px] font-bold text-slate-500">
-								{safePage} / {totalPages}
-							</span>
-							<Button
-								variant="outline"
-								size="icon"
-								disabled={safePage === totalPages}
-								onClick={() =>
-									setPage((current) => Math.min(totalPages, current + 1))
-								}
-								className="h-7 w-7 rounded-md border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900 disabled:cursor-not-allowed disabled:opacity-40"
-								title="Next page"
-							>
-								&rarr;
-							</Button>
-						</div>
-					</div>
-				</div>
-
-				<div className="overflow-x-auto">
-					<table className="w-full border-collapse text-left text-sm">
-						<thead>
-							<tr className="border-b border-slate-100 bg-slate-50/50 text-xs font-semibold uppercase tracking-wider text-slate-400">
-								<th className="px-6 py-4">Category</th>
-								<th className="px-6 py-4">ID</th>
-								<th className="px-6 py-4">Linked Products</th>
-								<th className="px-6 py-4">Usage</th>
-								<th className="px-6 py-4 text-right">Actions</th>
-							</tr>
-						</thead>
-						<tbody className="divide-y divide-slate-100">
-							{paginatedCategories.length === 0 ? (
-								<tr>
-									<td
-										colSpan={5}
-										className="px-6 py-14 text-center text-slate-400"
-									>
-										No categories match the current filters.
-									</td>
-								</tr>
-							) : (
-								paginatedCategories.map((category) => {
-									return (
-										<tr key={category.id} className="hover:bg-slate-50/40">
-											<td className="px-6 py-4">
-												<div className="flex items-center gap-3">
-													<div className="grid size-10 place-items-center rounded-2xl bg-emerald-50 text-emerald-800 ring-1 ring-emerald-900/8">
-														<FolderKanban className="size-4" />
-													</div>
-													<div>
-														<p className="text-sm font-semibold text-slate-950">
-															{category.label}
-														</p>
-														<p className="text-[11px] text-slate-500">
-															{category.productCount > 0
-																? "Used in catalog"
-																: "Not used yet"}
-														</p>
-													</div>
-												</div>
-											</td>
-											<td className="px-6 py-4">
-												<Tooltip content={category.id}>
-													<span className="cursor-help select-all font-mono text-[10px] font-bold text-slate-500">
-														{category.id.slice(0, 8).toUpperCase()}
-													</span>
-												</Tooltip>
-											</td>
-											<td className="px-6 py-4">
-												<span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
-													{category.productCount} products
-												</span>
-											</td>
-											<td className="px-6 py-4 text-xs text-slate-500">
-												{category.productCount > 0
-													? `Category appears in ${category.productCount} product${category.productCount > 1 ? "s" : ""}.`
-													: "Ready to assign in the product form."}
-											</td>
-											<td className="px-6 py-4 text-right">
-												<div className="flex items-center justify-end gap-2">
-													<Button
-														variant="outline"
-														size="icon"
-														onClick={() => openEdit(category)}
-														className="h-8 w-8 rounded-lg border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-														title="Edit category"
-													>
-														<Edit className="size-4" />
-													</Button>
-													<Button
-														variant="outline"
-														size="icon"
-														onClick={() => handleDelete(category)}
-														className="h-8 w-8 rounded-lg border-rose-200 text-rose-600 hover:bg-rose-50"
-														title="Delete category"
-													>
-														<Trash2 className="size-4" />
-													</Button>
-												</div>
-											</td>
-										</tr>
-									);
-								})
-							)}
-						</tbody>
-					</table>
-				</div>
-			</div>
+			<CategoryTable
+				analytics={categoryAnalytics}
+				refetch={refetch}
+				openEdit={openEdit}
+			/>
 
 			{(createOpen || editOpen) && (
 				<div className="fixed inset-0 z-999 flex items-center justify-center bg-black/55 p-4 backdrop-blur-xs">
@@ -549,7 +234,7 @@ export const CategoriesPage = () => {
 								Cancel
 							</Button>
 							<Button
-								onClick={() => void saveCategory()}
+								onClick={() => saveCategory()}
 								disabled={submitting}
 								className="h-10 rounded-xl bg-emerald-900 px-5 text-xs font-bold text-white hover:bg-emerald-950"
 							>
@@ -564,7 +249,7 @@ export const CategoriesPage = () => {
 				</div>
 			)}
 
-			<ConfirmDialog
+			{/* <ConfirmDialog
 				isOpen={confirmOpen}
 				title={confirmTitle}
 				description={confirmDesc}
@@ -572,7 +257,7 @@ export const CategoriesPage = () => {
 				isDestructive={confirmDestructive}
 				onConfirm={confirmAction || (() => {})}
 				onClose={() => setConfirmOpen(false)}
-			/>
+			/> */}
 		</div>
 	);
 };

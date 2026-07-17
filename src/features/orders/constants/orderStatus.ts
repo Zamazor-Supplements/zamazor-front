@@ -1,24 +1,23 @@
-export const ORDER_STATUSES = [
-	"PENDING",
-	"PAID",
-	"CONFIRMED",
-	"PROCESSING",
-	"SHIPPED",
-	"DELIVERED",
-	"CANCELED",
-	"REFUNDED",
-] as const;
+export const OrderStatus = {
+	Pending: "PENDING",
+	Paid: "PAID",
+	Confirmed: "CONFIRMED",
+	Processing: "PROCESSING",
+	Shipped: "SHIPPED",
+	Delivered: "DELIVERED",
+	Canceled: "CANCELED",
+	Refunded: "REFUNDED",
+} as const;
 
-type OrderStatus = (typeof ORDER_STATUSES)[number];
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
-const ORDER_STATUS_META: Record<
-	OrderStatus,
-	{
-		label: string;
-		badgeClass: string;
-		accentClass: string;
-	}
-> = {
+type Meta = {
+	label: string;
+	badgeClass: string;
+	accentClass: string;
+};
+
+export const ORDER_STATUS_META: Record<OrderStatus, Meta> = {
 	PENDING: {
 		label: "Pending",
 		badgeClass: "border-amber-200/70 bg-amber-50 text-amber-800",
@@ -61,25 +60,16 @@ const ORDER_STATUS_META: Record<
 	},
 } as const;
 
-export const ORDER_STATUS_OPTIONS = ORDER_STATUSES.map((status) => ({
-	value: status,
-	label: ORDER_STATUS_META[status].label,
-}));
+const FinalOrderStatus = new Set<OrderStatus>([
+	OrderStatus.Delivered,
+	OrderStatus.Canceled,
+	OrderStatus.Refunded,
+]);
+type FinalOrderStatus =
+	typeof FinalOrderStatus extends Set<infer T> ? T : never;
 
-const FINAL_ORDER_STATUSES = ["DELIVERED", "CANCELED", "REFUNDED"] as const;
-
-export function isFinalOrderStatus(status: string) {
-	return FINAL_ORDER_STATUSES.includes(status as (typeof FINAL_ORDER_STATUSES)[number]);
-}
-
-export function getOrderStatusMeta(status: string) {
-	if (status in ORDER_STATUS_META) {
-		return ORDER_STATUS_META[status as OrderStatus];
-	}
-
-	return {
-		label: status,
-		badgeClass: "border-teal-200/70 bg-teal-50 text-teal-800",
-		accentClass: "bg-teal-50 text-teal-800",
-	};
+export function isFinalOrderStatus(
+	status: OrderStatus,
+): status is FinalOrderStatus {
+	return FinalOrderStatus.has(status);
 }

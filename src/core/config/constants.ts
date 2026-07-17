@@ -15,7 +15,7 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(import.meta.env);
 
 if (!parsed.success) {
-	console.error("Invalid environment variables:", parsed.error);
+	console.error("Invalid environment variables:", { cause: parsed.error });
 	throw new Error(
 		"Environment validation failed. Fix the errors above before running the app.",
 	);

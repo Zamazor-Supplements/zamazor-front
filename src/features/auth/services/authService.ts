@@ -1,12 +1,10 @@
 import { API_ENDPOINTS } from "@/core/config/apiEndpoints";
 import { publicApiRequest } from "@/shared/utils/axiosPublic";
 import { clearAuth, useAuthStore } from "../stores/authStore";
-import { useCartStore } from "@/shared/hooks/use-cart-store";
 import {
 	refreshResponseSchema,
 	type RefreshResponse,
 } from "../schemas/authSchema";
-import { isSystemError } from "@/shared/types";
 import { tokenManager } from "../globals/tokenManager";
 import { AuthStatus } from "../types";
 import {
@@ -15,10 +13,12 @@ import {
 	type LoginResponse,
 } from "../schemas/loginSchema";
 import type { User } from "../schemas/userSchema";
-import type { RegisterApiRequest } from "../schemas/registerSchema";
+import type { RegisterRequest } from "../schemas/registerSchema";
+import { useGuestCartStore } from "@/services/cart/GuestCartStore";
+import { useGuestWishlistStore } from "@/features/wishlists/stores/guestWishlistStore";
 
 export const authService = {
-	register: async (data: RegisterApiRequest) => {
+	register: async (data: RegisterRequest) => {
 		return publicApiRequest<User>(
 			{
 				url: API_ENDPOINTS.AUTH.REGISTER,
@@ -50,10 +50,11 @@ export const authService = {
 			},
 		);
 
-		if (isSystemError(response)) return response;
 		const parsed = loginResponseSchema.safeParse(response);
 		if (!parsed.success) {
-			throw Error("Login response data validation failed:", parsed.error);
+			throw new Error("Login response data validation failed:", {
+				cause: parsed.error,
+			});
 		}
 
 		const { user, accessToken } = parsed.data;
@@ -63,10 +64,6 @@ export const authService = {
 			status: AuthStatus.Authenticated,
 		});
 		tokenManager.setAccessToken(accessToken);
-
-		useCartStore.getState().syncWithBackend().catch((err) => {
-			console.warn("Failed to sync cart after login:", err);
-		});
 
 		return response;
 	},
@@ -78,30 +75,35 @@ export const authService = {
 		});
 
 		clearAuth();
+
+		useGuestCartStore.getState().clear();
+		useGuestWishlistStore.getState().clear();
 	},
 
 	refresh: async () => {
-		const response = await publicApiRequest<RefreshResponse>(
-			{
-				url: API_ENDPOINTS.AUTH.REFRESH,
-				method: "POST",
-				withCredentials: true,
-			},
-			{ ignoreErrors: true },
-		);
+		try {
+			const response = await publicApiRequest<RefreshResponse>(
+				{
+					url: API_ENDPOINTS.AUTH.REFRESH,
+					method: "POST",
+					withCredentials: true,
+				},
+				{ ignoreErrors: true },
+			);
 
-		if (isSystemError(response)) {
+			const parsed = refreshResponseSchema.safeParse(response);
+			if (!parsed.success) {
+				clearAuth();
+				throw new Error("Token refresh data validation failed:", {
+					cause: parsed.error,
+				});
+			}
+			const { accessToken } = parsed.data;
+			tokenManager.setAccessToken(accessToken);
+			return accessToken;
+		} catch (error) {
 			clearAuth();
-			return null;
+			throw error;
 		}
-		const parsed = refreshResponseSchema.safeParse(response);
-		if (!parsed.success) {
-			console.error("Token refresh data validation failed:", parsed.error);
-			clearAuth();
-			return null;
-		}
-		const { accessToken } = parsed.data;
-		tokenManager.setAccessToken(accessToken);
-		return accessToken;
 	},
 };

@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/core/config/constants";
 import { APP_ROUTES } from "@/core/routes/paths";
-import { getOrderStatusMeta } from "@/features/orders/constants/orderStatus";
 import { formatMadCompact } from "@/shared/utils/price";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -17,9 +16,10 @@ import {
 	ShoppingCart,
 	TrendingUp,
 } from "lucide-react";
-import type { DashboardOverview } from "@/features/dashboard/schemas/dashboardSchema";
-import { dashboardService } from "@/features/dashboard/services/dashboardService";
+import { type RecentOrder } from "@/features/dashboard/schemas/dashboardSchema";
 import { buildShippingAddressString } from "@/features/addresses/utils/addressHelpers";
+import { useDashboardOverview } from "@/features/dashboard/hooks/use-dashboard";
+import { ORDER_STATUS_META } from "@/features/orders/constants/orderStatus";
 
 const cardMotion = {
 	initial: { opacity: 0, y: 18 },
@@ -32,27 +32,11 @@ const formatMoney = (value: number) => formatMadCompact(value);
 export const OverviewPage = () => {
 	useDocumentTitle(`Dashboard Overview | ${CONFIG.APP_NAME}`);
 
-	const [data, setData] = useState<DashboardOverview | null>(null);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		const loadDashboardData = async () => {
-			try {
-				const responseData = await dashboardService.getOverview();
-				setData(responseData);
-			} catch (error) {
-				console.error("Failed to load dashboard overview data:", error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		loadDashboardData();
-	}, []);
+	const { data, isPending, isError } = useDashboardOverview();
 
 	const recentSales = useMemo(() => {
 		const orders = data?.recentOrders;
-		if (!orders) return [];
+		if (!orders) return [] satisfies RecentOrder[];
 		return [...orders].reverse();
 	}, [data?.recentOrders]);
 
@@ -61,7 +45,7 @@ export const OverviewPage = () => {
 		return Math.max(...recentSales.map((order) => order.total));
 	}, [recentSales]);
 
-	if (loading) {
+	if (isPending) {
 		return (
 			<div className="flex min-h-105x-col items-center justify-center gap-3">
 				<div className="h-8 w-8 animate-spin rounded-full border-b-2 border-emerald-950" />
@@ -72,7 +56,7 @@ export const OverviewPage = () => {
 		);
 	}
 
-	if (!data) {
+	if (!data || isError) {
 		return (
 			<div className="flex min-h-[60vh] flex-col items-center justify-center p-6 text-center">
 				<div className="grid size-14 place-items-center rounded-2xl bg-rose-50 text-rose-700 shadow-sm">
@@ -515,6 +499,7 @@ export const OverviewPage = () => {
 									city: order.shippingCity,
 									phone: order.phone,
 								});
+								const meta = ORDER_STATUS_META[order.status];
 
 								return (
 									<div
@@ -531,19 +516,16 @@ export const OverviewPage = () => {
 												</p>
 											</div>
 											<span
-												className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getOrderStatusMeta(order.status).badgeClass}`}
+												className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${meta.badgeClass}`}
 											>
-												{getOrderStatusMeta(order.status).label}
+												{meta.label}
 											</span>
 										</div>
 										<div className="mt-3 flex items-center justify-between text-xs text-slate-500">
 											<span>
-												{new Date(order.createdAt).toLocaleDateString(
-													undefined,
-													{
-														dateStyle: "medium",
-													},
-												)}
+												{order.createdAt.toLocaleDateString(undefined, {
+													dateStyle: "medium",
+												})}
 											</span>
 											<span className="font-semibold text-slate-950">
 												{formatMoney(order.total)}
