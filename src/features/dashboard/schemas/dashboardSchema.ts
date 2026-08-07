@@ -1,4 +1,4 @@
-import { orderStatusSchema } from "@/features/orders/schemas/orderSchema";
+import { orderStatusSchema } from "@/features/orders/constants/orderStatus";
 import z from "zod/v4";
 
 export const recentOrderSchema = z.object({
@@ -23,11 +23,13 @@ export const lowStockProductSchema = z.object({
 	stockQuantity: z.int().nonnegative(),
 	category: z.string(),
 });
+export type LowStockProduct = z.infer<typeof lowStockProductSchema>;
 
 export const categorySummarySchema = z.object({
 	category: z.string(),
 	count: z.int().nonnegative(),
 });
+export type CategorySummary = z.infer<typeof categorySummarySchema>;
 
 export const topProductSchema = z.object({
 	id: z.uuid(),
@@ -50,7 +52,6 @@ export const dashboardOverviewSchema = z.object({
 	categorySummary: z.array(categorySummarySchema),
 	topProducts: z.array(topProductSchema),
 });
-
 export type DashboardOverview = z.infer<typeof dashboardOverviewSchema>;
 
 export const categoryAnalyticsSchema = z.array(
@@ -60,7 +61,6 @@ export const categoryAnalyticsSchema = z.array(
 		productCount: z.int().nonnegative(),
 	}),
 );
-
 export type CategoryAnalytics = z.infer<typeof categoryAnalyticsSchema>;
 
 export const productAnalyticsSchema = z.object({
@@ -69,5 +69,4 @@ export const productAnalyticsSchema = z.object({
 	lowStockCount: z.int().nonnegative(),
 	averagePrice: z.number().positive(),
 });
-
 export type ProductAnalytics = z.infer<typeof productAnalyticsSchema>;

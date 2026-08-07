@@ -1,4 +1,4 @@
-import type { Token } from "../types";
+import type { Token } from "../types/auth";
 
 type TokenListener = (accessToken: Token, resetToken: Token) => void;
 

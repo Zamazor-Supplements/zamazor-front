@@ -1,5 +1,4 @@
-import type { CartSummary } from "../schemas/cartSchema";
-import type { GuestCartItem } from "../../../services/cart/GuestCartStore";
+import type { GuestCartItem } from "../stores/guestCartStore";
 
 export interface CartService {
 	getItems(): Promise<GuestCartItem[]>;
@@ -7,8 +6,4 @@ export interface CartService {
 	updateQuantity(productId: string, quantity: number): Promise<GuestCartItem[]>;
 	removeItem(productId: string): Promise<GuestCartItem[]>;
 	clear(): Promise<void>;
-}
-
-export interface CartSummaryService {
-	getSummary(guestItems?: GuestCartItem[]): Promise<CartSummary>;
 }

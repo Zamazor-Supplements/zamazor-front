@@ -6,7 +6,7 @@ const toastDebounceMap = new Map<string, boolean>();
 
 interface NotificationMessage {
 	title: string;
-	description?: string;
+	description?: string | undefined;
 }
 
 export type ApiRequestOptions = {
@@ -19,7 +19,8 @@ export type ApiRequestOptions = {
 
 function getToastKey(config: AxiosRequestConfig): string {
 	const method = (config.method ?? "GET").toUpperCase();
-	const cleanUrl = (config.url ?? "unknown_url").split("?")[0];
+	const url = config.url ?? "unknown_url";
+	const cleanUrl = url.split("?")[0] ?? "unknown_url";
 
 	const normalizedUrl = cleanUrl
 		.replace(/\/\d+/g, "/:id")

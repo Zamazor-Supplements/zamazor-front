@@ -6,7 +6,6 @@ export const wishlistItemSchema = z.object({
 	product: productSchema,
 	createdAt: z.iso.datetime().pipe(z.coerce.date()),
 });
-export type WishlistItem = z.infer<typeof wishlistItemSchema>;
 
 export const wishlistSchema = z.object({
 	items: z.array(wishlistItemSchema),

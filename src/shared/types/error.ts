@@ -16,13 +16,13 @@ export function isSystemError(value: unknown): value is SystemError {
 	return systemErrorSchema.safeParse(value).success;
 }
 
-const CANCELLED_ERROR = {
+const CANCELED_ERROR = {
 	type: "about:blank",
 	title: "Request Canceled",
-	description: "Request was cancelled",
+	description: "Request was canceled",
 	status: 499,
 	detail: "The network request was intentionally aborted.",
-	code: "REQUEST_CANCELLED",
+	code: "REQUEST_CANCELED",
 } satisfies SystemError;
 
 const NETWORK_ERROR = {
@@ -81,7 +81,8 @@ const createUnexpectedError = (error: AxiosError) =>
 	}) satisfies SystemError;
 
 export function normalizeError(error: unknown): SystemError {
-	if (isCancel(error)) return CANCELLED_ERROR;
+	if (isSystemError(error)) return error;
+	if (isCancel(error)) return CANCELED_ERROR;
 	if (!isAxiosError(error)) return createRuntimeError(error);
 	if (error.code === "ECONNABORTED") return TIMEOUT_ERROR;
 

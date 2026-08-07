@@ -1,13 +1,11 @@
 import { productSchema } from "@/features/products/schemas/productSchema";
-import { createPageResponseSchema } from "@/shared/schemas/pageSchema";
 import z from "zod/v4";
 
-export const cartItemSchema = z.object({
+const cartItemSchema = z.object({
 	id: z.uuid(),
 	product: productSchema,
 	quantity: z.int().positive(),
 });
-export type CartItem = z.infer<typeof cartItemSchema>;
 
 export const populatedCartItemSchema = z.object({
 	product: productSchema,
@@ -26,7 +24,6 @@ const guestCartSummarySchema = baseCartSummary.extend({
 	shipping: z.null(),
 	discount: z.null(),
 });
-export type GuestCartSummary = z.infer<typeof guestCartSummarySchema>;
 
 const fullCartSummarySchema = baseCartSummary.extend({
 	tax: z.number().nonnegative(),
@@ -34,7 +31,7 @@ const fullCartSummarySchema = baseCartSummary.extend({
 	discount: z.number().nonnegative(),
 });
 
-export const cartSummarySchema = z.union([
+const cartSummarySchema = z.union([
 	guestCartSummarySchema,
 	fullCartSummarySchema,
 ]);
@@ -44,10 +41,6 @@ export const cartSchema = z
 	.object({
 		id: z.uuid(),
 		items: z.array(cartItemSchema),
-		subtotal: z.number().nonnegative(),
 	})
 	.and(cartSummarySchema);
 export type Cart = z.infer<typeof cartSchema>;
-
-export const cartPageSchema = createPageResponseSchema(cartSchema);
-export type CartPage = z.infer<typeof cartPageSchema>;

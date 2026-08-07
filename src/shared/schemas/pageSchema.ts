@@ -11,6 +11,6 @@ export const createPageResponseSchema = <T extends z.ZodTypeAny>(
 		size: z.int().positive(),
 	});
 
-export type PageResponse<T extends z.ZodTypeAny> = z.infer<
-	ReturnType<typeof createPageResponseSchema<T>>
->;
+// export type PageResponse<T extends z.ZodTypeAny> = z.infer<
+// 	ReturnType<typeof createPageResponseSchema<T>>
+// >;

@@ -1,28 +1,15 @@
-export function parsePrice(value: string | number | null | undefined): number {
-	if (typeof value === "number") {
-		return Number.isFinite(value) ? value : 0;
-	}
-
-	if (typeof value !== "string") {
-		return 0;
-	}
-
-	const normalized = value.replace(/[^0-9.,-]/g, "").replace(/,/g, ".");
-	const parsed = parseFloat(normalized);
-	return Number.isFinite(parsed) ? parsed : 0;
-}
-
-export function formatMadCompact(value: string | number | null | undefined): string {
-	const amount = parsePrice(value);
-
-	if (Math.abs(amount) < 1000) {
-		return `${amount.toFixed(2)} MAD`;
-	}
-
-	const compact = new Intl.NumberFormat("en", {
+export const formatCurrency = (
+	amount: number,
+	locale = "fr-MA",
+	currency = "MAD",
+) => {
+	return new Intl.NumberFormat(locale, {
+		style: "currency",
+		currency,
 		notation: "compact",
-		maximumFractionDigits: 1,
-	});
-
-	return `${compact.format(amount)} MAD`;
-}
+		compactDisplay: "short",
+		currencyDisplay: "code",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 2,
+	}).format(amount);
+};

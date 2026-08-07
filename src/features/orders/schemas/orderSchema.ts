@@ -1,34 +1,21 @@
 import { roleSchema } from "@/features/auth/schemas/userSchema";
 import { createPageResponseSchema } from "@/shared/schemas/pageSchema";
 import z from "zod/v4";
+import { orderStatusSchema } from "../constants/orderStatus";
 
-export const orderStatusSchema = z.enum([
-	"PENDING",
-	"PAID",
-	"CONFIRMED",
-	"PROCESSING",
-	"SHIPPED",
-	"DELIVERED",
-	"CANCELED",
-	"REFUNDED",
-]);
-export type OrderStatus = z.infer<typeof orderStatusSchema>;
-
-export const productSnapshotSchema = z.object({
+const productSnapshotSchema = z.object({
 	id: z.uuid(),
 	name: z.string().min(1),
 	imageUrl: z.url().nullable(),
 	price: z.number().positive(),
 });
-export type ProductSnapshot = z.infer<typeof productSnapshotSchema>;
 
-export const userMinSchema = z.object({
+const userMinSchema = z.object({
 	id: z.uuid(),
 	email: z.email(),
 	fullName: z.string().min(1),
 	role: roleSchema,
 });
-export type UserMin = z.infer<typeof userMinSchema>;
 
 export const orderItemSchema = z.object({
 	id: z.uuid(),

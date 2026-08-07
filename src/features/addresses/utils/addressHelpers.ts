@@ -1,6 +1,6 @@
 import type { Address } from "../schemas/addressSchema";
 
-export function parseShippingAddressFallback(shippingAddress?: string | null) {
+function parseShippingAddressFallback(shippingAddress?: string | null) {
 	const empty: Omit<Address, "id"> = {
 		street: "",
 		city: "",
@@ -44,7 +44,7 @@ export function buildShippingAddressString(parts: Omit<Address, "id">): string {
 	return parts.phone.trim() ? `${base}, Phone: ${parts.phone.trim()}` : base;
 }
 
-export function toAddressFormValues(
+function toAddressFormValues(
 	address: Omit<Address, "id">,
 	fallback?: string | null,
 ): Omit<Address, "id"> {

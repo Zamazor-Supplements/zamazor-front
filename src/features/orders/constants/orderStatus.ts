@@ -1,3 +1,5 @@
+import z from "zod/v4";
+
 export const OrderStatus = {
 	Pending: "PENDING",
 	Paid: "PAID",
@@ -10,6 +12,17 @@ export const OrderStatus = {
 } as const;
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+
+export const orderStatusSchema = z.enum([
+	OrderStatus.Pending,
+	OrderStatus.Paid,
+	OrderStatus.Confirmed,
+	OrderStatus.Processing,
+	OrderStatus.Shipped,
+	OrderStatus.Delivered,
+	OrderStatus.Canceled,
+	OrderStatus.Refunded,
+]);
 
 type Meta = {
 	label: string;

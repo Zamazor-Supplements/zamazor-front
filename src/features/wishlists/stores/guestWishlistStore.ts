@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { WishlistService } from "../types/service";
+import type { WishlistService } from "../types/wishlist";
 
 export type GuestWishlist = string[];
 interface GuestWishlistStore extends WishlistService {
@@ -24,7 +24,6 @@ export const useGuestWishlistStore = create<GuestWishlistStore>()(
 					? current.filter((id) => id !== productId)
 					: [...current, productId];
 				set({ items: next });
-				console.log(next);
 
 				return next;
 			},
@@ -41,6 +40,3 @@ export const useGuestWishlistStore = create<GuestWishlistStore>()(
 	),
 );
 
-export const useIsWishlistItem = (productId: string) => {
-	return useGuestWishlistStore((state) => state.items.includes(productId));
-};

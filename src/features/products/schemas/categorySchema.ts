@@ -6,3 +6,10 @@ export const categorySchema = z.object({
 });
 
 export type Category = z.infer<typeof categorySchema>;
+
+export const categoriesSchema = z.array(categorySchema);
+
+export const createCategorySchema = z.object({
+	label: z.string().trim().min(1),
+});
+export type CreateCategoryFormValues = z.infer<typeof createCategorySchema>;

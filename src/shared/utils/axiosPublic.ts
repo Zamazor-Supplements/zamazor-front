@@ -1,4 +1,4 @@
-import CONFIG from "@/core/config/constants";
+import CONFIG from "@/app/config/constants";
 import axios, { type AxiosRequestConfig } from "axios";
 import { coreApiRequest, type ApiRequestOptions } from "./coreApiRequest";
 

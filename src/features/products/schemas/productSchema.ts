@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "zod/v4";
 import { categorySchema } from "./categorySchema";
 import { createPageResponseSchema } from "@/shared/schemas/pageSchema";
 
@@ -14,8 +14,43 @@ export const productSchema = z.object({
 	createdAt: z.iso.datetime().pipe(z.coerce.date()),
 	modifiedAt: z.iso.datetime().pipe(z.coerce.date()),
 });
-
 export type Product = z.infer<typeof productSchema>;
 
 export const productPageSchema = createPageResponseSchema(productSchema);
 export type ProductPage = z.infer<typeof productPageSchema>;
+
+export const createProductSchema = z.object({
+	name: z.string().trim().min(2).max(200),
+	description: z.string().trim().max(200).optional(),
+	price: z.coerce.number().positive(),
+	stockQuantity: z.coerce.number().int().positive(),
+	categoryId: z.uuid(),
+	image: z
+		.instanceof(File)
+		.optional()
+		.refine((file) => {
+			if (!file) return true; // Allow optional file
+			const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+			return allowedTypes.includes(file.type);
+		}, "Invalid image type. Please upload a JPEG, PNG, or GIF file."),
+});
+export type CreateProductInput = z.input<typeof createProductSchema>;
+export type CreateProductOutput = z.output<typeof createProductSchema>;
+
+export const updateProductSchema = z.object({
+	name: z.string().trim().min(2).max(200).optional(),
+	description: z.string().trim().max(200).optional(),
+	price: z.coerce.number().positive().optional(),
+	stockQuantity: z.coerce.number().int().positive().optional(),
+	categoryId: z.uuid().optional(),
+	image: z
+		.instanceof(File)
+		.optional()
+		.refine((file) => {
+			if (!file) return true; // Allow optional file
+			const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+			return allowedTypes.includes(file.type);
+		}, "Invalid image type. Please upload a JPEG, PNG, or GIF file."),
+});
+export type UpdateProductInput = z.input<typeof updateProductSchema>;
+export type UpdateProductOutput = z.output<typeof updateProductSchema>;

@@ -1,0 +1,33 @@
+import { z } from "zod/v4";
+
+const DEFAULT_ENV = {
+	VITE_API_BASE_URL: "http://localhost:8080",
+	VITE_APP_NAME: "Zamazor",
+} as const;
+
+const envSchema = z.object({
+	VITE_API_BASE_URL: z
+		.url({ message: "Must be a valid URL string" })
+		.default(DEFAULT_ENV.VITE_API_BASE_URL),
+	VITE_APP_NAME: z.string().default(DEFAULT_ENV.VITE_APP_NAME),
+});
+
+const parsed = envSchema.safeParse(import.meta.env);
+
+if (!parsed.success) {
+	console.error("Invalid environment variables:", { cause: parsed.error });
+	throw new Error(
+		"Environment validation failed. Fix the errors above before running the app.",
+	);
+}
+
+const CONFIG = {
+	API_BASE_URL: parsed.data.VITE_API_BASE_URL,
+	TIMEOUT: 5000,
+	APP_NAME: parsed.data.VITE_APP_NAME,
+	FORMSPREE_FORM_ID: "mzdnavwv",
+	SUPPORT_EMAIL: "support@zamazor.ma",
+	SUPPORT_PHONE: "+212 6 11 42 31 16",
+} as const;
+
+export default CONFIG;
