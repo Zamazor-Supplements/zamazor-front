@@ -48,7 +48,7 @@ export const LoginForm = () => {
 						</span>
 						<Link
 							to={APP_ROUTES.AUTH.FORGOT_PASSWORD}
-							className="text-xs font-medium text-emerald-800 hover:text-emerald-950 hover:underline transition-colors"
+							className="text-xs font-medium text-brand-800 hover:text-brand-950 hover:underline transition-colors"
 						>
 							Forgot password?
 						</Link>
@@ -66,10 +66,9 @@ export const LoginForm = () => {
 			{/* Submit Button */}
 			<OriginButton
 				type="submit"
-				variant="emerald"
 				loading={isLoading}
 				disabled={!isDirty || isLoading}
-				className="w-full justify-center rounded-xl py-3 text-sm font-bold shadow-xs hover:shadow-md transition-all active:scale-[0.99]"
+				className="w-full justify-center rounded-lg py-3 text-sm font-bold shadow-xs hover:shadow-md transition-all active:scale-[0.99]"
 			>
 				{isLoading ? "Signing in..." : "Sign in"}
 			</OriginButton>

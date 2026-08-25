@@ -110,15 +110,15 @@ function WorkspaceSwitcher({
 	selected: string | undefined;
 }) {
 	return (
-		<div className="mb-4 flex items-center gap-3 rounded-xl border border-slate-100/50 bg-slate-50/50 px-2.5 py-2 select-none">
-			<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-900 text-[13px] font-bold text-white shadow-xs">
+		<div className="mb-4 flex select-none items-center gap-3 rounded-lg border border-brand-900/10 bg-surface-2/50 px-2.5 py-2">
+			<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-900 text-[13px] font-bold text-white shadow-xs">
 				{selected.charAt(0)}
 			</div>
 			<div className="flex flex-col overflow-hidden">
-				<span className="max-w-37.5 truncate text-[13px] font-bold leading-none text-slate-900">
+				<span className="max-w-37.5 truncate text-[13px] font-bold leading-none text-ink">
 					{selected}
 				</span>
-				<span className="mt-1 text-[10px] font-medium leading-none text-slate-500">
+				<span className="mt-1 text-[10px] font-medium leading-none text-ink-soft">
 					Admin Desk
 				</span>
 			</div>
@@ -158,18 +158,18 @@ function NavItem({
 					onNavClick();
 					item.onClick();
 				}}
-				className={`group flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition-all duration-200 select-none active:scale-[0.99] ${
+				className={`group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left transition-all duration-200 select-none active:scale-[0.99] ${
 					isDanger
-						? "text-slate-500 hover:bg-rose-50 hover:text-rose-600"
-						: "text-slate-600 hover:bg-slate-100/60 hover:text-slate-900"
+						? "text-ink-faint hover:bg-rose-50 hover:text-rose-600"
+						: "text-ink-soft hover:bg-brand-50/60 hover:text-ink"
 				}`}
 			>
 				<div className="flex items-center gap-2.5">
 					<item.icon
 						className={`h-4 w-4 transition-colors duration-200 ${
 							isDanger
-								? "text-slate-400 group-hover:text-rose-500"
-								: "text-slate-400 group-hover:text-slate-600"
+								? "text-ink-faint group-hover:text-rose-500"
+								: "text-ink-faint group-hover:text-ink"
 						}`}
 						strokeWidth={1.75}
 					/>
@@ -191,11 +191,11 @@ function NavItem({
 					onClick={() => setIsOpen((prev) => !prev)}
 					aria-expanded={isOpen}
 					aria-controls={submenuId}
-					className="group flex w-full items-center justify-between rounded-xl px-3 py-2 text-slate-600 transition-all duration-200 select-none hover:bg-slate-100/60 hover:text-slate-900 active:scale-[0.99]"
+					className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-ink-soft transition-all duration-200 select-none hover:bg-brand-50/60 hover:text-ink active:scale-[0.99]"
 				>
 					<div className="flex items-center gap-2.5">
 						<item.icon
-							className="h-4 w-4 text-slate-400 transition-colors duration-200 group-hover:text-slate-600"
+							className="h-4 w-4 text-ink-faint transition-colors duration-200 group-hover:text-ink"
 							strokeWidth={1.75}
 						/>
 						<span className="truncate text-[13px] tracking-wide">
@@ -203,7 +203,7 @@ function NavItem({
 						</span>
 					</div>
 					<ChevronRightIcon
-						className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`}
+						className={`h-3.5 w-3.5 text-ink-faint transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`}
 						strokeWidth={2}
 					/>
 				</button>
@@ -216,7 +216,7 @@ function NavItem({
 				>
 					<div className="relative mt-0.5 flex flex-col gap-0.5 overflow-hidden min-h-0">
 						<div
-							className="absolute top-0 bottom-0 border-l border-slate-200"
+							className="absolute top-0 bottom-0 border-l border-brand-900/10"
 							style={{ left: `${level * 12 + 19.5}px` }}
 						/>
 						{item.children.map((child) => (
@@ -241,10 +241,10 @@ function NavItem({
 			onClick={onNavClick}
 			style={{ paddingLeft }}
 			className={({ isActive }) =>
-				`group flex w-full items-center justify-between rounded-xl px-3 py-2 transition-all duration-200 select-none active:scale-[0.99] ${
+				`group flex w-full items-center justify-between rounded-lg px-3 py-2 transition-all duration-200 select-none active:scale-[0.99] ${
 					isActive
-						? "bg-slate-100 font-bold text-slate-900 shadow-xs"
-						: "text-slate-600 hover:bg-slate-100/60 hover:text-slate-900"
+						? "bg-brand-50 font-bold text-brand-950 shadow-xs"
+						: "text-ink-soft hover:bg-brand-50/60 hover:text-ink"
 				}`
 			}
 		>
@@ -254,8 +254,8 @@ function NavItem({
 						<item.icon
 							className={`h-4 w-4 transition-colors duration-200 ${
 								isActive
-									? "text-emerald-800"
-									: "text-slate-400 group-hover:text-slate-600"
+									? "text-brand-800"
+									: "text-ink-faint group-hover:text-ink"
 							}`}
 							strokeWidth={1.75}
 						/>
@@ -266,12 +266,12 @@ function NavItem({
 
 					<div className="flex items-center gap-2">
 						{item.shortcut && (
-							<kbd className="hidden group-hover:inline-flex h-5 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-1.5 font-mono text-[10px] font-medium text-slate-400 shadow-xs">
+							<kbd className="hidden h-5 items-center justify-center rounded-lg border border-brand-900/10 bg-surface-2 px-1.5 font-mono text-[10px] font-medium text-ink-faint shadow-xs group-hover:inline-flex">
 								{item.shortcut}
 							</kbd>
 						)}
 						{item.badge && (
-							<span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 px-1.5 text-[10px] font-bold text-emerald-800">
+							<span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-brand-100 bg-brand-50 px-1.5 text-[10px] font-bold text-brand-800">
 								{item.badge}
 							</span>
 						)}
@@ -305,7 +305,7 @@ export function SidebarNav({
 	return (
 		<aside
 			className={cn(
-				"flex h-full w-65 flex-col border-r border-slate-200/85 bg-white p-4 font-sans text-slate-800",
+				"flex h-full w-65 flex-col border-r border-brand-900/10 bg-card p-4 font-sans text-ink",
 				className,
 			)}
 		>
@@ -315,7 +315,7 @@ export function SidebarNav({
 				{navGroups.map((group, idx) => (
 					<div key={group.heading ?? idx} className="flex flex-col gap-0.5">
 						{group.heading && (
-							<span className="mb-1.5 px-3 text-[10px] font-black tracking-wider text-slate-400 uppercase">
+							<span className="mb-1.5 px-3 text-[10px] font-black uppercase tracking-wider text-ink-faint">
 								{group.heading}
 							</span>
 						)}
@@ -330,7 +330,7 @@ export function SidebarNav({
 				))}
 			</nav>
 
-			<div className="mt-auto flex flex-col gap-0.5 border-t border-slate-100 pt-4">
+			<div className="mt-auto flex flex-col gap-0.5 border-t border-brand-900/10 pt-4">
 				{footerItems.map((item) => (
 					<NavItem
 						key={"to" in item ? item.to : item.title}

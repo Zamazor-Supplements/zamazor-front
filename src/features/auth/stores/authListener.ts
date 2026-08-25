@@ -38,7 +38,12 @@ useAuthStore.subscribe(async (state, prevState) => {
 			if (wishlist.length > 0) syncPromises.push(syncWishlist(wishlist));
 
 			if (syncPromises.length > 0) {
-				await Promise.all(syncPromises);
+				try {
+					await Promise.all(syncPromises);
+				} catch {
+					// Sync is best-effort: a failed request must not break the
+					// login transition or prevent the cache refresh below.
+				}
 			}
 		}
 

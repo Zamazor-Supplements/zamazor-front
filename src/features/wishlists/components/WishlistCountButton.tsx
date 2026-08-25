@@ -23,13 +23,13 @@ export const WishlistCountButton = ({
 			<Link
 				to={APP_ROUTES.USER.WISHLIST}
 				onClick={onClick}
-				className="flex items-center justify-between rounded-xl px-3 py-2 text-slate-700 transition-colors hover:bg-emerald-50 hover:text-emerald-900"
+				className="flex items-center justify-between rounded-lg px-3 py-2 text-slate-700 transition-colors hover:bg-brand-50 hover:text-brand-900"
 			>
 				<span className="flex items-center gap-2.5 font-semibold">
 					<HeartIcon
 						className={cn(
 							"size-4 transition-colors",
-							hasItems ? "fill-rose-500 text-rose-500" : "text-emerald-850",
+							hasItems ? "fill-rose-500 text-rose-500" : "text-brand-800",
 						)}
 					/>
 					Wishlist
@@ -49,7 +49,7 @@ export const WishlistCountButton = ({
 			aria-label={`Wishlist (${count} items)`}
 			title="Wishlist"
 			className={cn(
-				"group relative flex h-9 w-9 items-center justify-center rounded-full text-slate-700 transition-all hover:bg-emerald-100/60 hover:text-emerald-900 active:scale-95",
+				"group relative flex h-9 w-9 items-center justify-center rounded-full text-slate-700 transition-all hover:bg-brand-100/60 hover:text-brand-900 active:scale-95",
 				className,
 			)}
 		>
@@ -58,7 +58,7 @@ export const WishlistCountButton = ({
 					"size-5 transition-transform duration-200 group-hover:scale-110",
 					hasItems
 						? "fill-rose-500 text-rose-500"
-						: "text-slate-700 group-hover:text-emerald-900",
+						: "text-slate-700 group-hover:text-brand-900",
 				)}
 			/>
 			{hasItems && (

@@ -13,7 +13,7 @@ export const QuizDietStep = ({
 }) => (
 	<div className="space-y-6">
 		<div>
-			<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">
+			<span className="text-[10px] font-black uppercase text-brand-800 tracking-wider">
 				Step 2 of 3
 			</span>
 			<h3 className="text-xl font-playfair text-slate-950 font-normal mt-1">
@@ -30,8 +30,8 @@ export const QuizDietStep = ({
 						className={cn(
 							"p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer shadow-sm",
 							isSelected
-								? "bg-emerald-900 border-emerald-900"
-								: "bg-white border-emerald-900/10 hover:border-emerald-700 hover:bg-emerald-50/20",
+								? "bg-brand-900 border-brand-900"
+								: "bg-white border-brand-900/10 hover:border-brand-700 hover:bg-brand-50/20",
 						)}
 					>
 						<p
@@ -45,7 +45,7 @@ export const QuizDietStep = ({
 						<p
 							className={cn(
 								"text-[11px] mt-1",
-								isSelected ? "text-emerald-100" : "text-slate-400",
+								isSelected ? "text-brand-100" : "text-slate-400",
 							)}
 						>
 							{opt.desc}
@@ -57,7 +57,7 @@ export const QuizDietStep = ({
 		<Button
 			variant="ghost"
 			onClick={onBack}
-			className="text-emerald-900 hover:bg-emerald-50 rounded-xl cursor-pointer"
+			className="text-brand-900 hover:bg-brand-50 rounded-lg cursor-pointer"
 		>
 			Back
 		</Button>

@@ -34,9 +34,11 @@ export function useSlider({
 		return () => window.clearInterval(timer);
 	}, [isPaused, slideCount, autoPlayInterval, goToNextSlide]);
 
-	// Keyboard Navigation Effect
+	// Keyboard Navigation Effect — skip when user is in an input/textarea
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
+			const tag = (e.target as HTMLElement)?.tagName;
+			if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 			if (e.key === "ArrowLeft") goToPreviousSlide();
 			if (e.key === "ArrowRight") goToNextSlide();
 		};

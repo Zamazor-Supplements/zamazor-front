@@ -1,42 +1,62 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	profileSchema,
 	type ProfileFormValues,
 } from "@/features/auth/schemas/profileSchema";
-import CONFIG from "@/app/config/constants";
+import CONFIG, { APP_COUNTRY } from "@/app/config/constants";
+import { APP_ROUTES } from "@/app/routes/paths";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import { useAuthenticatedUser } from "@/features/auth/services/queries";
+import { Breadcrumbs } from "@/shared/components/ui/breadcrumbs";
 import { ConfirmDialog } from "@/shared/components/ui/confirm-dialog";
 import { useLanguage } from "@/shared/hooks/use-language";
 import { useLogout } from "@/features/auth/services/mutations";
 import { useCreateOrUpdateAddress } from "@/features/addresses/services/mutations";
+import { useUpdateCurrentUser } from "@/features/profile/services/mutations";
 import { useCancelOrder } from "@/features/orders/services/mutations";
-import { useMyOrders } from "@/features/orders/services/queries";
 import type { Order } from "@/features/orders/schemas/orderSchema";
 import { ProfileHeader } from "../components/ProfileHeader";
 import { ProfileTabs } from "../components/ProfileTabs";
 import { ProfileFormSection } from "../components/ProfileFormSection";
 import { ProfileOrdersSection } from "../components/ProfileOrdersSection";
 
-const DEFAULT_COUNTRY = "Morocco";
 type ProfileTab = "profile" | "orders";
 
-export const ProfilePage = () => {
+export default function ProfilePage() {
 	const { t } = useLanguage();
 	useDocumentTitle(`${t("profile.title")} | ${CONFIG.APP_NAME}`);
 
 	const user = useAuthenticatedUser();
 	const logoutMutation = useLogout();
 
-	const [activeTab, setActiveTab] = useState<ProfileTab>("profile");
+	const [searchParams, setSearchParams] = useSearchParams();
+	const activeTab: ProfileTab = searchParams.get("tab") === "orders" ? "orders" : "profile";
 	const [orderToCancel, setOrderToCancel] = useState<Order | null>(null);
 
+	const handleTabChange = (tab: ProfileTab) => {
+		setSearchParams(
+			(prev) => {
+				const next = new URLSearchParams(prev);
+				if (tab === "orders") {
+					next.set("tab", "orders");
+				} else {
+					next.delete("tab");
+				}
+				return next;
+			},
+			{ replace: true }
+		);
+	};
+
 	const createOrUpdateAddressMutation = useCreateOrUpdateAddress();
+	const updateCurrentUserMutation = useUpdateCurrentUser();
 	const cancelOrderMutation = useCancelOrder();
 
-	const isSaving = createOrUpdateAddressMutation.isPending;
+	const isSaving = createOrUpdateAddressMutation.isPending ||
+		updateCurrentUserMutation.isPending;
 	const isCancelingOrder = cancelOrderMutation.isPending;
 
 	const form = useForm<ProfileFormValues>({
@@ -46,14 +66,9 @@ export const ProfilePage = () => {
 			street: user.address?.street ?? "",
 			city: user.address?.city ?? "",
 			phone: user.address?.phone ?? "",
-			country: user.address?.country ?? DEFAULT_COUNTRY,
+			country: user.address?.country ?? APP_COUNTRY,
 		},
 	});
-
-	const { data: orderPage, isPending: ordersPending } = useMyOrders(
-		{},
-		{ enabled: activeTab === "orders" },
-	);
 
 	const handleLogout = () => {
 		logoutMutation.mutate();
@@ -61,13 +76,23 @@ export const ProfilePage = () => {
 
 	const handleProfileSubmit = (data: ProfileFormValues) => {
 		const addressPayload = {
-			country: data.country.trim() || DEFAULT_COUNTRY,
+			// Country is a fixed application-level constraint; force it here so
+			// the submitted payload is locked to APP_COUNTRY regardless of what
+			// the form state holds (defense against future defaultValues regressions).
+			country: APP_COUNTRY,
 			city: (data.city || "").trim(),
 			street: (data.street || "").trim(),
 			phone: (data.phone || "").trim(),
 			isDefault: true,
 		};
 
+		// Send address update and name update in parallel if name changed.
+		const trimmedName = (data.fullName || "").trim();
+		const nameChanged = trimmedName && trimmedName !== user.fullName;
+
+		if (nameChanged) {
+			updateCurrentUserMutation.mutate({ fullName: trimmedName });
+		}
 		createOrUpdateAddressMutation.mutate(addressPayload);
 	};
 
@@ -91,15 +116,20 @@ export const ProfilePage = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-slate-50/60 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+		<div className="min-h-screen bg-surface py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
 			<div className="mx-auto max-w-5xl space-y-8">
+				<Breadcrumbs
+					items={[
+						{ label: "Home", href: APP_ROUTES.HOME },
+						{ label: "Profile" },
+					]} />
+
 				<ProfileHeader
 					user={user}
 					onLogout={handleLogout}
-					isLoggingOut={logoutMutation.isPending}
-				/>
+					isLoggingOut={logoutMutation.isPending} />
 
-				<ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+				<ProfileTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
 				{activeTab === "profile" ? (
 					<ProfileFormSection
@@ -110,14 +140,9 @@ export const ProfilePage = () => {
 						handleSubmit={form.handleSubmit}
 						onSubmit={handleProfileSubmit}
 						isSaving={isSaving}
-						isDirty={form.formState.isDirty}
-					/>
+						isDirty={form.formState.isDirty} />
 				) : (
-					<ProfileOrdersSection
-						orderPage={orderPage}
-						isPending={ordersPending}
-						onCancelOrder={promptCancelOrder}
-					/>
+					<ProfileOrdersSection onCancelOrder={promptCancelOrder} />
 				)}
 			</div>
 
@@ -133,8 +158,7 @@ export const ProfilePage = () => {
 					if (!isCancelingOrder) {
 						setOrderToCancel(null);
 					}
-				}}
-			/>
+				} } />
 		</div>
 	);
-};
+}

@@ -1,7 +1,7 @@
 import { privateApiRequest } from "@/shared/utils/axiosPrivate";
 import { cartSchema, type Cart } from "../schemas/cartSchema";
 import { API_ENDPOINTS } from "@/app/config/apiEndpoints";
-import type { GuestCartItem } from "../stores/guestCartStore";
+import type { GuestStoreCartItem } from "../stores/guestCartStore";
 import { parseResponse } from "@/shared/utils/parseResponse";
 
 export const getCart = async () => {
@@ -55,7 +55,7 @@ export const clearCart = async () => {
 	});
 };
 
-export const syncCart = async (items: GuestCartItem[]) => {
+export const syncCart = async (items: GuestStoreCartItem[]) => {
 	const response = await privateApiRequest<Cart>({
 		url: API_ENDPOINTS.CARTS.SYNC,
 		method: "POST",

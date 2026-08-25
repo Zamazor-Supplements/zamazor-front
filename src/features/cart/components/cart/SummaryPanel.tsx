@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
-import type { CartSummary } from "../../schemas/cartSchema";
+import type { Cart } from "../../schemas/cartSchema";
 import { useLanguage } from "@/shared/hooks/use-language";
 import { ArrowRightIcon, Loader2Icon } from "lucide-react";
-import { formatCurrency } from "@/shared/utils/price";
+import { formatPrice } from "@/shared/utils/price";
 import { Button } from "@/shared/components/ui/button";
 import { APP_ROUTES } from "@/app/routes/paths";
 import CONFIG from "@/app/config/constants";
@@ -11,7 +11,7 @@ export const SummaryPanel = ({
 	summary,
 	isFetching,
 }: {
-	summary: CartSummary;
+	summary: Cart;
 	isFetching: boolean;
 }) => {
 	const navigate = useNavigate();
@@ -22,7 +22,7 @@ export const SummaryPanel = ({
 
 	return (
 		<div className="space-y-4">
-			<div className="bg-white rounded-3xl border border-emerald-900/5 p-5 sm:p-6 shadow-md shadow-emerald-950/5 relative">
+			<div className="bg-white rounded-3xl border border-brand-900/5 p-5 sm:p-6 shadow-md shadow-brand-950/5 relative">
 				{/* Discrete indicator when background refetching happens */}
 				{isFetching && (
 					<div className="absolute top-4 right-4 flex items-center gap-1 text-xs text-slate-400">
@@ -41,7 +41,7 @@ export const SummaryPanel = ({
 					<div className="flex justify-between text-slate-600">
 						<span>{t("cart.subtotal")}</span>
 						<span className="font-bold text-slate-900">
-							{formatCurrency(subtotal)}
+							{formatPrice(subtotal)}
 						</span>
 					</div>
 
@@ -53,12 +53,12 @@ export const SummaryPanel = ({
 								Calculated during checkout
 							</span>
 						) : shippingCost === 0 ? (
-							<span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md text-xs uppercase tracking-wide">
+							<span className="font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md text-xs uppercase tracking-wide">
 								Free
 							</span>
 						) : (
 							<span className="font-bold text-slate-900">
-								{formatCurrency(shippingCost)}
+								{formatPrice(shippingCost)}
 							</span>
 						)}
 					</div>
@@ -66,14 +66,14 @@ export const SummaryPanel = ({
 					{/* Total */}
 					<div className="flex justify-between text-base font-black text-slate-900 border-t border-slate-100 pt-4 mt-2">
 						<span>{t("cart.total")}</span>
-						<span>{formatCurrency(total)}</span>
+						<span>{formatPrice(total)}</span>
 					</div>
 				</div>
 
 				{/* Checkout button */}
 				<Button
 					onClick={() => navigate(APP_ROUTES.CHECKOUT.ROOT)}
-					className="w-full h-12 bg-emerald-900 hover:bg-emerald-950 text-white font-bold rounded-xl mt-6 flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-emerald-950/10"
+					className="w-full h-12 bg-brand-900 hover:bg-brand-950 text-white font-bold rounded-lg mt-6 flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-brand-950/10"
 				>
 					{t("cart.checkoutBtn")}
 					<ArrowRightIcon className="size-4" />
@@ -81,7 +81,7 @@ export const SummaryPanel = ({
 			</div>
 
 			{/* Info panel */}
-			<div className="rounded-2xl border border-emerald-900/5 bg-[#f0f7ec] p-4 text-center">
+			<div className="rounded-2xl border border-brand-900/5 bg-[#f0f7ec] p-4 text-center">
 				<p className="text-[11px] leading-relaxed text-slate-600">
 					🌿 {CONFIG.APP_NAME} orders are processed within 24 hours.
 					Subscription stacks save an additional 15% on repeat deliveries with

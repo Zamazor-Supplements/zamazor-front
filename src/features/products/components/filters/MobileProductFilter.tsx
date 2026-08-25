@@ -1,69 +1,37 @@
-import type { ChangeEvent, Dispatch, SetStateAction } from "react";
-import {
-	initialFilters,
-	PRICE_CATEGORIES,
-	type Filters,
-} from "../../types/filters";
-import { useCategories } from "../../services/category/queries";
+import type { Dispatch, SetStateAction } from "react";
 import { SearchIcon, XIcon } from "lucide-react";
 import { Input } from "@/shared/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Button } from "@/shared/components/ui/button";
+import { useCategories } from "../../services/category/queries";
+import { PRICE_CATEGORIES } from "../../types/filters";
+import { useProductFilters } from "../../hooks/use-product-filters";
+import { GoalDietPills } from "./GoalDietPills";
 
 interface MobileProductFilterProps {
-	filters: Filters;
-	setFilters: Dispatch<SetStateAction<Filters>>;
-	handleResetFilters: () => void;
 	totalItems: number;
 	isOpen: boolean;
 	setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const MobileProductFilter = ({
-	filters,
-	setFilters,
-	handleResetFilters,
 	totalItems,
 	isOpen,
 	setIsOpen,
 }: MobileProductFilterProps) => {
 	const { data: categories } = useCategories();
+	const {
+		filters,
+		handleSearchChange,
+		handleCategoryToggle,
+		handlePriceToggle,
+		handleGoalToggle,
+		handleDietToggle,
+		handleResetFilters,
+		activeFiltersCount,
+	} = useProductFilters();
 
 	if (!isOpen) return null;
-
-	// Calculate active filter count for badge feedback
-	const activeFiltersCount =
-		(filters.query ? 1 : 0) +
-		(filters.categoryId !== initialFilters.categoryId ? 1 : 0) +
-		(filters.price !== initialFilters.price ? 1 : 0);
-
-	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setFilters((prev) => ({
-			...prev,
-			query: e.target.value,
-		}));
-	};
-
-	const handleCategoryToggle = (catId: string) => {
-		setFilters((prev) => ({
-			...prev,
-			categoryId: prev.categoryId === catId ? initialFilters.categoryId : catId,
-		}));
-	};
-
-	const handlePriceToggle = (minPrice?: number, maxPrice?: number) => {
-		setFilters((prev) => {
-			const isSelected =
-				prev.price?.min === minPrice && prev.price?.max === maxPrice;
-
-			return {
-				...prev,
-				price: isSelected
-					? initialFilters.price
-					: { min: minPrice, max: maxPrice },
-			};
-		});
-	};
 
 	return (
 		<div
@@ -83,7 +51,7 @@ export const MobileProductFilter = ({
 							Filters
 						</h3>
 						{activeFiltersCount > 0 && (
-							<span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-900 text-[11px] font-bold text-white">
+							<span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-900 text-[11px] font-bold text-white">
 								{activeFiltersCount}
 							</span>
 						)}
@@ -92,7 +60,7 @@ export const MobileProductFilter = ({
 						type="button"
 						onClick={() => setIsOpen(false)}
 						aria-label="Close filters"
-						className="cursor-pointer rounded-xl p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+						className="cursor-pointer rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
 					>
 						<XIcon className="size-5" />
 					</button>
@@ -118,8 +86,8 @@ export const MobileProductFilter = ({
 								type="text"
 								placeholder="e.g. Protein, Matcha"
 								value={filters.query}
-								onChange={handleSearchChange}
-								className="h-11 rounded-xl border-emerald-900/10 pl-10 focus-visible:ring-emerald-800"
+								onChange={(e) => handleSearchChange(e.target.value)}
+								className="h-11 rounded-lg border-brand-900/10 pl-10 focus-visible:ring-brand-800"
 							/>
 						</div>
 					</div>
@@ -140,10 +108,10 @@ export const MobileProductFilter = ({
 										aria-pressed={isSelected}
 										onClick={() => handleCategoryToggle(cat.id)}
 										className={cn(
-											"cursor-pointer rounded-xl border px-3.5 py-2 text-xs font-bold transition-all",
+											"cursor-pointer rounded-lg border px-3.5 py-2 text-xs font-bold transition-all",
 											isSelected
-												? "border-emerald-900 bg-emerald-900 text-white shadow-xs"
-												: "border-slate-200 bg-white text-slate-700 hover:border-emerald-900/30 hover:bg-emerald-50/50",
+												? "border-brand-900 bg-brand-900 text-white shadow-xs"
+												: "border-slate-200 bg-white text-slate-700 hover:border-brand-900/30 hover:bg-brand-50/50",
 										)}
 									>
 										{cat.label}
@@ -152,6 +120,13 @@ export const MobileProductFilter = ({
 							})}
 						</div>
 					</div>
+
+					{/* Goal + Dietary pills (shared with the desktop sidebar) */}
+					<GoalDietPills
+						filters={filters}
+						onGoalToggle={handleGoalToggle}
+						onDietToggle={handleDietToggle}
+					/>
 
 					{/* Price Range Filter Mobile */}
 					<div className="space-y-2.5">
@@ -173,10 +148,10 @@ export const MobileProductFilter = ({
 											handlePriceToggle(opt.minPrice, opt.maxPrice)
 										}
 										className={cn(
-											"cursor-pointer rounded-xl border px-3.5 py-2 text-xs font-bold transition-all",
+											"cursor-pointer rounded-lg border px-3.5 py-2 text-xs font-bold transition-all",
 											isSelected
-												? "border-emerald-900 bg-emerald-900 text-white shadow-xs"
-												: "border-slate-200 bg-white text-slate-700 hover:border-emerald-900/30 hover:bg-emerald-50/50",
+												? "border-brand-900 bg-brand-900 text-white shadow-xs"
+												: "border-slate-200 bg-white text-slate-700 hover:border-brand-900/30 hover:bg-brand-50/50",
 										)}
 									>
 										{opt.label}
@@ -194,14 +169,14 @@ export const MobileProductFilter = ({
 						variant="outline"
 						onClick={handleResetFilters}
 						disabled={activeFiltersCount === 0}
-						className="h-12 flex-1 rounded-xl border-slate-200 font-bold text-slate-700 disabled:opacity-50"
+						className="h-12 flex-1 rounded-lg border-slate-200 font-bold text-slate-700 disabled:opacity-50"
 					>
 						Clear
 					</Button>
 					<Button
 						type="button"
 						onClick={() => setIsOpen(false)}
-						className="h-12 flex-2 rounded-xl bg-emerald-900 font-bold text-white shadow-md hover:bg-emerald-950"
+						className="h-12 flex-2 rounded-lg bg-brand-900 font-bold text-white shadow-md hover:bg-brand-950"
 					>
 						Show {totalItems} Results
 					</Button>

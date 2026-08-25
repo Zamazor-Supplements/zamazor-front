@@ -1,4 +1,6 @@
-interface PriceRange {
+import type { GoalId, QuizDiet } from "../config/goalMapping";
+
+export interface PriceRange {
 	min: undefined | number;
 	max: undefined | number;
 }
@@ -7,6 +9,10 @@ export interface Filters {
 	price: PriceRange | undefined;
 	query: string | undefined;
 	categoryId: string | undefined;
+	/** Goal pills map to the real categoryId filter (see config/goalMapping.ts). */
+	goal: GoalId | undefined;
+	/** Dietary chips are visual-only — no backend tags exist for them. */
+	diet: QuizDiet | undefined;
 }
 
 export type Sort =
@@ -35,6 +41,8 @@ export const initialFilters = {
 	price: undefined,
 	query: undefined,
 	categoryId: undefined,
+	goal: undefined,
+	diet: undefined,
 } satisfies Filters;
 
 export const PRICE_CATEGORIES = [

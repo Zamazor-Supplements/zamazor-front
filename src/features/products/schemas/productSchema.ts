@@ -2,6 +2,19 @@ import z from "zod/v4";
 import { categorySchema } from "./categorySchema";
 import { createPageResponseSchema } from "@/shared/schemas/pageSchema";
 
+/**
+ * Customer review — all fields except author/rating/body are optional so the
+ * backend can grow into them without breaking existing payloads.
+ */
+export const productReviewSchema = z.object({
+	author: z.string().min(1),
+	rating: z.number().min(0).max(5),
+	date: z.string().optional(),
+	body: z.string(),
+	verified: z.boolean().optional(),
+});
+export type ProductReview = z.infer<typeof productReviewSchema>;
+
 export const productSchema = z.object({
 	id: z.uuid(),
 	name: z.string().min(1),
@@ -11,6 +24,11 @@ export const productSchema = z.object({
 	stockQuantity: z.int().nonnegative(),
 	reservedQuantity: z.int().nonnegative(),
 	category: categorySchema,
+	/* Optional enrichment fields — old API payloads without them still parse. */
+	ingredients: z.array(z.string()).optional(),
+	dosage: z.string().optional(),
+	rating: z.number().min(0).max(5).optional(),
+	reviews: z.array(productReviewSchema).optional(),
 	createdAt: z.iso.datetime().pipe(z.coerce.date()),
 	modifiedAt: z.iso.datetime().pipe(z.coerce.date()),
 });

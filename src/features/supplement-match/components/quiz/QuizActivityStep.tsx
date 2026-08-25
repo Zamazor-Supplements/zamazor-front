@@ -10,7 +10,7 @@ export const QuizActivityStep = ({
 }) => (
 	<div className="space-y-6">
 		<div>
-			<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">
+			<span className="text-[10px] font-black uppercase text-brand-800 tracking-wider">
 				Step 3 of 3
 			</span>
 			<h3 className="text-xl font-playfair text-slate-950 font-normal mt-1">
@@ -22,9 +22,9 @@ export const QuizActivityStep = ({
 				<button
 					key={opt.id}
 					onClick={() => onSelect(opt.id)}
-					className="p-4 bg-white rounded-2xl border border-emerald-900/10 hover:border-emerald-700 hover:bg-emerald-50/20 text-left transition-all duration-150 cursor-pointer shadow-sm group"
+					className="p-4 bg-white rounded-2xl border border-brand-900/10 hover:border-brand-700 hover:bg-brand-50/20 text-left transition-all duration-150 cursor-pointer shadow-sm group"
 				>
-					<p className="text-sm font-bold text-slate-900 leading-tight group-hover:text-emerald-800 transition-colors">
+					<p className="text-sm font-bold text-slate-900 leading-tight group-hover:text-brand-800 transition-colors">
 						{opt.label}
 					</p>
 					<p className="text-[11px] text-slate-400 mt-1.5">{opt.desc}</p>
@@ -34,7 +34,7 @@ export const QuizActivityStep = ({
 		<Button
 			variant="ghost"
 			onClick={onBack}
-			className="text-emerald-900 hover:bg-emerald-50 rounded-xl cursor-pointer"
+			className="text-brand-900 hover:bg-brand-50 rounded-lg cursor-pointer"
 		>
 			Back
 		</Button>

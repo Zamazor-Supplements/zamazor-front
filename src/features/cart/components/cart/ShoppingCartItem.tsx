@@ -2,13 +2,16 @@ import {
 	useRemoveFromCart,
 	useUpdateCartItemQuantity,
 } from "@/features/cart/services/mutations";
-import type { PopulatedCartItem } from "../../schemas/cartSchema";
+import type { CartItem } from "../../schemas/cartSchema";
 import { Link } from "react-router";
-import { Loader2Icon, MinusIcon, PlusIcon, Trash2Icon } from "lucide-react";
-import { formatCurrency } from "@/shared/utils/price";
+import { Loader2Icon, Trash2Icon } from "lucide-react";
+import { formatPrice } from "@/shared/utils/price";
 import { APP_ROUTES } from "@/app/routes/paths";
+import { QuantitySelector } from "@/shared/components/ui/quantity-selector";
+import { Image } from "@/shared/components/ui/image";
+import { cn } from "@/lib/utils";
 
-export const ShoppingCartItem = ({ item }: { item: PopulatedCartItem }) => {
+export const ShoppingCartItem = ({ item }: { item: CartItem }) => {
 	const updateQuantityMutation = useUpdateCartItemQuantity();
 	const removeItemMutation = useRemoveFromCart();
 	const { product, quantity } = item;
@@ -19,13 +22,11 @@ export const ShoppingCartItem = ({ item }: { item: PopulatedCartItem }) => {
 
 	const handleRemoveItem = () => {
 		if (isBusy) return;
-
 		removeItemMutation.mutate(product.id);
 	};
 
 	const handleIncreaseItemQuantity = () => {
 		if (isBusy) return;
-
 		updateQuantityMutation.mutate({
 			productId: product.id,
 			quantity: quantity + 1,
@@ -34,7 +35,6 @@ export const ShoppingCartItem = ({ item }: { item: PopulatedCartItem }) => {
 
 	const handleDecreaseItemQuantity = () => {
 		if (isBusy) return;
-
 		if (quantity <= 1) {
 			handleRemoveItem();
 			return;
@@ -47,96 +47,78 @@ export const ShoppingCartItem = ({ item }: { item: PopulatedCartItem }) => {
 
 	return (
 		<div
-			className={`flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-4 sm:p-5 bg-white rounded-2xl border border-emerald-900/5 shadow-xs hover:border-emerald-900/10 transition-all ${
-				isBusy ? "opacity-60 pointer-events-none" : "opacity-100"
-			}`}
+			aria-busy={isBusy}
+			className={cn(
+				"group relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4 p-3.5 sm:p-4 bg-white rounded-2xl border border-slate-100 shadow-2xs hover:border-brand-950/15 hover:shadow-sm transition-all",
+				isRemoving && "opacity-50 scale-[0.99] pointer-events-none",
+			)}
 		>
-			{/* Product Image & Details */}
-			<div className="flex gap-4 items-center">
+			{/* Top / Left side: Image & Product Details */}
+			<div className="flex items-center gap-3.5 min-w-0 w-full sm:flex-1">
 				<Link
-					to={APP_ROUTES.PRODUCT(product.id)}
-					className="size-20 shrink-0 bg-slate-50 rounded-xl border border-emerald-900/5 flex items-center justify-center p-2 hover:scale-102 transition-transform focus:outline-none focus:ring-2 focus:ring-emerald-800/20"
+					to={APP_ROUTES.PRODUCT({ id: product.id })}
+					className="size-16 sm:size-18 shrink-0 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center p-2 overflow-hidden focus:outline-none focus:ring-2 focus:ring-brand-800/20"
 				>
-					<img
+					<Image
 						src={product.imageUrl}
 						alt={product.name}
-						className="h-full w-full object-contain"
-						loading="lazy"
+						objectFit="contain"
+						className="h-full w-full object-center group-hover:scale-105 transition-transform duration-300"
 					/>
 				</Link>
 
-				<div>
+				<div className="min-w-0 flex-1">
 					<Link
-						to={APP_ROUTES.PRODUCT(product.id)}
-						className="font-playfair text-lg font-bold text-slate-950 hover:text-emerald-800 transition-colors leading-tight block"
+						to={APP_ROUTES.PRODUCT({ id: product.id })}
+						className="font-playfair text-sm sm:text-base font-bold text-slate-950 hover:text-brand-800 transition-colors line-clamp-1 block w-full"
 					>
 						{product.name}
 					</Link>
 					{product.category?.label && (
-						<p className="text-xs text-emerald-800 font-bold uppercase tracking-wider mt-1">
+						<p className="text-[10px] sm:text-[11px] text-brand-800 font-bold uppercase tracking-wider mt-0.5 truncate">
 							{product.category.label}
 						</p>
 					)}
+					<p className="text-[11px] text-slate-400 mt-1">
+						{formatPrice(product.price)} each
+					</p>
 				</div>
 			</div>
 
-			{/* Controls (Quantity, Subtotal, Delete) */}
-			<div className="flex items-center gap-6 sm:gap-8 justify-between w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
-				{/* Quantity Selector */}
-				<div className="flex items-center rounded-lg border border-emerald-900/15 bg-white p-0.5">
+			{/* Bottom / Right side: Quantity Selector, Total Price, & Delete Button */}
+			<div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-5 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+				<div className={cn("transition-opacity", isUpdating && "opacity-70")}>
+					<QuantitySelector
+						value={quantity}
+						onDecrease={handleDecreaseItemQuantity}
+						onIncrease={handleIncreaseItemQuantity}
+						disabled={isBusy}
+						isUpdating={isUpdating}
+						size="sm"
+					/>
+				</div>
+
+				<div className="flex items-center gap-3 sm:gap-5 ml-auto sm:ml-0">
+					<div className="text-right min-w-16 sm:min-w-20">
+						<p className="text-xs sm:text-base font-black text-slate-900">
+							{formatPrice(product.price * quantity)}
+						</p>
+					</div>
+
 					<button
 						type="button"
-						onClick={handleDecreaseItemQuantity}
+						onClick={handleRemoveItem}
 						disabled={isBusy}
-						aria-label="Decrease quantity"
-						className="size-7 font-bold text-slate-500 hover:text-slate-900 flex items-center justify-center hover:bg-slate-50 rounded-md cursor-pointer disabled:cursor-not-allowed"
+						className="text-slate-400 hover:text-rose-500 transition-colors p-2 rounded-lg hover:bg-rose-50 cursor-pointer disabled:cursor-not-allowed shrink-0"
+						aria-label="Remove item from cart"
 					>
-						<MinusIcon className="size-3" />
-					</button>
-
-					<span className="w-8 text-center text-xs font-bold text-slate-900 select-none flex items-center justify-center">
-						{isUpdating ? (
-							<Loader2Icon className="size-3 animate-spin text-emerald-800" />
+						{isRemoving ? (
+							<Loader2Icon className="size-4 animate-spin text-rose-500" />
 						) : (
-							quantity
+							<Trash2Icon className="size-4" />
 						)}
-					</span>
-
-					<button
-						type="button"
-						onClick={handleIncreaseItemQuantity}
-						disabled={isBusy}
-						aria-label="Increase quantity"
-						className="size-7 font-bold text-slate-500 hover:text-slate-900 flex items-center justify-center hover:bg-slate-50 rounded-md cursor-pointer disabled:cursor-not-allowed"
-					>
-						<PlusIcon className="size-3" />
 					</button>
 				</div>
-
-				{/* Price Subtotal */}
-				<div className="text-right min-w-17.5">
-					<p className="text-sm font-black text-slate-900">
-						{formatCurrency(product.price * quantity)}
-					</p>
-					<p className="text-[10px] text-slate-400 mt-0.5">
-						{formatCurrency(product.price)} each
-					</p>
-				</div>
-
-				{/* Delete button */}
-				<button
-					type="button"
-					onClick={handleRemoveItem}
-					disabled={isBusy}
-					className="text-slate-400 hover:text-rose-500 transition-colors p-1 cursor-pointer disabled:cursor-not-allowed"
-					aria-label="Remove item from cart"
-				>
-					{isRemoving ? (
-						<Loader2Icon className="size-4 animate-spin text-rose-500" />
-					) : (
-						<Trash2Icon className="size-4" />
-					)}
-				</button>
 			</div>
 		</div>
 	);

@@ -14,8 +14,6 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 
-// --- Data ---
-
 const MILESTONES = [
 	{
 		year: "2021",
@@ -77,16 +75,14 @@ const STATS = [
 	{ value: "4.9/5", label: "Customer Rating" },
 ];
 
-// --- Main Story Page Component ---
-
-export const StoryPage = () => {
+export default function StoryPage() {
 	useDocumentTitle(`Our Story & Heritage | ${CONFIG.APP_NAME}`);
 
 	return (
-		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-emerald-100">
+		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-brand-100">
 			<div className="mx-auto max-w-7xl space-y-16">
 				{/* --- Hero Section --- */}
-				<div className="relative overflow-hidden rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-950 via-emerald-900 to-slate-950 p-8 sm:p-16 text-white shadow-xl shadow-emerald-950/10">
+				<div className="relative overflow-hidden rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-950 via-brand-900 to-slate-950 p-8 sm:p-16 text-white shadow-xl shadow-brand-950/10">
 					<div className="relative z-10 max-w-3xl space-y-4">
 						<div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-lime-300 backdrop-blur-md">
 							<SparklesIcon className="size-3.5" />
@@ -97,7 +93,7 @@ export const StoryPage = () => {
 							Fueling Human Potential Through Pure Nutrition
 						</h1>
 
-						<p className="text-sm sm:text-base leading-relaxed text-emerald-100/80 pt-2">
+						<p className="text-sm sm:text-base leading-relaxed text-brand-100/80 pt-2">
 							ZAMAZOR was born out of a simple necessity: athletes and fitness
 							enthusiasts in Morocco deserved uncompromising quality, complete
 							formula transparency, and guaranteed authentic supplements.
@@ -113,9 +109,9 @@ export const StoryPage = () => {
 					{STATS.map((stat) => (
 						<div
 							key={stat.label}
-							className="rounded-3xl border border-emerald-900/10 bg-white p-6 sm:p-8 text-center shadow-xs"
+							className="rounded-3xl border border-brand-900/10 bg-white p-6 sm:p-8 text-center shadow-xs"
 						>
-							<p className="font-playfair text-3xl sm:text-4xl font-black text-emerald-950">
+							<p className="font-playfair text-3xl sm:text-4xl font-black text-brand-950">
 								{stat.value}
 							</p>
 							<p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -129,7 +125,7 @@ export const StoryPage = () => {
 				<div className="grid gap-8 lg:grid-cols-2 items-center">
 					<div className="space-y-6">
 						<div>
-							<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+							<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 								Our Purpose
 							</p>
 							<h2 className="text-3xl sm:text-4xl font-playfair font-normal text-slate-950 mt-1">
@@ -154,14 +150,14 @@ export const StoryPage = () => {
 									key={idx}
 									className="flex items-start gap-3 text-xs sm:text-sm text-slate-800"
 								>
-									<CheckCircle2Icon className="size-5 text-emerald-800 shrink-0 mt-0.5" />
+									<CheckCircle2Icon className="size-5 text-brand-800 shrink-0 mt-0.5" />
 									<span>{point}</span>
 								</li>
 							))}
 						</ul>
 					</div>
 
-					<div className="rounded-[2.5rem] border border-emerald-900/10 bg-emerald-950 p-8 sm:p-10 text-white relative overflow-hidden shadow-lg">
+					<div className="rounded-hero border border-brand-900/10 bg-brand-950 p-8 sm:p-10 text-white relative overflow-hidden shadow-lg">
 						<div className="relative z-10 space-y-4">
 							<div className="grid size-12 place-items-center rounded-2xl bg-white/10 text-lime-300">
 								<FlameIcon className="size-6" />
@@ -169,7 +165,7 @@ export const StoryPage = () => {
 							<h3 className="text-2xl font-playfair font-normal">
 								Our Promise to You
 							</h3>
-							<p className="text-xs sm:text-sm leading-relaxed text-emerald-100/80">
+							<p className="text-xs sm:text-sm leading-relaxed text-brand-100/80">
 								"We don't sell products we wouldn't use ourselves every single
 								day. Every scoop, tablet, and bar from ZAMAZOR is engineered to
 								deliver genuine results for your training journey."
@@ -184,7 +180,7 @@ export const StoryPage = () => {
 				{/* --- Core Values --- */}
 				<div className="space-y-8">
 					<div className="text-center max-w-2xl mx-auto space-y-2">
-						<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+						<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 							What We Stand For
 						</p>
 						<h2 className="text-2xl sm:text-4xl font-playfair font-normal text-slate-950">
@@ -198,9 +194,9 @@ export const StoryPage = () => {
 							return (
 								<div
 									key={value.title}
-									className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs hover:border-emerald-900/30 transition-all duration-200"
+									className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs hover:border-brand-900/30 transition-all duration-200"
 								>
-									<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+									<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 										<Icon className="size-6" />
 									</div>
 									<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -216,9 +212,9 @@ export const StoryPage = () => {
 				</div>
 
 				{/* --- Brand History Timeline --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-12 shadow-xs space-y-8">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-12 shadow-xs space-y-8">
 					<div>
-						<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+						<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 							Evolution
 						</p>
 						<h2 className="text-2xl sm:text-3xl font-playfair font-normal text-slate-950 mt-1">
@@ -233,7 +229,7 @@ export const StoryPage = () => {
 								className="rounded-3xl border border-slate-100 bg-slate-50/50 p-6 flex flex-col justify-between"
 							>
 								<div>
-									<span className="font-playfair text-3xl font-black text-emerald-800">
+									<span className="font-playfair text-3xl font-black text-brand-800">
 										{item.year}
 									</span>
 									<h3 className="mt-2 text-base font-bold text-slate-950">
@@ -249,13 +245,13 @@ export const StoryPage = () => {
 				</div>
 
 				{/* --- Call to Action --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-900 to-slate-900 p-8 sm:p-12 text-white shadow-xl">
+				<div className="rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-900 to-slate-900 p-8 sm:p-12 text-white shadow-xl">
 					<div className="flex flex-col lg:flex-row items-center justify-between gap-8">
 						<div className="space-y-2 text-center lg:text-left">
 							<h2 className="text-2xl sm:text-3xl font-playfair font-normal">
 								Ready to Upgrade Your Nutrition?
 							</h2>
-							<p className="text-xs sm:text-sm text-emerald-100/80 max-w-xl">
+							<p className="text-xs sm:text-sm text-brand-100/80 max-w-xl">
 								Explore our lab-verified collection of proteins, pre-workouts,
 								and essential recovery formulas.
 							</p>
@@ -263,7 +259,7 @@ export const StoryPage = () => {
 
 						<Button
 							asChild
-							className="rounded-xl bg-lime-400 px-8 py-3.5 font-bold text-slate-950 hover:bg-lime-300 shrink-0 cursor-pointer shadow-md"
+							className="rounded-lg bg-lime-400 px-8 py-3.5 font-bold text-slate-950 hover:bg-lime-300 shrink-0 cursor-pointer shadow-md"
 						>
 							<Link to={APP_ROUTES.SHOP}>
 								Shop Collection
@@ -275,4 +271,4 @@ export const StoryPage = () => {
 			</div>
 		</div>
 	);
-};
+}

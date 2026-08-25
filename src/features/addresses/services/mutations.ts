@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Address, AddressRequest } from "../schemas/addressSchema";
 import { createOrUpdateDefaultAddress, updateDefaultAddress } from "./api";
 import { addressKeys } from "./keys";
+import { authKeys } from "@/features/auth/services/keys";
 
 export function useCreateOrUpdateAddress() {
 	const queryClient = useQueryClient();
@@ -11,6 +12,8 @@ export function useCreateOrUpdateAddress() {
 			createOrUpdateDefaultAddress(payload),
 		onSuccess: (updatedAddress) => {
 			queryClient.setQueryData(addressKeys.default(), updatedAddress);
+			// Also invalidate the user cache so the profile form re-reads the fresh address.
+			queryClient.invalidateQueries({ queryKey: authKeys.me() });
 		},
 	});
 }

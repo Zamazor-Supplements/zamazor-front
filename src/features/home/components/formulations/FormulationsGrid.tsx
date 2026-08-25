@@ -54,17 +54,17 @@ export const FormulationsGrid = () => {
 	return (
 		<section
 			id="formulations"
-			className="bg-[#fcfdfa] py-20 border-b border-emerald-900/10"
+			className="bg-surface-3 py-20 border-b border-brand-900/10"
 		>
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="text-center mb-16">
-					<p className="text-xs font-black uppercase tracking-widest text-emerald-700">
+					<p className="text-xs font-black uppercase tracking-widest text-brand-700">
 						Formulations
 					</p>
-					<h2 className="mt-2 text-3xl font-playfair font-normal leading-tight text-slate-950 sm:text-5xl">
+					<h2 className="mt-2 text-3xl font-playfair font-normal leading-tight text-ink sm:text-5xl">
 						Science-backed formulations
 					</h2>
-					<p className="mt-4 mx-auto max-w-2xl text-base leading-relaxed text-slate-600">
+					<p className="mt-4 mx-auto max-w-2xl text-base leading-relaxed text-ink-soft">
 						Our targeted blends combine research-backed ingredients with
 						thoughtful formulation to support lasting vitality and everyday
 						balance.
@@ -80,14 +80,14 @@ export const FormulationsGrid = () => {
 							viewport={{ once: true }}
 							transition={{ duration: 0.35, delay: card.delay }}
 							onClick={() => navigate(APP_ROUTES.SHOP)}
-							className="relative overflow-hidden rounded-[2.5rem] aspect-4/5 p-6 sm:p-8 flex flex-col justify-between shadow-lg border border-emerald-900/10 group cursor-pointer hover:-translate-y-1 transition-all duration-300"
+							className="relative overflow-hidden rounded-3xl aspect-4/5 p-6 sm:p-8 flex flex-col justify-between shadow-lg border border-brand-900/10 group cursor-pointer hover:-translate-y-1 transition-all duration-300"
 						>
 							{/* Background Image & Overlay */}
 							<div
 								className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
 								style={{ backgroundImage: `url(${card.bgImage})` }}
 							/>
-							<div className="absolute inset-0 bg-linear-to-t from-emerald-950/85 via-emerald-950/30 to-black/30 group-hover:from-emerald-950/90 group-hover:via-emerald-950/40 transition-colors duration-300" />
+							<div className="absolute inset-0 bg-linear-to-t from-brand-950/85 via-brand-950/30 to-black/30 group-hover:from-brand-950/90 group-hover:via-brand-950/40 transition-colors duration-300" />
 
 							{/* Top Content */}
 							<div className="relative z-10">
@@ -101,7 +101,7 @@ export const FormulationsGrid = () => {
 
 							{/* Bottom Action */}
 							<div className="relative z-10 flex items-end justify-between mt-auto">
-								<button className="bg-lime-300 text-emerald-950 hover:bg-lime-400 font-bold px-6 py-3 rounded-full text-xs sm:text-sm transition-all duration-200 transform active:scale-95 shadow-md shadow-lime-950/20">
+								<button className="bg-accent text-brand-950 hover:bg-accent/90 font-bold px-6 py-3 rounded-full text-xs sm:text-sm transition-all duration-200 transform active:scale-95 shadow-md shadow-lime-950/20">
 									Shop Now
 								</button>
 

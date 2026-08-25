@@ -14,10 +14,9 @@ import { OverviewFallbackError } from "@/features/dashboard/components/overview/
 import { OverviewSkeleton } from "@/features/dashboard/components/overview/OverviewSkeleton";
 import { LowStockAlerts } from "@/features/dashboard/components/overview/LowStockAlerts";
 
-export const OverviewPage = () => {
+export default function OverviewPage() {
 	useDocumentTitle(`Dashboard Overview | ${CONFIG.APP_NAME}`);
-	const { data, isPending, isError, refetch, isFetching } =
-		useDashboardOverview();
+	const { data, isPending, isError, refetch, isFetching } = useDashboardOverview();
 
 	const totalProductsCount = useMemo(() => {
 		return (
@@ -39,8 +38,8 @@ export const OverviewPage = () => {
 		<div className="relative space-y-6 sm:space-y-8 min-w-0 pb-10">
 			{/* Background Refetch Indicator */}
 			{isFetching && (
-				<div className="absolute -top-3 right-0 z-10 flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-[11px] font-medium text-slate-600 shadow-sm backdrop-blur-xs">
-					<Loader2Icon className="size-3 animate-spin text-emerald-800" />
+				<div className="absolute -top-3 right-0 z-10 flex items-center gap-2 rounded-full border border-brand-900/10 bg-card/90 px-3 py-1 text-[11px] font-medium text-ink-soft shadow-sm backdrop-blur-xs">
+					<Loader2Icon className="size-3 animate-spin text-brand-800" />
 					Updating live data...
 				</div>
 			)}
@@ -63,15 +62,13 @@ export const OverviewPage = () => {
 						recentOrders={data.recentOrders}
 						pending={data.pendingOrders}
 						completed={data.completedOrders}
-						canceled={data.canceledOrders}
-					/>
+						canceled={data.canceledOrders} />
 				</div>
 
 				<div className="space-y-6 min-w-0">
 					<CategoryMix
 						categories={data.categorySummary}
-						totalProducts={totalProductsCount}
-					/>
+						totalProducts={totalProductsCount} />
 					<LowStockAlerts products={data.lowStockProducts} />
 				</div>
 			</div>
@@ -81,9 +78,8 @@ export const OverviewPage = () => {
 				<TopProducts products={data.topProducts} />
 				<RecentOrdersGrid
 					orders={data.recentOrders}
-					totalOrders={data.totalOrders}
-				/>
+					totalOrders={data.totalOrders} />
 			</div>
 		</div>
 	);
-};
+}

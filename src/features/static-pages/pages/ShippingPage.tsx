@@ -19,8 +19,6 @@ import { useState } from "react";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/app/config/constants";
 
-// --- Data ---
-
 const SHIPPING_RATES = [
 	{
 		region: "Casablanca & Surroundings",
@@ -96,18 +94,16 @@ const SHIPPING_FAQS = [
 	},
 ];
 
-// --- Main Shipping Page Component ---
-
-export const ShippingPage = () => {
+export default function ShippingPage() {
 	const [openFaqId, setOpenFaqId] = useState<string | null>("cod");
 
 	useDocumentTitle(`Shipping & Delivery Policy | ${CONFIG.APP_NAME}`);
 
 	return (
-		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-emerald-100">
+		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-brand-100">
 			<div className="mx-auto max-w-7xl space-y-12">
 				{/* --- Hero Section --- */}
-				<div className="relative overflow-hidden rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-950 via-emerald-900 to-slate-950 p-8 sm:p-14 text-white shadow-xl shadow-emerald-950/10">
+				<div className="relative overflow-hidden rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-950 via-brand-900 to-slate-950 p-8 sm:p-14 text-white shadow-xl shadow-brand-950/10">
 					<div className="relative z-10 max-w-3xl">
 						<p className="text-[11px] font-black uppercase tracking-[0.26em] text-lime-300">
 							Logistics & Fulfillment
@@ -115,7 +111,7 @@ export const ShippingPage = () => {
 						<h1 className="mt-3 text-3xl sm:text-5xl font-playfair font-normal leading-tight">
 							Shipping & Delivery
 						</h1>
-						<p className="mt-4 text-sm sm:text-base leading-relaxed text-emerald-100/80">
+						<p className="mt-4 text-sm sm:text-base leading-relaxed text-brand-100/80">
 							We deliver high-performance nutrition directly to your doorstep
 							across Morocco. Fast, trackable, and reliable express shipping
 							options available.
@@ -128,8 +124,8 @@ export const ShippingPage = () => {
 
 				{/* --- Key Shipping Highlights --- */}
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<TruckIcon className="size-6" />
 						</div>
 						<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -140,8 +136,8 @@ export const ShippingPage = () => {
 						</p>
 					</div>
 
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<CreditCardIcon className="size-6" />
 						</div>
 						<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -152,8 +148,8 @@ export const ShippingPage = () => {
 						</p>
 					</div>
 
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<ShieldCheckIcon className="size-6" />
 						</div>
 						<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -164,8 +160,8 @@ export const ShippingPage = () => {
 						</p>
 					</div>
 
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<MapPinIcon className="size-6" />
 						</div>
 						<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -179,17 +175,17 @@ export const ShippingPage = () => {
 				</div>
 
 				{/* --- Delivery Rates Table / Cards --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
 					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
 						<div>
-							<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+							<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 								Morocco Logistics
 							</p>
 							<h2 className="text-2xl font-playfair font-normal text-slate-950 mt-1">
 								Rates & Delivery Timelines
 							</h2>
 						</div>
-						<span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-900">
+						<span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-900">
 							<Clock3Icon className="size-3.5" />
 							Standard Cutoff: 2:00 PM (GMT+1)
 						</span>
@@ -199,11 +195,11 @@ export const ShippingPage = () => {
 						{SHIPPING_RATES.map((item) => (
 							<div
 								key={item.region}
-								className="flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-slate-50/40 p-6 hover:border-emerald-900/20 hover:bg-slate-50 transition-all"
+								className="flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-slate-50/40 p-6 hover:border-brand-900/20 hover:bg-slate-50 transition-all"
 							>
 								<div>
 									<div className="flex items-center justify-between gap-2 mb-3">
-										<span className="rounded-full bg-emerald-900/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-900">
+										<span className="rounded-full bg-brand-900/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-900">
 											{item.highlight}
 										</span>
 										<span className="text-xs font-bold text-slate-400">
@@ -219,14 +215,14 @@ export const ShippingPage = () => {
 										<p className="text-2xl font-black text-slate-950">
 											{item.cost}
 										</p>
-										<p className="text-xs font-semibold text-emerald-700">
+										<p className="text-xs font-semibold text-brand-700">
 											{item.freeThreshold}
 										</p>
 									</div>
 								</div>
 
 								<div className="mt-6 border-t border-slate-200/60 pt-4 flex items-center gap-2 text-xs text-slate-500">
-									<CheckCircle2Icon className="size-4 text-emerald-800 shrink-0" />
+									<CheckCircle2Icon className="size-4 text-brand-800 shrink-0" />
 									<span>SMS tracking included</span>
 								</div>
 							</div>
@@ -235,9 +231,9 @@ export const ShippingPage = () => {
 				</div>
 
 				{/* --- How Shipping Works Workflow --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-8">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-8">
 					<div>
-						<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+						<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 							Fulfillment Journey
 						</p>
 						<h2 className="text-2xl font-playfair font-normal text-slate-950 mt-1">
@@ -255,7 +251,7 @@ export const ShippingPage = () => {
 								>
 									<div>
 										<div className="flex items-center justify-between mb-4">
-											<div className="grid size-12 place-items-center rounded-2xl bg-emerald-900 text-white shadow-sm">
+											<div className="grid size-12 place-items-center rounded-2xl bg-brand-900 text-white shadow-sm">
 												<Icon className="size-6" />
 											</div>
 											<span className="font-playfair text-3xl font-black text-slate-200">
@@ -277,9 +273,9 @@ export const ShippingPage = () => {
 				</div>
 
 				{/* --- Shipping FAQs --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
 					<div className="flex items-center gap-3 border-b border-slate-100 pb-6">
-						<div className="grid size-10 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+						<div className="grid size-10 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<HelpCircleIcon className="size-5" />
 						</div>
 						<div>
@@ -311,10 +307,9 @@ export const ShippingPage = () => {
 										</span>
 										<ChevronDownIcon
 											className={cn(
-												"size-5 shrink-0 text-emerald-800 transition-transform duration-200",
-												isOpen && "rotate-180",
-											)}
-										/>
+												"size-5 shrink-0 text-brand-800 transition-transform duration-200",
+												isOpen && "rotate-180"
+											)} />
 									</button>
 
 									{isOpen && (
@@ -329,7 +324,7 @@ export const ShippingPage = () => {
 				</div>
 
 				{/* --- Support Escalation Banner --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-900 to-slate-900 p-8 text-white shadow-xl">
+				<div className="rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-900 to-slate-900 p-8 text-white shadow-xl">
 					<div className="flex flex-col md:flex-row items-center justify-between gap-6">
 						<div className="flex items-start gap-4">
 							<div className="grid size-12 place-items-center rounded-2xl bg-white/10 text-lime-300 shrink-0">
@@ -339,7 +334,7 @@ export const ShippingPage = () => {
 								<h3 className="text-xl font-playfair font-normal">
 									Has your package been delayed?
 								</h3>
-								<p className="mt-1 text-xs text-emerald-100/80 max-w-xl">
+								<p className="mt-1 text-xs text-brand-100/80 max-w-xl">
 									If your order hasn't arrived within the expected timeframe,
 									our support team can directly investigate with the local
 									courier desk.
@@ -349,7 +344,7 @@ export const ShippingPage = () => {
 
 						<Button
 							asChild
-							className="rounded-xl bg-lime-400 px-6 py-3 font-bold text-slate-950 hover:bg-lime-300 shrink-0 cursor-pointer shadow-sm"
+							className="rounded-lg bg-lime-400 px-6 py-3 font-bold text-slate-950 hover:bg-lime-300 shrink-0 cursor-pointer shadow-sm"
 						>
 							<Link to={APP_ROUTES.PAGES.CONTACT}>
 								Contact Support Desk
@@ -361,4 +356,4 @@ export const ShippingPage = () => {
 			</div>
 		</div>
 	);
-};
+}

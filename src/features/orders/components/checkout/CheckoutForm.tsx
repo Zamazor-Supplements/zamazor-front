@@ -4,9 +4,10 @@ import { useLanguage } from "@/shared/hooks/use-language";
 import { Input } from "@/shared/components/ui/input";
 import { OriginButton } from "@/shared/components/ui/origin-button";
 import { Loader2Icon, LockIcon } from "lucide-react";
-import { formatCurrency } from "@/shared/utils/price";
+import { formatPrice } from "@/shared/utils/price";
 import { useCheckout } from "../../services/mutations";
 import { Checkbox } from "@/shared/components/ui/checkbox";
+import { APP_COUNTRY } from "@/app/config/constants";
 
 const StripeMark = () => (
 	<svg viewBox="0 0 24 24" aria-hidden="true" className="size-5">
@@ -36,7 +37,10 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 	const checkoutMutation = useCheckout();
 
 	const handleCheckoutSubmit = (data: CheckoutFormValues) => {
-		checkoutMutation.mutate(data);
+		// Country is a fixed application-level constraint; force it here so the
+		// submitted payload is locked to APP_COUNTRY regardless of what the form
+		// state holds (defence against future defaultValues regressions).
+		checkoutMutation.mutate({ ...data, country: APP_COUNTRY });
 	};
 
 	return (
@@ -45,20 +49,20 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 			className="space-y-6 w-full max-w-full"
 		>
 			{/* Step 1: Contact Information */}
-			<div className="bg-white rounded-3xl border border-emerald-900/5 p-5 sm:p-7 shadow-xs transition-all hover:shadow-md">
-				<h2 className="font-playfair text-lg sm:text-xl font-bold text-slate-950 mb-5 flex items-center gap-2.5 border-b border-slate-100 pb-3">
-					<span className="size-6 bg-emerald-900 text-white rounded-full flex items-center justify-center text-xs font-bold font-sans shrink-0">
+			<div className="bg-card rounded-3xl border border-brand-900/5 p-5 sm:p-7 shadow-xs transition-all hover:shadow-md">
+				<h2 className="font-playfair text-lg sm:text-xl font-bold text-ink mb-5 flex items-center gap-2.5 border-b border-brand-900/10 pb-3">
+					<span className="size-6 bg-brand-900 text-white rounded-full flex items-center justify-center text-xs font-bold font-sans shrink-0">
 						1
 					</span>
 					{t("checkout.step1")}
 				</h2>
 				<div className="space-y-4">
 					<div>
-						<label className="text-xs font-black uppercase text-slate-400 tracking-wider block mb-2">
+						<label className="text-xs font-black uppercase text-ink-faint tracking-wider block mb-2">
 							{t("checkout.phone")}
 						</label>
 						<div className="flex flex-col sm:flex-row gap-2 w-full">
-							<div className="flex h-11 items-center justify-center sm:justify-start gap-2 rounded-xl border border-emerald-900/10 bg-slate-50 px-3.5 text-sm font-black text-slate-700 shrink-0">
+							<div className="flex h-11 items-center justify-center sm:justify-start gap-2 rounded-lg border border-brand-900/10 bg-surface-2 px-3.5 text-sm font-black text-slate-700 shrink-0">
 								<span aria-hidden="true" className="text-base leading-none">
 									🇲🇦
 								</span>
@@ -68,7 +72,7 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 								type="tel"
 								placeholder="600 00 00 00"
 								{...register("phone")}
-								className="h-11 w-full min-w-0 rounded-xl border-emerald-900/10 focus-visible:ring-emerald-800 bg-[#fbfcf9] text-base sm:text-sm"
+								className="h-11 w-full min-w-0 rounded-lg border-brand-900/10 focus-visible:ring-brand-800 bg-surface-3 text-base sm:text-sm"
 							/>
 						</div>
 						{errors.phone && (
@@ -81,23 +85,23 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 			</div>
 
 			{/* Step 2: Shipping & Address */}
-			<div className="bg-white rounded-3xl border border-emerald-900/5 p-5 sm:p-7 shadow-xs transition-all hover:shadow-md">
-				<h2 className="font-playfair text-lg sm:text-xl font-bold text-slate-950 mb-5 flex items-center gap-2.5 border-b border-slate-100 pb-3">
-					<span className="size-6 bg-emerald-900 text-white rounded-full flex items-center justify-center text-xs font-bold font-sans shrink-0">
+			<div className="bg-card rounded-3xl border border-brand-900/5 p-5 sm:p-7 shadow-xs transition-all hover:shadow-md">
+				<h2 className="font-playfair text-lg sm:text-xl font-bold text-ink mb-5 flex items-center gap-2.5 border-b border-brand-900/10 pb-3">
+					<span className="size-6 bg-brand-900 text-white rounded-full flex items-center justify-center text-xs font-bold font-sans shrink-0">
 						2
 					</span>
 					{t("checkout.step2")}
 				</h2>
 				<div className="space-y-4">
 					<div>
-						<label className="text-xs font-black uppercase text-slate-400 tracking-wider block mb-2">
+						<label className="text-xs font-black uppercase text-ink-faint tracking-wider block mb-2">
 							{t("checkout.address")}
 						</label>
 						<Input
 							type="text"
 							placeholder="123 Wellness Way"
 							{...register("street")}
-							className="h-11 w-full min-w-0 rounded-xl border-emerald-900/10 focus-visible:ring-emerald-800 bg-[#fbfcf9] text-base sm:text-sm"
+							className="h-11 w-full min-w-0 rounded-lg border-brand-900/10 focus-visible:ring-brand-800 bg-surface-3 text-base sm:text-sm"
 						/>
 						{errors.street && (
 							<p className="text-xs text-rose-600 mt-1.5 font-bold">
@@ -108,14 +112,14 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
 						<div className="min-w-0">
-							<label className="text-xs font-black uppercase text-slate-400 tracking-wider block mb-2">
+							<label className="text-xs font-black uppercase text-ink-faint tracking-wider block mb-2">
 								{t("checkout.city")}
 							</label>
 							<Input
 								type="text"
 								placeholder="Casablanca"
 								{...register("city")}
-								className="h-11 w-full min-w-0 rounded-xl border-emerald-900/10 focus-visible:ring-emerald-800 bg-[#fbfcf9] text-base sm:text-sm"
+								className="h-11 w-full min-w-0 rounded-lg border-brand-900/10 focus-visible:ring-brand-800 bg-surface-3 text-base sm:text-sm"
 							/>
 							{errors.city && (
 								<p className="text-xs text-rose-600 mt-1.5 font-bold">
@@ -124,46 +128,44 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 							)}
 						</div>
 						<div className="min-w-0">
-							<label className="text-xs font-black uppercase text-slate-400 tracking-wider block mb-2">
+							<label className="text-xs font-black uppercase text-ink-faint tracking-wider block mb-2">
 								{t("checkout.country")}
 							</label>
 							<Input
 								type="text"
 								disabled
 								{...register("country")}
-								className="h-11 w-full min-w-0 rounded-xl border-emerald-900/10 focus-visible:ring-emerald-800 bg-slate-50 text-slate-500 cursor-not-allowed text-base sm:text-sm"
+								className="h-11 w-full min-w-0 rounded-lg border-brand-900/10 focus-visible:ring-brand-800 bg-surface-2 text-ink-soft cursor-not-allowed text-base sm:text-sm"
 							/>
 						</div>
 					</div>
 
-					{/* Fully Connected Checkbox */}
 					<div className="pt-2">
 						<Controller
 							name="isDefault"
 							control={control}
 							render={({ field }) => (
 								<div
-									onClick={() => field.onChange(!field.value)}
 									className={`flex items-start gap-3.5 rounded-2xl border p-4 cursor-pointer transition-all ${
 										field.value
-											? "border-emerald-800/40 bg-emerald-50/40 shadow-xs"
-											: "border-emerald-900/10 bg-[#fbfcf9] hover:bg-emerald-50/20"
+											? "border-brand-800/40 bg-brand-50/40 shadow-xs"
+											: "border-brand-900/10 bg-cream hover:bg-brand-50/20"
 									}`}
 								>
 									<Checkbox
 										id="isDefault"
 										checked={field.value}
 										onCheckedChange={field.onChange}
-										className="mt-0.5 size-4 rounded border-emerald-900/20 data-[state=checked]:bg-emerald-900 data-[state=checked]:text-white data-[state=checked]:border-emerald-900 shrink-0"
+										className="mt-0.5 size-4 rounded border-brand-900/20 data-[state=checked]:bg-brand-900 data-[state=checked]:text-white data-[state=checked]:border-brand-900 shrink-0"
 									/>
 									<div className="grid gap-0.5 select-none min-w-0">
 										<label
 											htmlFor="isDefault"
-											className="text-sm font-bold text-slate-900 cursor-pointer leading-snug"
+											className="text-sm font-bold text-ink cursor-pointer leading-snug"
 										>
 											Set as default shipping address
 										</label>
-										<p className="text-xs text-slate-500 leading-relaxed">
+										<p className="text-xs text-ink-soft leading-relaxed">
 											Save this address for your future orders and make it your
 											primary shipping location.
 										</p>
@@ -176,36 +178,36 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 			</div>
 
 			{/* Step 3: Payment */}
-			<div className="bg-white rounded-3xl border border-emerald-900/5 p-5 sm:p-7 shadow-xs transition-all hover:shadow-md">
-				<h2 className="font-playfair text-lg sm:text-xl font-bold text-slate-950 mb-5 flex items-center gap-2.5 border-b border-slate-100 pb-3">
-					<span className="size-6 bg-emerald-900 text-white rounded-full flex items-center justify-center text-xs font-bold font-sans shrink-0">
+			<div className="bg-card rounded-3xl border border-brand-900/5 p-5 sm:p-7 shadow-xs transition-all hover:shadow-md">
+				<h2 className="font-playfair text-lg sm:text-xl font-bold text-ink mb-5 flex items-center gap-2.5 border-b border-brand-900/10 pb-3">
+					<span className="size-6 bg-brand-900 text-white rounded-full flex items-center justify-center text-xs font-bold font-sans shrink-0">
 						3
 					</span>
 					Stripe payment
 				</h2>
-				<div className="rounded-2xl border border-emerald-900/10 bg-[#f7fbf3] p-4 sm:p-5">
+				<div className="rounded-2xl border border-brand-900/10 bg-surface p-4 sm:p-5">
 					<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3.5">
-						<div className="grid size-11 shrink-0 place-items-center rounded-xl bg-white ring-1 ring-[#635BFF]/15 shadow-sm">
+						<div className="grid size-11 shrink-0 place-items-center rounded-lg bg-card ring-1 ring-[#635BFF]/15 shadow-sm">
 							<StripeMark />
 						</div>
 						<div className="min-w-0">
-							<p className="text-sm font-bold text-slate-950">
+							<p className="text-sm font-bold text-ink">
 								Secure payment via Stripe
 							</p>
-							<p className="mt-0.5 text-xs sm:text-sm leading-relaxed text-slate-500">
+							<p className="mt-0.5 text-xs sm:text-sm leading-relaxed text-ink-soft">
 								You will be redirected to Stripe to complete your payment
 								securely. No card details are stored on our servers.
 							</p>
 						</div>
 					</div>
-					<div className="mt-4 flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-emerald-800">
-						<span className="rounded-full border border-emerald-900/10 bg-white px-2.5 py-1 shadow-2xs">
+					<div className="mt-4 flex flex-wrap gap-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-brand-800">
+						<span className="rounded-full border border-brand-900/10 bg-card px-2.5 py-1 shadow-2xs">
 							SSL protected
 						</span>
-						<span className="rounded-full border border-emerald-900/10 bg-white px-2.5 py-1 shadow-2xs">
+						<span className="rounded-full border border-brand-900/10 bg-card px-2.5 py-1 shadow-2xs">
 							Stripe Checkout
 						</span>
-						<span className="rounded-full border border-emerald-900/10 bg-white px-2.5 py-1 shadow-2xs">
+						<span className="rounded-full border border-brand-900/10 bg-card px-2.5 py-1 shadow-2xs">
 							Secure redirect
 						</span>
 					</div>
@@ -216,9 +218,8 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 			<div className="grid gap-3 pt-2">
 				<OriginButton
 					type="submit"
-					variant="emerald"
 					disabled={checkoutMutation.isPending}
-					className="w-full h-14 rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-950/10 text-base"
+					className="w-full h-14 rounded-2xl font-bold flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-950/10 text-base"
 				>
 					{checkoutMutation.isPending ? (
 						<>
@@ -229,7 +230,7 @@ export const CheckoutForm = ({ form, totalToPay }: CheckoutFormProps) => {
 						<>
 							<LockIcon className="size-4 shrink-0" />
 							<span className="truncate">
-								Pay with Stripe &bull; {formatCurrency(totalToPay)}
+								Pay with Stripe &bull; {formatPrice(totalToPay)}
 							</span>
 						</>
 					)}

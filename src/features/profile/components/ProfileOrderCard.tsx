@@ -1,10 +1,16 @@
 import { Button } from "@/shared/components/ui/button";
-import { PackageIcon, Trash2Icon } from "lucide-react";
+import {
+	Loader2Icon,
+	PackageIcon,
+	RotateCcwIcon,
+	Trash2Icon,
+} from "lucide-react";
+import { useReorder } from "@/features/cart/services/mutations";
 import {
 	ORDER_STATUS_META,
 	OrderStatus,
 } from "@/features/orders/constants/orderStatus";
-import { formatCurrency } from "@/shared/utils/price";
+import { formatPrice } from "@/shared/utils/price";
 import { toAddressString } from "@/features/addresses/utils/addressHelpers";
 import type { Order } from "@/features/orders/schemas/orderSchema";
 import { cn } from "@/lib/utils";
@@ -22,14 +28,29 @@ export const ProfileOrderCard = ({
 	const meta = ORDER_STATUS_META[order.status];
 	const isPendingPayment = order.status === OrderStatus.Pending;
 	const { mutate: getPaymentUrl, isPending } = useGetPaymentUrl();
+	const reorderMutation = useReorder();
+	const isReordering = reorderMutation.isPending;
+
+	const canReorder =
+		order.status === OrderStatus.Delivered ||
+		order.status === OrderStatus.Canceled;
+
+	const handleReorder = () => {
+		reorderMutation.mutate(
+			order.items.map((item) => ({
+				productId: item.product.id,
+				quantity: item.quantity,
+			})),
+		);
+	};
 
 	return (
 		<div
 			className={cn(
-				"group rounded-3xl border transition-all duration-300 bg-white shadow-xl shadow-slate-900/5 overflow-hidden w-full min-w-0",
+				"group rounded-3xl border transition-all duration-300 bg-card shadow-xl shadow-brand-950/5 overflow-hidden w-full min-w-0",
 				isPendingPayment
-					? "border-emerald-900/30 bg-linear-to-b from-emerald-50/20 via-white to-white ring-2 ring-emerald-900/5"
-					: "border-slate-100 hover:border-emerald-900/20",
+					? "border-brand-900/30 bg-linear-to-b from-brand-50/20 via-card to-card ring-2 ring-brand-900/5"
+					: "border-brand-900/10 hover:border-brand-900/20",
 			)}
 		>
 			{/* Order Header Bar */}
@@ -37,14 +58,14 @@ export const ProfileOrderCard = ({
 				className={cn(
 					"flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-5 sm:px-8 py-4 sm:py-5 border-b",
 					isPendingPayment
-						? "border-emerald-900/10 bg-emerald-50/30"
-						: "border-slate-100 bg-slate-50/50",
+						? "border-brand-900/10 bg-brand-50/30"
+						: "border-brand-900/10 bg-surface-2/50",
 				)}
 			>
 				<div className="flex items-center gap-3 flex-wrap min-w-0">
-					<div className="flex items-center gap-2 bg-white px-3.5 py-1.5 rounded-2xl border border-slate-200/80 shadow-xs">
-						<PackageIcon className="size-4 text-emerald-900 shrink-0" />
-						<span className="font-mono text-xs font-extrabold tracking-tight text-slate-900 truncate">
+					<div className="flex items-center gap-2 bg-card px-3.5 py-1.5 rounded-2xl border border-brand-900/10/80 shadow-xs">
+						<PackageIcon className="size-4 text-brand-900 shrink-0" />
+						<span className="font-mono text-xs font-extrabold tracking-tight text-ink truncate">
 							#{order.id.slice(0, 8).toUpperCase()}
 						</span>
 					</div>
@@ -55,35 +76,34 @@ export const ProfileOrderCard = ({
 					</span>
 				</div>
 
-				<div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-200/60">
+				<div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-brand-900/10/60">
 					<div className="text-left sm:text-right">
-						<span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block">
+						<span className="text-[10px] text-ink-faint uppercase font-black tracking-widest block">
 							Total Due
 						</span>
-						<span className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-							{formatCurrency(order.total)}
+						<span className="text-base sm:text-lg font-black text-ink tracking-tight">
+							{formatPrice(order.total)}
 						</span>
 					</div>
 				</div>
 			</div>
-
 			{/* Main Content Area */}
 			<div className="px-5 sm:px-8 py-5 sm:py-6 space-y-5 sm:space-y-6 min-w-0">
 				{/* Order Meta Info */}
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 text-xs text-slate-500 border-b border-slate-100 pb-4 min-w-0">
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 text-xs text-ink-soft border-b border-brand-900/10 pb-4 min-w-0">
 					<div className="flex items-center gap-2 font-semibold">
-						<span className="text-slate-400">Placed on:</span>
-						<span className="text-slate-700">
+						<span className="text-ink-faint">Placed on:</span>
+						<span className="text-ink">
 							{order.createdAt.toLocaleDateString("en-US", {
 								dateStyle: "long",
 							})}
 						</span>
 					</div>
 					<div className="flex items-center gap-1.5 font-medium min-w-0 max-w-full">
-						<span className="text-slate-400 font-semibold shrink-0">
+						<span className="text-ink-faint font-semibold shrink-0">
 							Destination:
 						</span>
-						<span className="text-slate-700 truncate">
+						<span className="text-ink truncate">
 							{toAddressString({
 								country: order.shippingCountry,
 								city: order.shippingCity,
@@ -99,42 +119,46 @@ export const ProfileOrderCard = ({
 					{order.items.map((item) => (
 						<div
 							key={item.id}
-							className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50/50 p-3.5 transition-colors hover:bg-slate-50 min-w-0 overflow-hidden"
+							className="flex items-center justify-between gap-3 rounded-2xl border border-brand-900/10 bg-surface-2/50 p-3.5 transition-colors hover:bg-surface-2 min-w-0 overflow-hidden"
 						>
 							<div className="flex items-center gap-3 min-w-0 flex-1">
-								<div className="size-10 sm:size-11 rounded-xl bg-white border border-slate-200/80 text-emerald-900 flex items-center justify-center shrink-0 shadow-xs font-bold text-xs">
+								<div className="size-10 sm:size-11 rounded-lg bg-card border border-brand-900/10/80 text-brand-900 flex items-center justify-center shrink-0 shadow-xs font-bold text-xs">
 									{item.quantity}x
 								</div>
 								<div className="min-w-0 flex-1">
-									<p className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+									<p className="font-bold text-ink text-xs sm:text-sm truncate">
 										{item.product.name}
 									</p>
-									<span className="text-[11px] font-medium text-slate-400 truncate block">
-										{formatCurrency(item.product.price)} each
+									<span className="text-[11px] font-medium text-ink-faint truncate block">
+										{formatPrice(item.product.price)} each
 									</span>
 								</div>
 							</div>
-							<span className="font-black text-slate-900 text-xs sm:text-sm shrink-0 pl-2">
-								{formatCurrency(item.product.price * item.quantity)}
+							<span className="font-black text-ink text-xs sm:text-sm shrink-0 pl-2">
+								{formatPrice(item.product.price * item.quantity)}
 							</span>
 						</div>
 					))}
 				</div>
 			</div>
-
+			{/* Footer Actions Bar */}
 			{/* Footer Actions Bar */}
 			<div
 				className={cn(
-					"flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-5 sm:px-8 py-4 sm:py-5 border-t",
+					"flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-5 sm:px-8 py-4 sm:py-5 border-t transition-colors",
 					isPendingPayment
-						? "border-emerald-900/10 bg-emerald-50/20"
-						: "border-slate-100 bg-slate-50/50",
+						? "border-brand-900/10 bg-brand-50/30"
+						: "border-brand-900/10 bg-surface-2/40",
 				)}
 			>
-				<div className="text-xs text-slate-500 font-medium">
+				{/* Status / Support Text */}
+				<div className="text-xs sm:text-sm text-ink-soft font-medium">
 					{isPendingPayment ? (
-						<span className="text-emerald-900 font-bold flex items-center gap-1.5">
-							<span className="size-2 rounded-full bg-emerald-700 animate-ping shrink-0" />
+						<span className="text-brand-900 font-semibold flex items-center gap-2">
+							<span className="relative flex size-2">
+								<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-700 opacity-75" />
+								<span className="relative inline-flex size-2 rounded-full bg-brand-800" />
+							</span>
 							Action required: Complete your payment to process this order.
 						</span>
 					) : (
@@ -145,30 +169,54 @@ export const ProfileOrderCard = ({
 					)}
 				</div>
 
-				<div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
+				{/* Action Buttons Group */}
+				<div className="flex flex-col-reverse sm:flex-row items-center gap-2.5 w-full sm:w-auto justify-end">
+					{/* Cancel Order (Secondary / Destructive) */}
+					{order.status === "PENDING" && (
+						<Button
+							type="button"
+							variant="ghost"
+							onClick={() => onCancel(order)}
+							className="h-10 w-full sm:w-auto rounded-lg px-4 text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-all cursor-pointer"
+						>
+							<Trash2Icon className="mr-1.5 size-4 shrink-0" />
+							Cancel Order
+						</Button>
+					)}
+
+					{/* Reorder Action */}
+					{canReorder && (
+						<Button
+							type="button"
+							variant="outline"
+							onClick={handleReorder}
+							disabled={isReordering}
+							className="h-10 w-full sm:w-auto rounded-lg border-brand-900/15 bg-white px-4 text-xs font-semibold text-brand-900 hover:bg-brand-50/50 hover:border-brand-900/30 transition-all shadow-2xs cursor-pointer"
+						>
+							{isReordering ? (
+								<Loader2Icon className="mr-1.5 size-4 shrink-0 animate-spin" />
+							) : (
+								<RotateCcwIcon className="mr-1.5 size-4 shrink-0" />
+							)}
+							{isReordering ? "Reordering..." : "Reorder"}
+						</Button>
+					)}
+
+					{/* Primary Payment Action */}
 					{isPendingPayment && (
 						<Button
 							onClick={() => getPaymentUrl(order.id)}
 							disabled={isPending}
-							className="h-11 w-full sm:w-auto rounded-2xl bg-emerald-900 px-6 text-xs font-bold tracking-wide text-white shadow-lg shadow-emerald-900/20 hover:bg-emerald-950 transition-all hover:scale-[1.02] cursor-pointer"
+							className="h-10 w-full sm:w-auto rounded-lg bg-brand-900 px-5 text-xs font-semibold tracking-wide text-white shadow-md shadow-brand-900/15 hover:bg-brand-950 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
 						>
+							{isPending && (
+								<Loader2Icon className="size-4 shrink-0 animate-spin" />
+							)}
 							{isPending ? "Redirecting..." : "Proceed to Payment"}
 						</Button>
 					)}
-
-					{order.status === "PENDING" && (
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => onCancel(order)}
-							className="h-11 w-full sm:w-auto rounded-2xl border-rose-200/80 px-5 text-xs font-bold text-rose-600 hover:bg-rose-50 hover:border-rose-300 transition-all shadow-xs cursor-pointer"
-						>
-							<Trash2Icon className="mr-2 size-4 shrink-0" />
-							Cancel Order
-						</Button>
-					)}
 				</div>
-			</div>
+			</div>{" "}
 		</div>
 	);
 };

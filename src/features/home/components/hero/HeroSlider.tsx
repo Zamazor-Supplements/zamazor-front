@@ -9,8 +9,20 @@ import {
 } from "../../config/motion";
 import { Button } from "@/shared/components/ui/button";
 import { Link } from "react-router";
-import { ArrowRightIcon } from "lucide-react";
+import { useLanguage } from "@/shared/hooks/use-language";
+import {
+	ArrowRightIcon,
+	BadgeCheckIcon,
+	FlaskConicalIcon,
+	LeafIcon,
+} from "lucide-react";
 import { SliderControls } from "./SliderControls";
+
+const TRUST_STRIP = [
+	{ icon: FlaskConicalIcon, labelKey: "hero.trustLabTested" },
+	{ icon: BadgeCheckIcon, labelKey: "hero.trustGmp" },
+	{ icon: LeafIcon, labelKey: "hero.trustNatural" },
+] as const;
 
 interface HeroSliderProps {
 	slides: Slide[];
@@ -41,13 +53,14 @@ export const HeroSlider = ({
 		pauseOnHover,
 	});
 
+	const { t } = useLanguage();
 	const slide = slides[activeSlide];
 	if (!slide) return null;
 
 	return (
 		<section
 			className={cn(
-				"relative w-full h-screen min-h-150 overflow-hidden border-b border-emerald-900/10 bg-emerald-950",
+				"relative w-full h-screen min-h-150 overflow-hidden border-b border-brand-900/10 bg-brand-950",
 				className,
 			)}
 			style={{
@@ -72,7 +85,7 @@ export const HeroSlider = ({
 					{/* Dark Gradient Overlay */}
 					<div
 						className={cn(
-							"absolute inset-0 bg-linear-to-r from-emerald-950/90 via-emerald-950/65 to-transparent max-md:bg-emerald-950/80",
+							"absolute inset-0 bg-linear-to-r from-brand-950/90 via-brand-950/65 to-transparent max-md:bg-brand-950/80",
 							overlayClassName,
 						)}
 					/>
@@ -95,7 +108,7 @@ export const HeroSlider = ({
 								{slide.badge && (
 									<motion.div
 										variants={childVariants}
-										className="mb-5 inline-flex w-fit items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-950/55 px-3.5 py-1.5 text-sm font-bold text-emerald-300 shadow-sm backdrop-blur-sm"
+										className="mb-5 inline-flex w-fit items-center gap-2 rounded-lg border border-accent/25 bg-brand-950/55 px-3.5 py-1.5 text-sm font-bold text-accent shadow-sm backdrop-blur-sm"
 									>
 										{slide.accent && (
 											<span
@@ -117,7 +130,7 @@ export const HeroSlider = ({
 								{/* Description */}
 								<motion.p
 									variants={childVariants}
-									className="mt-6 text-base sm:text-lg leading-relaxed text-emerald-50/85"
+									className="mt-6 text-base sm:text-lg leading-relaxed text-brand-50/85"
 								>
 									{slide.description}
 								</motion.p>
@@ -132,7 +145,7 @@ export const HeroSlider = ({
 											<Button
 												asChild
 												size="lg"
-												className="h-12 bg-emerald-500 text-emerald-950 font-extrabold px-6 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
+												className="h-12 bg-accent text-brand-950 font-extrabold px-6 hover:bg-accent/85 shadow-lg shadow-lime-500/20"
 											>
 												<Link to={slide.primaryAction.href}>
 													{slide.primaryAction.label}
@@ -150,13 +163,29 @@ export const HeroSlider = ({
 												size="lg"
 												className="h-12 border-white/20 bg-white/10 text-white font-extrabold px-6 hover:bg-white/20 hover:text-white backdrop-blur-sm"
 											>
-												<a href={slide.secondaryAction.href}>
+												<Link to={slide.secondaryAction.href}>
 													{slide.secondaryAction.label}
-												</a>
+												</Link>
 											</Button>
 										)}
 									</motion.div>
 								)}
+
+								{/* Trust Strip */}
+								<motion.div
+									variants={childVariants}
+									className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-2.5"
+								>
+									{TRUST_STRIP.map(({ icon: Icon, labelKey }) => (
+										<span
+											key={labelKey}
+											className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-accent backdrop-blur-sm"
+										>
+											<Icon className="size-3.5" />
+											{t(labelKey)}
+										</span>
+									))}
+								</motion.div>
 							</motion.div>
 						</AnimatePresence>
 					</div>

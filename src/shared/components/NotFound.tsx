@@ -11,15 +11,15 @@ export default function NotFound() {
 
 	return (
 		<main className="flex min-h-svh w-full items-center bg-[#fcfdfa] px-4 py-8 sm:px-6 lg:px-8">
-			<div className="mx-auto flex w-full max-w-2xl justify-center overflow-hidden rounded-[2rem] border border-emerald-900/10 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.14),transparent_42%),linear-gradient(180deg,#f7fbf3_0%,#ffffff_100%)] shadow-[0_30px_80px_-40px_rgba(6,95,70,0.25)]">
+			<div className="mx-auto flex w-full max-w-2xl justify-center overflow-hidden rounded-xl border border-brand-900/10 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.14),transparent_42%),linear-gradient(180deg,#f7fbf3_0%,#ffffff_100%)] shadow-[0_30px_80px_-40px_rgba(6,95,70,0.25)]">
 				<div className="flex w-full max-w-xl flex-col items-center gap-8 p-8 text-center sm:p-10 lg:p-12">
-					<div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-emerald-800">
+					<div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-brand-800">
 						<Sparkles className="size-4" />
 						<span>{CONFIG.APP_NAME}</span>
 					</div>
 
 					<div className="max-w-xl space-y-5">
-						<p className="text-[11px] font-black uppercase tracking-[0.3em] text-emerald-700">
+						<p className="text-[11px] font-black uppercase tracking-[0.3em] text-brand-700">
 							404
 						</p>
 						<h1 className="font-playfair text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
@@ -35,7 +35,7 @@ export default function NotFound() {
 					<div className="flex flex-col items-center gap-3 sm:flex-row">
 						<Button
 							asChild
-							className="h-11 rounded-xl bg-emerald-900 px-5 text-sm font-bold text-white hover:bg-emerald-950"
+							className="h-11 rounded-lg bg-brand-900 px-5 text-sm font-bold text-white hover:bg-brand-950"
 						>
 							<Link
 								to={APP_ROUTES.SHOP}
@@ -47,7 +47,7 @@ export default function NotFound() {
 						</Button>
 						<Button
 							variant="outline"
-							className="h-11 rounded-xl border-emerald-900/10 px-5 text-sm font-bold text-emerald-900 hover:bg-emerald-50"
+							className="h-11 rounded-lg border-brand-900/10 px-5 text-sm font-bold text-brand-900 hover:bg-brand-50"
 							onClick={() => navigate(-1)}
 						>
 							<ArrowLeftIcon className="size-4" />

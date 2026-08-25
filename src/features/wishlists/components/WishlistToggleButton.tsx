@@ -27,7 +27,7 @@ export const WishlistToggleButton = ({
 			aria-label={label}
 			title={label}
 			className={cn(
-				"relative flex items-center justify-center cursor-pointer transition-colors disabled:opacity-50 bg-white/95 text-slate-700 shadow-sm border border-slate-100/80 hover:bg-rose-50/50 hover:border-rose-100 focus:outline-none focus:ring-2 focus:ring-emerald-800/20",
+				"relative flex items-center justify-center cursor-pointer transition-colors disabled:opacity-50 bg-white/95 text-slate-700 shadow-sm border border-slate-100/80 hover:bg-rose-50/50 hover:border-rose-100 focus:outline-none focus:ring-2 focus:ring-brand-800/20",
 				isAnimated &&
 					"transition-all duration-300 hover:scale-105 active:scale-75",
 				isFavorite && "bg-rose-50/50 border-rose-100 text-rose-500",

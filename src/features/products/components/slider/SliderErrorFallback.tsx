@@ -17,9 +17,9 @@ export const SliderErrorFallback = ({
 	showShopLink = true,
 }: SliderErrorFallbackProps) => (
 	<div className="flex w-full min-h-70 items-center justify-center py-6 px-4">
-		<div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-900/15 bg-white/80 backdrop-blur-xs p-6 sm:p-8 text-center shadow-2xs max-w-md w-full">
+		<div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-brand-900/15 bg-white/80 backdrop-blur-xs p-6 sm:p-8 text-center shadow-2xs max-w-md w-full">
 			{/* Compact Icon Container */}
-			<div className="flex size-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-950/5">
+			<div className="flex size-12 items-center justify-center rounded-lg bg-brand-50 text-brand-800 border border-brand-950/5">
 				<PackageSearchIcon className="size-5" />
 			</div>
 
@@ -38,9 +38,9 @@ export const SliderErrorFallback = ({
 						onClick={onRetry}
 						variant="outline"
 						size="sm"
-						className="h-9 rounded-lg border-emerald-900/15 bg-white text-emerald-900 hover:bg-emerald-50 text-xs font-medium cursor-pointer transition-all active:scale-95"
+						className="h-9 rounded-lg border-brand-900/15 bg-white text-brand-900 hover:bg-brand-50 text-xs font-medium cursor-pointer transition-all active:scale-95"
 					>
-						<RotateCcwIcon className="mr-1.5 size-3.5 text-emerald-700" />
+						<RotateCcwIcon className="mr-1.5 size-3.5 text-brand-700" />
 						Refresh
 					</Button>
 				)}
@@ -48,7 +48,7 @@ export const SliderErrorFallback = ({
 					<Button
 						asChild
 						size="sm"
-						className="h-9 rounded-lg bg-emerald-900 text-white hover:bg-emerald-950 text-xs font-medium cursor-pointer transition-all active:scale-95 shadow-2xs"
+						className="h-9 rounded-lg bg-brand-900 text-white hover:bg-brand-950 text-xs font-medium cursor-pointer transition-all active:scale-95 shadow-2xs"
 					>
 						<Link to={APP_ROUTES.SHOP}>
 							Explore shop

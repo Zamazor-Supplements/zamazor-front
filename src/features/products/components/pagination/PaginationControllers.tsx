@@ -30,7 +30,7 @@ export const PaginationControllers = ({
 	return (
 		<nav
 			aria-label="Pagination navigation"
-			className="mt-10 flex items-center justify-center gap-2 border-t border-emerald-900/5 pt-6 select-none"
+			className="mt-10 flex items-center justify-center gap-2 border-t border-brand-900/5 pt-6 select-none"
 		>
 			{/* Previous Button */}
 			<Button
@@ -39,7 +39,7 @@ export const PaginationControllers = ({
 				disabled={isFirstPage}
 				onClick={() => goToPage(paginations.page - 1)}
 				aria-label="Go to previous page"
-				className="h-9 w-9 cursor-pointer rounded-xl border-emerald-900/10 text-emerald-800 transition-colors hover:bg-emerald-50 hover:text-emerald-900 disabled:cursor-not-allowed disabled:opacity-40"
+				className="h-9 w-9 cursor-pointer rounded-lg border-brand-900/10 text-brand-800 transition-colors hover:bg-brand-50 hover:text-brand-900 disabled:cursor-not-allowed disabled:opacity-40"
 			>
 				<ChevronLeftIcon className="size-4" />
 			</Button>
@@ -55,10 +55,10 @@ export const PaginationControllers = ({
 						aria-label={`Go to page ${i + 1}`}
 						aria-current={isCurrentPage ? "page" : undefined}
 						className={cn(
-							"h-9 w-9 cursor-pointer rounded-xl text-xs font-bold transition-all",
+							"h-9 w-9 cursor-pointer rounded-lg text-xs font-bold transition-all",
 							isCurrentPage
-								? "border-emerald-900 bg-emerald-900 text-white shadow-sm hover:bg-emerald-950"
-								: "border-emerald-900/10 text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900",
+								? "border-brand-900 bg-brand-900 text-white shadow-sm hover:bg-brand-950"
+								: "border-brand-900/10 text-brand-800 hover:bg-brand-50 hover:text-brand-900",
 						)}
 					>
 						{i + 1}
@@ -73,7 +73,7 @@ export const PaginationControllers = ({
 				disabled={isLastPage}
 				onClick={() => goToPage(paginations.page + 1)}
 				aria-label="Go to next page"
-				className="h-9 w-9 cursor-pointer rounded-xl border-emerald-900/10 text-emerald-800 transition-colors hover:bg-emerald-50 hover:text-emerald-900 disabled:cursor-not-allowed disabled:opacity-40"
+				className="h-9 w-9 cursor-pointer rounded-lg border-brand-900/10 text-brand-800 transition-colors hover:bg-brand-50 hover:text-brand-900 disabled:cursor-not-allowed disabled:opacity-40"
 			>
 				<ChevronRightIcon className="size-4" />
 			</Button>

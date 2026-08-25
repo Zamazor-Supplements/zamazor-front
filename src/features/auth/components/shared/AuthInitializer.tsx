@@ -10,7 +10,8 @@ export function AuthInitializer({ children }: PropsWithChildren) {
 	const initialized = useAuthStore(
 		(state) => state.status !== AuthStatus.Loading,
 	);
-	const { setAuthenticated, setUnauthenticated } = useAuthStore();
+	const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
+	const setUnauthenticated = useAuthStore((s) => s.setUnauthenticated);
 
 	const query = useQuery({
 		queryKey: authKeys.me(),
@@ -24,7 +25,12 @@ export function AuthInitializer({ children }: PropsWithChildren) {
 	}, [query.status, setAuthenticated, setUnauthenticated]);
 
 	if (!initialized) {
-		return <LoadingScreen />;
+		return (
+			<LoadingScreen
+				message="Loading your account..."
+				subtext="Preparing your custom nutrition workspace"
+			/>
+		);
 	}
 
 	return children;

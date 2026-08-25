@@ -2,13 +2,13 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { CartService } from "../types/service";
 
-export interface GuestCartItem {
+export interface GuestStoreCartItem {
 	productId: string;
 	quantity: number;
 }
 
 interface GuestCartStore extends CartService {
-	items: GuestCartItem[];
+	items: GuestStoreCartItem[];
 	isHydrated: boolean;
 	setHydrated: () => void;
 }
@@ -16,7 +16,7 @@ interface GuestCartStore extends CartService {
 export const useGuestCartStore = create<GuestCartStore>()(
 	persist(
 		(set, get) => ({
-			items: [] satisfies GuestCartItem[],
+			items: [],
 			isHydrated: false,
 			setHydrated: () => set({ isHydrated: true }),
 

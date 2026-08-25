@@ -71,7 +71,7 @@ export const PaginationHeader = ({
 					size="sm"
 					onClick={() => setIsMobileFiltersOpen(true)}
 					aria-label="Open filters menu"
-					className="flex h-10 items-center gap-1.5 rounded-xl border-emerald-900/10 px-4 font-semibold text-emerald-800 transition-colors hover:bg-emerald-50 lg:hidden"
+					className="flex h-10 items-center gap-1.5 rounded-lg border-brand-900/10 px-4 font-semibold text-brand-800 transition-colors hover:bg-brand-50 lg:hidden"
 				>
 					<SlidersHorizontalIcon className="size-4" aria-hidden="true" />
 					<span>Filters</span>
@@ -101,7 +101,7 @@ export const PaginationHeader = ({
 						value={paginations.sort}
 						onChange={handleSortChange}
 						aria-label="Sort products by"
-						className="h-10 cursor-pointer rounded-xl border border-emerald-900/10 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-emerald-800/20"
+						className="h-10 cursor-pointer rounded-lg border border-brand-900/10 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-brand-800/20"
 					>
 						{SORT_OPTIONS.map((option) => (
 							<option key={option.value} value={option.value}>

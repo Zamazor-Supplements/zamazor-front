@@ -13,6 +13,8 @@ export const OrderStatus = {
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
+export type OrderStatusFilter = OrderStatus | undefined;
+
 export const orderStatusSchema = z.enum([
 	OrderStatus.Pending,
 	OrderStatus.Paid,
@@ -58,8 +60,8 @@ export const ORDER_STATUS_META: Record<OrderStatus, Meta> = {
 	},
 	PAID: {
 		label: "Paid",
-		badgeClass: "border-emerald-200/70 bg-emerald-50 text-emerald-800",
-		accentClass: "bg-emerald-50 text-emerald-800",
+		badgeClass: "border-brand-200/70 bg-brand-50 text-brand-800",
+		accentClass: "bg-brand-50 text-brand-800",
 	},
 	CANCELED: {
 		label: "Canceled",

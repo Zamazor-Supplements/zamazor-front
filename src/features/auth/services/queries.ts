@@ -17,13 +17,25 @@ export function useCurrentUser() {
 	});
 }
 
-export function useAuthenticatedUser() {
+export function useAuthenticatedUser(): User {
 	const queryClient = useQueryClient();
-	return queryClient.getQueryData<User>(authKeys.me())!;
+	const user = queryClient.getQueryData<User>(authKeys.me());
+	if (!user) {
+		// Should never happen in practice (RequireAuth guards authenticated
+		// routes), but if the cache is cleared mid-render we bail gracefully
+		// instead of crashing with a TypeError on property access.
+		return {
+			id: "",
+			fullName: "",
+			email: "",
+			address: null,
+			role: "USER"
+		} as User;
+	}
+	return user;
 }
 
 export function useIsAuthenticated() {
-	const queryClient = useQueryClient();
-	const user = queryClient.getQueryData<User>(authKeys.me());
+	const { data: user } = useCurrentUser();
 	return !!user;
 }

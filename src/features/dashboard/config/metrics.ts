@@ -22,7 +22,7 @@ export const OVERVIEW_METRICS_CONFIG = (data: DashboardOverview) => [
 		value: formatCurrency(data.totalSales),
 		subtitle: "Gross sales across all channels",
 		icon: BadgeDollarSign,
-		accent: "bg-emerald-50 text-emerald-800",
+		accent: "bg-brand-50 text-brand-800",
 		alert: false,
 	},
 	{
@@ -56,7 +56,7 @@ export const PRODUCT_METRICS_CONFIG = (data: ProductAnalytics) => [
 		label: "Total Products",
 		value: String(data.totalProducts),
 		subtitle: "Active items in catalog",
-		accent: "bg-slate-100 text-slate-700 border-slate-200/60",
+		accent: "bg-surface-2 text-ink border-brand-900/10",
 		icon: Package,
 		alert: false,
 	},
@@ -76,7 +76,7 @@ export const PRODUCT_METRICS_CONFIG = (data: ProductAnalytics) => [
 		accent:
 			data.lowStockCount > 0
 				? "bg-amber-50 text-amber-700 border-amber-200/80"
-				: "bg-slate-50 text-slate-600 border-slate-200/60",
+				: "bg-brand-50 text-brand-700 border-brand-200/60",
 		icon: AlertTriangle,
 		alert: data.lowStockCount > 0,
 	},
@@ -84,7 +84,7 @@ export const PRODUCT_METRICS_CONFIG = (data: ProductAnalytics) => [
 		label: "Average Price",
 		value: formatCurrency(data.averagePrice),
 		subtitle: "Mean catalog value",
-		accent: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
+		accent: "bg-brand-50 text-brand-700 border-brand-200/60",
 		icon: BadgeDollarSign,
 		alert: false,
 	},
@@ -105,15 +105,15 @@ export const ORDER_METRICS_CONFIG = (orderPage: OrderPage) => {
 		{
 			label: "Total Orders",
 			value: String(orderPage.totalElements),
-			subtitle: "Across current registry",
-			accent: "bg-slate-50 text-slate-700 border-slate-200/60",
+			subtitle: "Across current filter",
+			accent: "bg-surface-2 text-ink border-brand-900/10",
 			icon: Folder,
 			alert: false,
 		},
 		{
 			label: "Pending",
 			value: String(pendingCount),
-			subtitle: "Awaiting fulfillment",
+			subtitle: "On current page",
 			accent: "bg-amber-50 text-amber-700 border-amber-200/60",
 			icon: Clock3,
 			alert: true,
@@ -121,7 +121,7 @@ export const ORDER_METRICS_CONFIG = (orderPage: OrderPage) => {
 		{
 			label: "Paid",
 			value: String(paidCount),
-			subtitle: "Payment settled",
+			subtitle: "On current page",
 			accent: "bg-sky-50 text-sky-700 border-sky-200/60",
 			icon: CheckCircle2,
 			alert: false,
@@ -129,8 +129,8 @@ export const ORDER_METRICS_CONFIG = (orderPage: OrderPage) => {
 		{
 			label: "Page Revenue",
 			value: formatCurrency(revenue),
-			subtitle: "From page settled orders",
-			accent: "bg-emerald-50 text-emerald-800 border-emerald-200/60",
+			subtitle: "Settled orders on this page",
+			accent: "bg-brand-50 text-brand-800 border-brand-200/60",
 			icon: BadgeDollarSign,
 			alert: false,
 		},

@@ -37,8 +37,6 @@ export const RegisterForm = () => {
 		});
 	};
 
-	console.log(isLoading);
-
 	return (
 		<form
 			onSubmit={handleSubmit(onSubmit, onError)}
@@ -83,10 +81,9 @@ export const RegisterForm = () => {
 			<div className="pt-1">
 				<OriginButton
 					type="submit"
-					variant="emerald"
 					loading={isLoading}
 					disabled={!isDirty || isLoading}
-					className="w-full h-12 justify-center rounded-xl text-sm font-bold shadow-xs hover:shadow-md transition-all active:scale-[0.99] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+					className="w-full h-12 justify-center rounded-lg text-sm font-bold shadow-xs hover:shadow-md transition-all active:scale-[0.99] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
 				>
 					{isLoading ? "Creating account..." : "Create account"}
 				</OriginButton>
@@ -98,14 +95,14 @@ export const RegisterForm = () => {
 					By registering, you agree to our{" "}
 					<Link
 						to={APP_ROUTES.PAGES.TERMS}
-						className="font-medium text-emerald-800 hover:text-emerald-950 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-800/20 rounded-xs"
+						className="font-medium text-brand-800 hover:text-brand-950 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-brand-800/20 rounded-xs"
 					>
 						Terms of Service
 					</Link>{" "}
 					and{" "}
 					<Link
 						to={APP_ROUTES.PAGES.PRIVACY}
-						className="font-medium text-emerald-800 hover:text-emerald-950 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-800/20 rounded-xs"
+						className="font-medium text-brand-800 hover:text-brand-950 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-brand-800/20 rounded-xs"
 					>
 						Privacy Policy
 					</Link>

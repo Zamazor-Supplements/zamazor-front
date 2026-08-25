@@ -20,7 +20,7 @@ export const SliderControls = ({
 	if (totalSlides <= 1) return null;
 
 	return (
-		<div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-25 flex items-center gap-4 rounded-full border border-white/10 bg-emerald-950/45 px-5 py-2.5 shadow-2xl backdrop-blur-md">
+		<div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-25 flex items-center gap-4 rounded-full border border-white/10 bg-brand-950/45 px-5 py-2.5 shadow-2xl backdrop-blur-md">
 			<Button
 				type="button"
 				variant="ghost"
@@ -40,9 +40,9 @@ export const SliderControls = ({
 						aria-label={`Show slide ${index + 1}`}
 						onClick={() => onSelect(index)}
 						className={cn(
-							"h-2.5 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-400",
+							"h-2.5 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent",
 							index === activeSlide
-								? "w-8 bg-emerald-400"
+								? "w-8 bg-accent"
 								: "w-2.5 bg-white/40 hover:bg-white/70",
 						)}
 					/>

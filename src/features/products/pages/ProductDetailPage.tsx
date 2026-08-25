@@ -5,6 +5,7 @@ import { APP_ROUTES } from "@/app/routes/paths";
 
 import { ArrowLeftIcon } from "lucide-react";
 import { ProductDetails } from "@/features/products/components/product/ProductDetails";
+import { StickyAddToCartBar } from "@/features/products/components/product/StickyAddToCartBar";
 import { ProductCard } from "@/features/products/components/product/ProductCard";
 import {
 	useProduct,
@@ -13,46 +14,57 @@ import {
 import CONFIG from "@/app/config/constants";
 import { ProductNotFound } from "@/features/products/components/product/ProductNotFound";
 import { ProductDetailSkeleton } from "@/features/products/components/skeleton/ProductDetailSkeleton";
+import { Breadcrumbs } from "@/shared/components/ui/breadcrumbs";
+import { useRecentlyViewedStore } from "@/shared/hooks/use-recently-viewed";
 
-export const ProductDetailPage = () => {
-	const { id = "" } = useParams<{ id: string }>();
+export default function ProductDetailPage() {
+	const { id = "" } = useParams<{ id: string; }>();
 	const navigate = useNavigate();
 
 	// Primary Query for Main Product Data
 	const { data: product, isPending, isError } = useProduct(id);
 
 	// Secondary Query for Cross-Sells (Failures here will be gracefully ignored)
-	const { data: productPage, isPending: isCategoryPending } =
-		useProductsByCategory(product?.category.id);
+	const { data: productPage, isPending: isCategoryPending } = useProductsByCategory(product?.category.id);
 
 	// Dynamic Document Title
 	useDocumentTitle(
 		product
 			? `${product.name} | ${CONFIG.APP_NAME}`
-			: `Product | ${CONFIG.APP_NAME}`,
+			: `Product | ${CONFIG.APP_NAME}`
 	);
 
-	// Scroll to top on load or product change
+	// Scroll to top on load or product change, and record the view for the
+	// homepage "Recently viewed" rail (read-only via getState, no re-render).
 	useEffect(() => {
 		window.scrollTo(0, 0);
+		useRecentlyViewedStore.getState().trackProduct(id);
 	}, [id]);
 
 	// Derived Recommendations Memoized
-	const recommendations =
-		productPage?.items && product?.id
-			? productPage.items.filter((item) => item?.id !== product.id).slice(0, 3)
-			: [];
+	const recommendations = productPage?.items && product?.id
+		? productPage.items.filter((item) => item?.id !== product.id).slice(0, 3)
+		: [];
 
 	if (isPending) return <ProductDetailSkeleton />;
 	if (!product || isError) return <ProductNotFound />;
 
 	return (
 		<main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+			{/* Breadcrumbs */}
+			<Breadcrumbs
+				items={[
+					{ label: "Home", href: APP_ROUTES.HOME },
+					{ label: "Shop", href: APP_ROUTES.SHOP },
+					{ label: product.name },
+				]}
+				className="mb-4" />
+
 			{/* Back Navigation */}
 			<button
 				type="button"
 				onClick={() => navigate(APP_ROUTES.HOME)}
-				className="group mb-8 flex items-center gap-2 text-sm font-semibold text-emerald-800 transition-colors hover:text-emerald-950 cursor-pointer"
+				className="group mb-8 flex items-center gap-2 text-sm font-semibold text-brand-800 transition-colors hover:text-brand-950 cursor-pointer"
 			>
 				<ArrowLeftIcon className="size-4 transition-transform group-hover:-translate-x-1" />
 				Back to home
@@ -61,11 +73,14 @@ export const ProductDetailPage = () => {
 			{/* Main Product Info Component */}
 			<ProductDetails product={product} />
 
+			{/* Mobile sticky add-to-cart bar (below the fold, < lg) */}
+			<StickyAddToCartBar product={product} />
+
 			{/* Cross-Sell Recommendations Section (Renders only if items exist) */}
 			{(recommendations.length > 0 || isCategoryPending) && (
-				<section className="mt-20 border-t border-emerald-900/10 pt-16">
+				<section className="mt-20 border-t border-brand-900/10 pt-16">
 					<div className="mb-12 text-center">
-						<p className="text-xs font-black uppercase tracking-widest text-emerald-700">
+						<p className="text-xs font-black uppercase tracking-widest text-brand-700">
 							Perfect your stack
 						</p>
 						<h2 className="mt-2 font-playfair text-3xl font-normal tracking-tight text-slate-950 sm:text-4xl">
@@ -86,4 +101,4 @@ export const ProductDetailPage = () => {
 			)}
 		</main>
 	);
-};
+}

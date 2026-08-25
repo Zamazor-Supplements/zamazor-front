@@ -10,7 +10,7 @@ export const HeaderLanguageSwitcher = ({
 	onLanguageChange,
 }: LanguageSwitcherProps) => {
 	return (
-		<div className="mr-1 flex items-center gap-1 rounded-full border border-emerald-950/10 bg-emerald-50/50 p-0.5">
+		<div className="mr-1 flex items-center gap-1 rounded-full border border-brand-950/10 bg-brand-50/50 p-0.5">
 			{(["en", "fr"] as const).map((lang) => (
 				<button
 					key={lang}
@@ -22,8 +22,8 @@ export const HeaderLanguageSwitcher = ({
 					className={cn(
 						"h-6 cursor-pointer rounded-full px-2 text-[10px] font-bold transition-all uppercase",
 						language === lang
-							? "bg-emerald-900 text-white shadow-xs"
-							: "text-emerald-800 hover:bg-emerald-50/30",
+							? "bg-brand-900 text-white shadow-xs"
+							: "text-brand-800 hover:bg-brand-50/30",
 					)}
 				>
 					{lang}

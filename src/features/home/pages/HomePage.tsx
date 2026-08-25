@@ -1,6 +1,5 @@
 import CONFIG from "@/app/config/constants";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
-import { motion } from "framer-motion";
 import {
 	BadgeCheckIcon,
 	BatteryChargingIcon,
@@ -11,9 +10,8 @@ import {
 	TruckIcon,
 } from "lucide-react";
 
-import { ProductsSlider } from "@/features/products/components/slider/ProductsSlider";
-import { CategorySlider } from "@/features/products/components/category/CategorySlider";
-import { sectionLift } from "@/app/config/motion";
+import { BestSellersSection } from "@/features/products/components/slider/BestSellersSection";
+import { ShopByCategorySection } from "@/features/products/components/category/ShopByCategorySection";
 import { HERO_SLIDES } from "@/features/home/config/slides";
 import { HeroSlider } from "@/features/home/components/hero/HeroSlider";
 import { SupplementFinder } from "@/features/supplement-match/components/shared/SupplementFinder";
@@ -26,6 +24,8 @@ import { DailyStackTimeline } from "../components/timeline/DailyStackTimeLine";
 import { CustomerReviews } from "@/features/home/components/reviews/Reviews";
 import { TrustBadges } from "@/features/home/components/trust/TrustBadges";
 import { EditorialSelection } from "@/features/home/components/editorial/EditorialSelection";
+import { RecentlyViewed } from "@/features/home/components/RecentlyViewed/RecentlyViewed";
+import { FloatingQuizButton } from "@/shared/components/FloatingQuizButton";
 
 const STACK_STEPS = [
 	{
@@ -35,7 +35,7 @@ const STACK_STEPS = [
 		copy: "Daily Greens and Hydra Charge help your morning start with active minerals, digestive enzymes, and steady focus.",
 		products: ["Daily Greens", "Hydra Charge"],
 		icon: BatteryChargingIcon,
-		color: "bg-emerald-500 text-white shadow-emerald-500/20",
+		color: "bg-brand-500 text-white shadow-brand-500/20",
 	},
 	{
 		time: "02:00 PM",
@@ -174,7 +174,7 @@ const COMPARISON_DATA = [
 	},
 ];
 
-export const HomePage = () => {
+export default function HomePage() {
 	const { data: categories } = useCategories();
 
 	useDocumentTitle(`Clean Supplements | ${CONFIG.APP_NAME}`);
@@ -184,65 +184,17 @@ export const HomePage = () => {
 			<HeroSlider slides={HERO_SLIDES} />
 			<CategoryMarquee categories={categories} />
 			<SupplementFinder />
-			<ProductsSlider />
+			<BestSellersSection />
 			<FormulationsGrid />
-			<CategorySlider />
+			<ShopByCategorySection />
 			<EditorialSelection />
-
-			{/* Proof & Evidence Section */}
-			<motion.div
-				id="proof"
-				variants={sectionLift}
-				initial="hidden"
-				whileInView="visible"
-				viewport={{ once: true, amount: 0.2 }}
-				transition={{ duration: 0.5, ease: "easeOut" }}
-			>
-				<ProofSection stats={PROOF_STATS} />
-			</motion.div>
-
-			{/* Feature Comparison */}
-			<motion.div
-				variants={sectionLift}
-				initial="hidden"
-				whileInView="visible"
-				viewport={{ once: true, amount: 0.18 }}
-				transition={{ duration: 0.5, ease: "easeOut" }}
-			>
-				<ComparisonTable data={COMPARISON_DATA} />
-			</motion.div>
-
-			{/* Daily Routine Timeline */}
-			<motion.div
-				variants={sectionLift}
-				initial="hidden"
-				whileInView="visible"
-				viewport={{ once: true, amount: 0.14 }}
-				transition={{ duration: 0.5, ease: "easeOut" }}
-			>
-				<DailyStackTimeline steps={STACK_STEPS} />
-			</motion.div>
-
-			{/* Customer Testimonials */}
-			<motion.div
-				variants={sectionLift}
-				initial="hidden"
-				whileInView="visible"
-				viewport={{ once: true, amount: 0.16 }}
-				transition={{ duration: 0.5, ease: "easeOut" }}
-			>
-				<CustomerReviews reviews={REVIEWS} />
-			</motion.div>
-
-			<motion.div
-				variants={sectionLift}
-				initial="hidden"
-				whileInView="visible"
-				viewport={{ once: true, amount: 0.16 }}
-				transition={{ duration: 0.5, ease: "easeOut" }}
-			>
-				<TrustBadges items={TRUST_ITEMS} />
-			</motion.div>
+			<RecentlyViewed />
+			<ProofSection stats={PROOF_STATS} />
+			<ComparisonTable data={COMPARISON_DATA} />
+			<DailyStackTimeline steps={STACK_STEPS} />
+			<CustomerReviews reviews={REVIEWS} />
+			<TrustBadges items={TRUST_ITEMS} />
+			<FloatingQuizButton />
 		</>
 	);
-};
+}

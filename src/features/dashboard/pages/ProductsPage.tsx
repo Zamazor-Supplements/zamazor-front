@@ -3,7 +3,7 @@ import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/app/config/constants";
 import { Button } from "@/shared/components/ui/button";
 import { ConfirmDialog } from "@/shared/components/ui/confirm-dialog";
-import { PlusIcon, RefreshCwIcon } from "lucide-react";
+import { PlusIcon, RotateCwIcon } from "lucide-react";
 import type {
 	CreateProductOutput,
 	Product,
@@ -12,6 +12,11 @@ import { useCategories } from "@/features/products/services/category/queries";
 import { useCreateCategory } from "@/features/products/services/category/mutations";
 import { useDashboardProducts } from "@/features/dashboard/services/queries";
 import { useProducts } from "@/features/products/services/product/queries";
+import {
+	DASHBOARD_PRODUCT_PAGE_SIZE,
+	useDashboardProductFilters,
+	type DashboardProductSort,
+} from "@/features/dashboard/hooks/use-dashboard-product-filters";
 import { ProductAnalyticsCards } from "@/features/dashboard/components/products/ProductAnalyticsCards";
 import { ProductFiltersToolbar } from "@/features/dashboard/components/products/ProductFiltersToolbar";
 import { ProductFormModal } from "@/features/dashboard/components/products/ProductFormModal";
@@ -19,6 +24,7 @@ import { ProductTable } from "@/features/dashboard/components/products/ProductTa
 import { useDebounce } from "@/shared/hooks/use-debounce";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ProductPageSkeleton } from "@/features/dashboard/components/products/ProductPageSkeleton";
+import { PageHeader } from "@/features/dashboard/components/shared/PageHeader";
 import {
 	useCreateProduct,
 	useDeleteProduct,
@@ -30,17 +36,9 @@ type Filters = {
 	categoryId: string;
 };
 
-type Sort =
-	| "createdAt,desc"
-	| "createdAt,asc"
-	| "name,asc"
-	| "name,desc"
-	| "price,asc"
-	| "price,desc";
-
 type Pagination = {
 	page: number;
-	sort: Sort;
+	sort: DashboardProductSort;
 	size: number;
 };
 
@@ -58,20 +56,7 @@ type ConfirmState = {
 	confirmText: string;
 };
 
-const PRODUCTS_PER_PAGE = 6;
-
-const DEFAULT_FILTERS: Filters = {
-	search: "",
-	categoryId: "",
-};
-
-const DEFAULT_PAGINATION: Pagination = {
-	page: 0,
-	size: PRODUCTS_PER_PAGE,
-	sort: "createdAt,desc",
-};
-
-export const ProductsPage = () => {
+export default function ProductsPage() {
 	useDocumentTitle(`Products Management | ${CONFIG.APP_NAME}`);
 
 	const { data: categories = [], isLoading: isLoadingCategories } =
@@ -88,8 +73,8 @@ export const ProductsPage = () => {
 	const [highlightedProductId, setHighlightedProductId] = useState<
 		string | null
 	>(null);
-	const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-	const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
+	const { filters, updateFilters, setPage, resetFilters, isFilterActive } =
+		useDashboardProductFilters();
 
 	const [modal, setModal] = useState<ModalState>({
 		open: false,
@@ -121,31 +106,21 @@ export const ProductsPage = () => {
 		{
 			q: debouncedSearch.trim() || undefined,
 			categoryId: filters.categoryId || undefined,
-			page: pagination.page,
-			size: pagination.size,
-			sort: pagination.sort,
+			page: filters.page,
+			size: DASHBOARD_PRODUCT_PAGE_SIZE,
+			sort: filters.sort,
 		},
 		{
 			placeholderData: keepPreviousData,
 		},
 	);
 
-	const isFilterActive =
-		Boolean(filters.search.trim()) ||
-		Boolean(filters.categoryId) ||
-		pagination.sort !== DEFAULT_PAGINATION.sort;
-
 	const handleRefetchAll = async () => {
 		await Promise.all([refetchProducts(), refetchAnalytics()]);
 	};
 
 	const handlePageChange = (page: number) => {
-		setPagination((prev) => ({ ...prev, page }));
-	};
-
-	const resetFilters = () => {
-		setFilters(DEFAULT_FILTERS);
-		setPagination(DEFAULT_PAGINATION);
+		setPage(page);
 	};
 
 	useEffect(() => {
@@ -220,9 +195,8 @@ export const ProductsPage = () => {
 		openConfirm({
 			title: "Delete Product",
 			description: `Are you sure you want to delete "${productName}"? This action cannot be undone.`,
-			action: async () => {
-				await deleteProductMutation.mutateAsync(productId);
-				await handleRefetchAll();
+			action: () => {
+				deleteProductMutation.mutate(productId);
 			},
 			destructive: true,
 			confirmText: "Delete",
@@ -239,63 +213,60 @@ export const ProductsPage = () => {
 	return (
 		<div className="space-y-6">
 			{/* Header Title & Actions */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-5">
-				<div>
-					<div className="flex items-center gap-2">
-						<span className="h-2 w-2 rounded-full bg-emerald-600" />
-						<p className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
-							Inventory Control
-						</p>
-					</div>
-					<h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-						Product Catalog
-					</h1>
-					<p className="mt-1 text-xs text-slate-500">
-						Monitor inventory levels, adjust unit pricing, and manage stock
-						distribution.
-					</p>
-				</div>
+			<PageHeader
+				eyebrow={
+					<span className="inline-flex items-center gap-2">
+						<span className="h-2 w-2 rounded-full bg-brand-600" />
+						Inventory Control
+					</span>
+				}
+				title="Product Catalog"
+				description="Monitor inventory levels, adjust unit pricing, and manage stock distribution."
+			>
+				<Button
+					variant="outline"
+					onClick={handleRefetchAll}
+					disabled={isFetching}
+					className="h-9.5 rounded-lg border-brand-900/10 bg-card px-3.5 text-xs font-semibold text-ink shadow-sm hover:bg-surface-2 hover:text-ink active:scale-95 disabled:opacity-60"
+				>
+					<RotateCwIcon
+						className={`mr-2 size-3.5 ${isFetching ? "animate-spin text-brand-700" : "text-ink-faint"}`}
+					/>
+					Refresh
+				</Button>
 
-				<div className="flex items-center gap-2.5">
-					<Button
-						variant="outline"
-						onClick={handleRefetchAll}
-						disabled={isFetching}
-						className="h-9.5 rounded-xl border-slate-200 bg-white px-3.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 active:scale-95 disabled:opacity-60"
-					>
-						<RefreshCwIcon
-							className={`mr-2 size-3.5 ${isFetching ? "animate-spin text-emerald-700" : "text-slate-400"}`}
-						/>
-						Refresh
-					</Button>
-
-					<Button
-						onClick={() => openProductModal()}
-						className="h-9.5 rounded-xl bg-emerald-800 px-4 text-xs font-semibold text-white shadow-sm hover:bg-emerald-900 active:scale-95"
-					>
-						<PlusIcon className="mr-1.5 size-4 stroke-[2.5]" />
-						Add Product
-					</Button>
-				</div>
-			</div>
+				<Button
+					onClick={() => openProductModal()}
+					className="h-9.5 px-4 text-xs font-semibold"
+				>
+					<PlusIcon className="mr-1.5 size-4 stroke-[2.5]" />
+					Add Product
+				</Button>
+			</PageHeader>
 
 			{/* Analytics Cards Header */}
 			{analytics && <ProductAnalyticsCards analytics={analytics} />}
 
 			{/* Main Table Wrapper */}
-			<div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+			<div className="overflow-hidden rounded-lg border border-brand-900/10 bg-card shadow-sm">
 				<ProductFiltersToolbar
-					filters={filters}
-					pagination={pagination}
+					filters={{
+						search: filters.search,
+						categoryId: filters.categoryId,
+					}}
+					pagination={{
+						page: filters.page,
+						sort: filters.sort,
+						size: DASHBOARD_PRODUCT_PAGE_SIZE,
+					}}
 					totalElements={productPage?.totalElements ?? 0}
 					categories={categories}
 					isFilterActive={isFilterActive}
-					updateFilters={(newFilters: Partial<Filters>) => {
-						setFilters((prev) => ({ ...prev, ...newFilters }));
-						setPagination((prev) => ({ ...prev, page: 0 }));
+					updateFilters={(next: Partial<Filters>) => {
+						updateFilters({ ...next, page: 0 });
 					}}
-					updatePagination={(newPagination: Partial<Pagination>) =>
-						setPagination((prev) => ({ ...prev, page: 0, ...newPagination }))
+					updatePagination={(next: Partial<Pagination>) =>
+						updateFilters({ ...next, page: next.page ?? 0 })
 					}
 					onResetFilters={resetFilters}
 				/>
@@ -337,4 +308,4 @@ export const ProductsPage = () => {
 			/>
 		</div>
 	);
-};
+}

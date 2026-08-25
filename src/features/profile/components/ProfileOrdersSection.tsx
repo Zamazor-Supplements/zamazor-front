@@ -1,36 +1,34 @@
-import { Loader2, ShoppingBag } from "lucide-react";
+import { Loader2Icon, ShoppingBagIcon } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "@/shared/components/ui/button";
 import { APP_ROUTES } from "@/app/routes/paths";
 import { ProfileOrderCard } from "./ProfileOrderCard";
 import type { Order } from "@/features/orders/schemas/orderSchema";
-import type { OrderPage } from "@/features/orders/schemas/orderSchema";
 import { useLanguage } from "@/shared/hooks/use-language";
+import { useMyOrders } from "@/features/orders/services/queries";
+import { ErrorFallback } from "@/shared/components/ui/error-fallback";
 
 interface ProfileOrdersSectionProps {
-	orderPage?: OrderPage | undefined;
-	isPending: boolean;
 	onCancelOrder: (order: Order) => void;
 }
 
 export const ProfileOrdersSection = ({
-	orderPage,
-	isPending,
 	onCancelOrder,
 }: ProfileOrdersSectionProps) => {
 	const { t } = useLanguage();
+	const { data: orderPage, isPending, isError, refetch } = useMyOrders();
 
 	if (isPending || !orderPage) {
 		return (
-			<div className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-10 shadow-2xl shadow-slate-900/5 backdrop-blur-xl">
+			<div className="rounded-3xl border border-brand-900/10 bg-card p-6 sm:p-10 shadow-2xl shadow-brand-950/5 backdrop-blur-xl">
 				<div className="flex flex-col items-center justify-center py-20 sm:py-28 text-center px-4">
-					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-900 mb-4 shadow-sm ring-1 ring-emerald-900/10">
-						<Loader2 className="size-6 animate-spin text-emerald-900" />
+					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-brand-900 mb-4 shadow-sm ring-1 ring-brand-900/10">
+						<Loader2Icon className="size-6 animate-spin text-brand-900" />
 					</div>
-					<h3 className="font-playfair text-base sm:text-lg font-bold text-slate-900">
+					<h3 className="font-playfair text-base sm:text-lg font-bold text-ink">
 						Loading your orders
 					</h3>
-					<p className="mt-1 text-xs sm:text-sm text-slate-400 font-medium">
+					<p className="mt-1 text-xs sm:text-sm text-ink-faint font-medium">
 						Please wait while we sync your latest purchases...
 					</p>
 				</div>
@@ -38,32 +36,42 @@ export const ProfileOrdersSection = ({
 		);
 	}
 
+	if (isError) {
+		return (
+			<ErrorFallback
+				title="Failed to load orders"
+				description="Something went wrong while fetching orders."
+				onRetry={() => refetch()}
+			/>
+		);
+	}
+
 	if (orderPage.items.length === 0) {
 		return (
-			<div className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-10 shadow-2xl shadow-slate-900/5">
-				<div className="border-b border-slate-100 pb-6 mb-8">
-					<h2 className="font-playfair text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+			<div className="rounded-3xl border border-brand-900/10 bg-card p-6 sm:p-10 shadow-2xl shadow-brand-950/5">
+				<div className="border-b border-brand-900/10 pb-6 mb-8">
+					<h2 className="font-playfair text-xl sm:text-2xl font-extrabold tracking-tight text-ink">
 						{t("profile.ordersHistory")}
 					</h2>
-					<p className="text-xs sm:text-sm text-slate-400 mt-1">
+					<p className="text-xs sm:text-sm text-ink-faint mt-1">
 						Track your active orders and review purchase history.
 					</p>
 				</div>
 
 				<div className="text-center py-16 sm:py-20 px-4">
-					<div className="size-20 rounded-3xl bg-emerald-50 text-emerald-900 flex items-center justify-center mx-auto mb-5 shadow-inner ring-1 ring-emerald-900/10">
-						<ShoppingBag className="size-8" />
+					<div className="size-20 rounded-3xl bg-brand-50 text-brand-900 flex items-center justify-center mx-auto mb-5 shadow-inner ring-1 ring-brand-900/10">
+						<ShoppingBagIcon className="size-8" />
 					</div>
-					<h3 className="font-playfair text-lg sm:text-xl font-bold text-slate-900">
+					<h3 className="font-playfair text-lg sm:text-xl font-bold text-ink">
 						{t("profile.emptyOrders")}
 					</h3>
-					<p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-sm mx-auto font-medium leading-relaxed">
+					<p className="mt-2 text-xs sm:text-sm text-ink-soft max-w-sm mx-auto font-medium leading-relaxed">
 						You haven't placed any orders yet. Discover our formulas and start
 						building your routine!
 					</p>
 					<Button
 						asChild
-						className="mt-8 bg-emerald-900 hover:bg-emerald-950 text-white rounded-2xl px-8 h-12 sm:h-14 font-bold shadow-lg shadow-emerald-900/25 transition-all hover:scale-[1.02] cursor-pointer"
+						className="mt-8 px-8 h-5 sm:h-14 font-bold shadow-lg cursor-pointer"
 					>
 						<Link to={APP_ROUTES.SHOP}>Explore Formulas</Link>
 					</Button>
@@ -73,20 +81,20 @@ export const ProfileOrdersSection = ({
 	}
 
 	return (
-		<div className="rounded-3xl border border-slate-100 bg-white p-5 sm:p-8 lg:p-10 shadow-2xl shadow-slate-900/5">
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-6 mb-6 sm:mb-8 gap-4">
+		<div className="rounded-3xl border border-brand-900/10 bg-card p-5 sm:p-8 lg:p-10 shadow-2xl shadow-brand-950/5">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-brand-900/10 pb-6 mb-6 sm:mb-8 gap-4">
 				<div>
-					<h2 className="font-playfair text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
+					<h2 className="font-playfair text-xl sm:text-2xl font-extrabold tracking-tight text-ink">
 						{t("profile.ordersHistory")}
 					</h2>
-					<p className="text-xs sm:text-sm text-slate-400 mt-1">
+					<p className="text-xs sm:text-sm text-ink-faint mt-1">
 						Manage your shipments, track fulfillment status, and clear pending
 						balances.
 					</p>
 				</div>
-				<div className="inline-flex items-center gap-2 rounded-2xl bg-slate-50 border border-slate-100 px-4 py-2.5 self-start sm:self-auto shadow-xs">
-					<span className="size-2 rounded-full bg-emerald-600 animate-pulse" />
-					<span className="text-xs font-bold text-slate-700">
+				<div className="inline-flex items-center gap-2 rounded-2xl bg-surface-2 border border-brand-900/10 px-4 py-2.5 self-start sm:self-auto shadow-xs">
+					<span className="size-2 rounded-full bg-brand-600 animate-pulse" />
+					<span className="text-xs font-bold text-ink">
 						{orderPage.items.length}{" "}
 						{orderPage.items.length === 1 ? "Order" : "Orders"} Total
 					</span>

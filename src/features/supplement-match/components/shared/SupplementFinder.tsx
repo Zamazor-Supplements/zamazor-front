@@ -2,9 +2,9 @@ import { SupplementRecommendation } from "../results/SupplementRecommendation";
 
 export const SupplementFinder = () => {
 	return (
-		<section className="bg-[#fcfdfa] py-20 border-b border-emerald-900/10">
+		<section className="bg-[#fcfdfa] py-20 border-b border-brand-900/10">
 			<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-				<span className="text-xs font-black uppercase tracking-widest text-emerald-800">
+				<span className="text-xs font-black uppercase tracking-widest text-brand-800">
 					Smart Supplement Finder
 				</span>
 				<h2 className="mt-3 text-3xl font-playfair font-normal leading-tight text-slate-950 sm:text-4xl">

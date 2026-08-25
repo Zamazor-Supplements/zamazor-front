@@ -38,7 +38,7 @@ export const SupplementRecommendation = ({
 	return (
 		<div
 			className={cn(
-				"bg-linear-to-br from-emerald-50/50 to-lime-50/20 border border-emerald-900/10 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden text-left min-h-105 flex flex-col justify-between",
+				"bg-linear-to-br from-brand-50/50 to-lime-50/20 border border-brand-900/10 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden text-left min-h-105 flex flex-col justify-between",
 				className,
 			)}
 		>

@@ -35,7 +35,7 @@ export const MiniPaginationNav = ({
 	return (
 		<nav
 			aria-label="Compact pagination"
-			className="flex h-10 select-none items-center gap-1.5 rounded-xl border border-emerald-900/10 bg-white px-2.5 py-1 shadow-xs"
+			className="flex h-10 select-none items-center gap-1.5 rounded-lg border border-brand-900/10 bg-white px-2.5 py-1 shadow-xs"
 		>
 			<button
 				type="button"
@@ -43,7 +43,7 @@ export const MiniPaginationNav = ({
 				onClick={handlePrev}
 				aria-label="Previous page"
 				title="Previous page"
-				className="cursor-pointer p-1 text-emerald-800 transition-colors hover:text-emerald-950 focus:outline-hidden focus:ring-2 focus:ring-emerald-800/20 rounded-md disabled:cursor-not-allowed disabled:opacity-30"
+				className="cursor-pointer p-1 text-brand-800 transition-colors hover:text-brand-950 focus:outline-hidden focus:ring-2 focus:ring-brand-800/20 rounded-md disabled:cursor-not-allowed disabled:opacity-30"
 			>
 				<ChevronLeftIcon className="size-4" />
 			</button>
@@ -58,7 +58,7 @@ export const MiniPaginationNav = ({
 				onClick={handleNext}
 				aria-label="Next page"
 				title="Next page"
-				className="cursor-pointer p-1 text-emerald-800 transition-colors hover:text-emerald-950 focus:outline-hidden focus:ring-2 focus:ring-emerald-800/20 rounded-md disabled:cursor-not-allowed disabled:opacity-30"
+				className="cursor-pointer p-1 text-brand-800 transition-colors hover:text-brand-950 focus:outline-hidden focus:ring-2 focus:ring-brand-800/20 rounded-md disabled:cursor-not-allowed disabled:opacity-30"
 			>
 				<ChevronRightIcon className="size-4" />
 			</button>

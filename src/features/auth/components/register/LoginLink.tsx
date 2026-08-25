@@ -11,7 +11,7 @@ export const LoginLink = () => {
 			<Link
 				to={APP_ROUTES.AUTH.LOGIN}
 				state={{ from }}
-				className="ms-1 font-semibold text-emerald-700 hover:text-emerald-800 dark:text-lime-400 dark:hover:text-lime-300 hover:underline"
+				className="ms-1 font-semibold text-brand-700 hover:text-brand-800 dark:text-lime-400 dark:hover:text-lime-300 hover:underline"
 			>
 				Sign in
 			</Link>

@@ -92,18 +92,16 @@ const RETURN_FAQS = [
 	},
 ];
 
-// --- Main Returns Page Component ---
-
-export const ReturnsPage = () => {
+export default function ReturnsPage() {
 	const [openFaqId, setOpenFaqId] = useState<string | null>("fees");
 
 	useDocumentTitle(`Returns & Refund Policy | ${CONFIG.APP_NAME}`);
 
 	return (
-		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-emerald-100">
+		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-brand-100">
 			<div className="mx-auto max-w-7xl space-y-12">
 				{/* --- Hero Section --- */}
-				<div className="relative overflow-hidden rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-950 via-emerald-900 to-slate-950 p-8 sm:p-14 text-white shadow-xl shadow-emerald-950/10">
+				<div className="relative overflow-hidden rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-950 via-brand-900 to-slate-950 p-8 sm:p-14 text-white shadow-xl shadow-brand-950/10">
 					<div className="relative z-10 max-w-3xl">
 						<p className="text-[11px] font-black uppercase tracking-[0.26em] text-lime-300">
 							Customer Protection
@@ -111,7 +109,7 @@ export const ReturnsPage = () => {
 						<h1 className="mt-3 text-3xl sm:text-5xl font-playfair font-normal leading-tight">
 							Returns & Refund Policy
 						</h1>
-						<p className="mt-4 text-sm sm:text-base leading-relaxed text-emerald-100/80">
+						<p className="mt-4 text-sm sm:text-base leading-relaxed text-brand-100/80">
 							Your satisfaction is guaranteed. We offer a simple 14-day
 							hassle-free return policy on all unopened items across Morocco.
 						</p>
@@ -123,8 +121,8 @@ export const ReturnsPage = () => {
 
 				{/* --- Policy Highlights --- */}
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<Clock3Icon className="size-6" />
 						</div>
 						<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -135,8 +133,8 @@ export const ReturnsPage = () => {
 						</p>
 					</div>
 
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<TruckIcon className="size-6" />
 						</div>
 						<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -147,8 +145,8 @@ export const ReturnsPage = () => {
 						</p>
 					</div>
 
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<ShieldCheckIcon className="size-6" />
 						</div>
 						<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -159,8 +157,8 @@ export const ReturnsPage = () => {
 						</p>
 					</div>
 
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<BanknoteIcon className="size-6" />
 						</div>
 						<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -173,9 +171,9 @@ export const ReturnsPage = () => {
 				</div>
 
 				{/* --- Eligibility Matrix (Eligible vs Non-Eligible) --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
 					<div>
-						<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+						<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 							Requirements
 						</p>
 						<h2 className="text-2xl font-playfair font-normal text-slate-950 mt-1">
@@ -185,9 +183,9 @@ export const ReturnsPage = () => {
 
 					<div className="grid gap-6 md:grid-cols-2">
 						{/* Eligible Column */}
-						<div className="rounded-3xl border border-emerald-900/20 bg-emerald-50/30 p-6 space-y-4">
-							<div className="flex items-center gap-3 border-b border-emerald-900/10 pb-4">
-								<CheckCircle2Icon className="size-6 text-emerald-800 shrink-0" />
+						<div className="rounded-3xl border border-brand-900/20 bg-brand-50/30 p-6 space-y-4">
+							<div className="flex items-center gap-3 border-b border-brand-900/10 pb-4">
+								<CheckCircle2Icon className="size-6 text-brand-800 shrink-0" />
 								<h3 className="text-base font-bold text-slate-950">
 									{RETURN_CONDITIONS[0].title}
 								</h3>
@@ -198,7 +196,7 @@ export const ReturnsPage = () => {
 										key={idx}
 										className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700"
 									>
-										<span className="mt-1 size-1.5 rounded-full bg-emerald-700 shrink-0" />
+										<span className="mt-1 size-1.5 rounded-full bg-brand-700 shrink-0" />
 										<span>{item}</span>
 									</li>
 								))}
@@ -229,9 +227,9 @@ export const ReturnsPage = () => {
 				</div>
 
 				{/* --- Step-by-Step Return Process --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-8">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-8">
 					<div>
-						<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+						<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 							Workflow
 						</p>
 						<h2 className="text-2xl font-playfair font-normal text-slate-950 mt-1">
@@ -249,7 +247,7 @@ export const ReturnsPage = () => {
 								>
 									<div>
 										<div className="flex items-center justify-between mb-4">
-											<div className="grid size-12 place-items-center rounded-2xl bg-emerald-900 text-white shadow-sm">
+											<div className="grid size-12 place-items-center rounded-2xl bg-brand-900 text-white shadow-sm">
 												<Icon className="size-6" />
 											</div>
 											<span className="font-playfair text-3xl font-black text-slate-200">
@@ -271,9 +269,9 @@ export const ReturnsPage = () => {
 				</div>
 
 				{/* --- Returns FAQs --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
 					<div className="flex items-center gap-3 border-b border-slate-100 pb-6">
-						<div className="grid size-10 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+						<div className="grid size-10 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<HelpCircleIcon className="size-5" />
 						</div>
 						<div>
@@ -305,10 +303,9 @@ export const ReturnsPage = () => {
 										</span>
 										<ChevronDownIcon
 											className={cn(
-												"size-5 shrink-0 text-emerald-800 transition-transform duration-200",
-												isOpen && "rotate-180",
-											)}
-										/>
+												"size-5 shrink-0 text-brand-800 transition-transform duration-200",
+												isOpen && "rotate-180"
+											)} />
 									</button>
 
 									{isOpen && (
@@ -323,7 +320,7 @@ export const ReturnsPage = () => {
 				</div>
 
 				{/* --- Support Callout Banner --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-900 to-slate-900 p-8 text-white shadow-xl">
+				<div className="rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-900 to-slate-900 p-8 text-white shadow-xl">
 					<div className="flex flex-col md:flex-row items-center justify-between gap-6">
 						<div className="flex items-start gap-4">
 							<div className="grid size-12 place-items-center rounded-2xl bg-white/10 text-lime-300 shrink-0">
@@ -333,7 +330,7 @@ export const ReturnsPage = () => {
 								<h3 className="text-xl font-playfair font-normal">
 									Ready to request a return or exchange?
 								</h3>
-								<p className="mt-1 text-xs text-emerald-100/80 max-w-xl">
+								<p className="mt-1 text-xs text-brand-100/80 max-w-xl">
 									Contact our support team with your order number. We will
 									arrange a courier pickup at a time convenient for you.
 								</p>
@@ -342,7 +339,7 @@ export const ReturnsPage = () => {
 
 						<Button
 							asChild
-							className="rounded-xl bg-lime-400 px-6 py-3 font-bold text-slate-950 hover:bg-lime-300 shrink-0 cursor-pointer shadow-sm"
+							className="rounded-lg bg-lime-400 px-6 py-3 font-bold text-slate-950 hover:bg-lime-300 shrink-0 cursor-pointer shadow-sm"
 						>
 							<Link to={APP_ROUTES.PAGES.CONTACT}>
 								Start Return Request
@@ -354,4 +351,4 @@ export const ReturnsPage = () => {
 			</div>
 		</div>
 	);
-};
+}

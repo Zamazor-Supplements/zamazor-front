@@ -2,10 +2,10 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 
 export function ProductCardSkeleton() {
 	return (
-		<div className="relative flex h-full flex-col justify-between rounded-[2rem] border border-emerald-950/5 bg-white p-4 shadow-sm">
+		<div className="relative flex h-full flex-col justify-between rounded-xl border border-brand-950/5 bg-white p-4 shadow-sm">
 			<div>
 				{/* Image Container Matching Real Card */}
-				<div className="relative h-72 sm:h-80 w-full overflow-hidden rounded-[1.5rem] bg-slate-50 border border-gray-100/60">
+				<div className="relative h-72 sm:h-80 w-full overflow-hidden rounded-xl bg-slate-50 border border-gray-100/60">
 					{/* Category Pill Badge Skeleton */}
 					<Skeleton className="absolute left-3 top-3 h-6 w-24 rounded-full" />
 
@@ -27,7 +27,7 @@ export function ProductCardSkeleton() {
 			</div>
 
 			{/* Add To Cart Action Button Skeleton */}
-			<Skeleton className="mt-5 h-10 w-full rounded-xl" />
+			<Skeleton className="mt-5 h-10 w-full rounded-lg" />
 		</div>
 	);
 }

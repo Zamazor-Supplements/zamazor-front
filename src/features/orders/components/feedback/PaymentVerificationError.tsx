@@ -34,13 +34,13 @@ export const PaymentVerificationError = ({
 					<Button
 						onClick={onRetry}
 						variant="outline"
-						className="flex-1 h-11 border-slate-200 hover:bg-slate-50 font-medium rounded-xl cursor-pointer"
+						className="flex-1 h-11 border-slate-200 hover:bg-slate-50 font-medium rounded-lg cursor-pointer"
 					>
 						Try Again
 					</Button>
 					<Button
 						onClick={() => navigate(APP_ROUTES.SHOP)}
-						className="flex-1 h-11 bg-slate-900 hover:bg-slate-950 text-white font-medium rounded-xl cursor-pointer shadow-sm"
+						className="flex-1 h-11 bg-slate-900 hover:bg-slate-950 text-white font-medium rounded-lg cursor-pointer shadow-sm"
 					>
 						Return to Shop
 					</Button>

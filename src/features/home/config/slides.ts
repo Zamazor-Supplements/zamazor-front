@@ -26,7 +26,7 @@ export const HERO_SLIDES: Slide[] = [
 		id: "protein-slide",
 		image: heroProtein,
 		badge: "Plant-powered performance",
-		accent: "bg-emerald-500",
+		accent: "bg-brand-500",
 		title: "Clean supplements for energy, strength, and recovery.",
 		description:
 			"Build your daily stack with transparent formulas, great taste, and ingredients chosen for real routines.",

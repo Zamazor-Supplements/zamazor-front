@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	useGuestCartStore,
-	type GuestCartItem,
+	type GuestStoreCartItem,
 } from "../stores/guestCartStore";
+import { useCartDrawerStore } from "../stores/cartDrawerStore";
 import { cartKeys } from "./keys";
-// import { handleCartSuccess } from "./utils";
-import type { Cart, PopulatedCartItem } from "../schemas/cartSchema";
+import type { Cart, CartItem } from "../schemas/cartSchema";
 import {
 	addToCart,
 	clearCart,
@@ -32,10 +32,6 @@ function useAuthenticatedCartMutation<TVariables>(
 					queryKey: cartKeys.all,
 				});
 			}
-
-			queryClient.invalidateQueries({
-				queryKey: ["cart", "summary"],
-			});
 		},
 	});
 }
@@ -49,21 +45,27 @@ export function useSyncCart() {
 
 function useGuestAddToCart() {
 	const guestAddItem = useGuestCartStore((s) => s.addItem);
+	const openCartDrawer = useCartDrawerStore((s) => s.open);
 
 	return useMutation({
-		mutationFn: async ({ product, quantity }: PopulatedCartItem) =>
+		mutationFn: async ({ product, quantity }: CartItem) =>
 			guestAddItem(product.id, quantity),
+		onSuccess: () => {
+			openCartDrawer();
+		},
 	});
 }
 
 function useAuthenticatedAddToCart() {
 	const queryClient = useQueryClient();
+	const openCartDrawer = useCartDrawerStore((s) => s.open);
 
 	return useMutation({
-		mutationFn: async ({ product, quantity }: PopulatedCartItem) =>
+		mutationFn: async ({ product, quantity }: CartItem) =>
 			addToCart(product.id, quantity),
 		onSuccess: (data) => {
 			queryClient.setQueryData(cartKeys.all, data);
+			openCartDrawer();
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: cartKeys.all });
@@ -80,6 +82,43 @@ export function useAddToCart() {
 	const authenticatedAddItemMutation = useAuthenticatedAddToCart();
 
 	return authenticated ? authenticatedAddItemMutation : guestAddItemMutation;
+}
+
+export interface ReorderLine {
+	productId: string;
+	quantity: number;
+}
+
+/**
+ * Re-add a previous order's line items to the cart (guest or authenticated).
+ * Each line is added through the standard add-to-cart path, then the cart
+ * drawer opens so the restored items are immediately visible.
+ */
+export function useReorder() {
+	const authenticated = useIsAuthenticated();
+	const queryClient = useQueryClient();
+	const guestAddItem = useGuestCartStore((s) => s.addItem);
+	const openCartDrawer = useCartDrawerStore((s) => s.open);
+
+	return useMutation({
+		mutationFn: async (lines: ReorderLine[]) => {
+			await Promise.all(
+				lines.map((line) =>
+					authenticated
+						? addToCart(line.productId, line.quantity)
+						: guestAddItem(line.productId, line.quantity),
+				),
+			);
+		},
+		onSuccess: () => {
+			if (authenticated) {
+				queryClient.invalidateQueries({
+					queryKey: cartKeys.all,
+				});
+			}
+			openCartDrawer();
+		},
+	});
 }
 
 /**
@@ -105,12 +144,13 @@ export function useUpdateCartItemQuantity() {
 	const authenticated = useIsAuthenticated();
 	const guestUpdateQuantity = useGuestCartStore((s) => s.updateQuantity);
 
-	const authenticatedMutation = useAuthenticatedCartMutation<GuestCartItem>(
-		({ productId, quantity }) => updateCartItemQuantity(productId, quantity),
-	);
+	const authenticatedMutation =
+		useAuthenticatedCartMutation<GuestStoreCartItem>(
+			({ productId, quantity }) => updateCartItemQuantity(productId, quantity),
+		);
 
 	const guestMutation = useMutation({
-		mutationFn: ({ productId, quantity }: GuestCartItem) =>
+		mutationFn: ({ productId, quantity }: GuestStoreCartItem) =>
 			guestUpdateQuantity(productId, quantity),
 	});
 

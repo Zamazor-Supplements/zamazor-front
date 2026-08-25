@@ -24,7 +24,7 @@ import { useForm, ValidationError } from "@formspree/react";
 
 const FORMSPREE_FORM_ID = CONFIG.FORMSPREE_FORM_ID;
 
-export const ContactPage = () => {
+export default function ContactPage() {
 	const [copiedEmail, setCopiedEmail] = useState(false);
 	const [formState, handleFormspreeSubmit] = useForm(FORMSPREE_FORM_ID);
 
@@ -37,10 +37,10 @@ export const ContactPage = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-emerald-100">
+		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-brand-100">
 			<div className="mx-auto max-w-7xl space-y-10">
 				{/* --- Hero Header --- */}
-				<div className="relative overflow-hidden rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-950 via-emerald-900 to-slate-950 p-8 sm:p-12 text-white shadow-xl shadow-emerald-950/10">
+				<div className="relative overflow-hidden rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-950 via-brand-900 to-slate-950 p-8 sm:p-12 text-white shadow-xl shadow-brand-950/10">
 					<div className="relative z-10 max-w-3xl">
 						<p className="text-[11px] font-black uppercase tracking-[0.26em] text-lime-300">
 							Help & Support
@@ -48,7 +48,7 @@ export const ContactPage = () => {
 						<h1 className="mt-3 text-3xl sm:text-5xl font-playfair font-normal leading-tight">
 							Get in touch with us.
 						</h1>
-						<p className="mt-4 text-sm sm:text-base leading-relaxed text-emerald-100/80">
+						<p className="mt-4 text-sm sm:text-base leading-relaxed text-brand-100/80">
 							Have a question about your order, our nutrition formulas, or bulk
 							purchasing? Our team is here to help you move fast.
 						</p>
@@ -59,8 +59,8 @@ export const ContactPage = () => {
 
 				{/* --- Contact Channels Highlights --- */}
 				<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<MailIcon className="size-5" />
 						</div>
 						<h2 className="mt-4 text-lg font-bold text-slate-950">
@@ -69,13 +69,13 @@ export const ContactPage = () => {
 						<p className="mt-1 text-sm leading-relaxed text-slate-500">
 							Response guaranteed within 24 business hours.
 						</p>
-						<p className="mt-3 text-sm font-semibold text-emerald-900">
+						<p className="mt-3 text-sm font-semibold text-brand-900">
 							{CONFIG.SUPPORT_EMAIL}
 						</p>
 					</div>
 
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<PhoneIcon className="size-5" />
 						</div>
 						<h2 className="mt-4 text-lg font-bold text-slate-950">
@@ -84,13 +84,13 @@ export const ContactPage = () => {
 						<p className="mt-1 text-sm leading-relaxed text-slate-500">
 							Monday to Friday, 9:00 AM - 5:00 PM.
 						</p>
-						<p className="mt-3 text-sm font-semibold text-emerald-900">
+						<p className="mt-3 text-sm font-semibold text-brand-900">
 							{CONFIG.SUPPORT_PHONE}
 						</p>
 					</div>
 
-					<div className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs sm:col-span-2 xl:col-span-1">
-						<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+					<div className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs sm:col-span-2 xl:col-span-1">
+						<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<ShieldCheckIcon className="size-5" />
 						</div>
 						<h2 className="mt-4 text-lg font-bold text-slate-950">
@@ -101,7 +101,7 @@ export const ContactPage = () => {
 						</p>
 						<Link
 							to={APP_ROUTES.PAGES.FAQ}
-							className="mt-3 inline-flex items-center text-xs font-bold text-emerald-800 hover:underline"
+							className="mt-3 inline-flex items-center text-xs font-bold text-brand-800 hover:underline"
 						>
 							Visit help FAQ
 							<ArrowRightIcon className="ml-1 size-3" />
@@ -112,9 +112,9 @@ export const ContactPage = () => {
 				{/* --- Main Section: Formspree Form + Sidebar Info --- */}
 				<div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-start">
 					{/* Formspree Interactive Form Card */}
-					<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs">
+					<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs">
 						<div className="flex items-center gap-3 mb-6">
-							<div className="grid size-10 place-items-center rounded-xl bg-emerald-50 text-emerald-800">
+							<div className="grid size-10 place-items-center rounded-lg bg-brand-50 text-brand-800">
 								<MessageSquareIcon className="size-5" />
 							</div>
 							<div>
@@ -128,8 +128,8 @@ export const ContactPage = () => {
 						</div>
 
 						{formState.succeeded ? (
-							<div className="flex min-h-95 flex-col items-center justify-center rounded-3xl border border-emerald-900/10 bg-emerald-50/40 p-8 text-center animate-in fade-in duration-300">
-								<div className="flex size-16 items-center justify-center rounded-2xl bg-emerald-900 text-white shadow-md shadow-emerald-950/10">
+							<div className="flex min-h-95 flex-col items-center justify-center rounded-3xl border border-brand-900/10 bg-brand-50/40 p-8 text-center animate-in fade-in duration-300">
+								<div className="flex size-16 items-center justify-center rounded-2xl bg-brand-900 text-white shadow-md shadow-brand-950/10">
 									<CheckCircle2Icon className="size-8" />
 								</div>
 								<h3 className="mt-5 font-playfair text-2xl font-normal text-slate-950">
@@ -147,8 +147,7 @@ export const ContactPage = () => {
 									type="text"
 									name="_gotcha"
 									className="hidden"
-									tabIndex={-1}
-								/>
+									tabIndex={-1} />
 
 								<div className="grid gap-4 sm:grid-cols-2">
 									<div>
@@ -163,13 +162,11 @@ export const ContactPage = () => {
 											name="name"
 											required
 											placeholder="e.g. John Doe"
-											className="rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white"
-										/>
+											className="rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white" />
 										<ValidationError
 											prefix="Name"
 											field="name"
-											errors={formState.errors}
-										/>
+											errors={formState.errors} />
 									</div>
 
 									<div>
@@ -185,13 +182,11 @@ export const ContactPage = () => {
 											name="email"
 											required
 											placeholder="you@example.com"
-											className="rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white"
-										/>
+											className="rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white" />
 										<ValidationError
 											prefix="Email"
 											field="email"
-											errors={formState.errors}
-										/>
+											errors={formState.errors} />
 									</div>
 								</div>
 
@@ -206,13 +201,11 @@ export const ContactPage = () => {
 										id="subject"
 										name="subject"
 										placeholder="e.g. Question about order #1042"
-										className="rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white"
-									/>
+										className="rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white" />
 									<ValidationError
 										prefix="Subject"
 										field="subject"
-										errors={formState.errors}
-									/>
+										errors={formState.errors} />
 								</div>
 
 								<div>
@@ -228,13 +221,11 @@ export const ContactPage = () => {
 										required
 										rows={5}
 										placeholder="Tell us how we can help..."
-										className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 p-3.5 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-emerald-700 focus:bg-white focus:ring-2 focus:ring-emerald-700/20"
-									/>
+										className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 p-3.5 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-700 focus:bg-white focus:ring-2 focus:ring-brand-700/20" />
 									<ValidationError
 										prefix="Message"
 										field="message"
-										errors={formState.errors}
-									/>
+										errors={formState.errors} />
 								</div>
 
 								{formState.errors && (
@@ -246,7 +237,7 @@ export const ContactPage = () => {
 								<Button
 									type="submit"
 									disabled={formState.submitting}
-									className="h-12 w-full sm:w-auto rounded-xl bg-emerald-950 px-8 font-semibold text-white hover:bg-emerald-900 disabled:opacity-50 cursor-pointer"
+									className="h-12 w-full sm:w-auto rounded-lg bg-brand-950 px-8 font-semibold text-white hover:bg-brand-900 disabled:opacity-50 cursor-pointer"
 								>
 									{formState.submitting ? (
 										<>
@@ -267,7 +258,7 @@ export const ContactPage = () => {
 					{/* Right Sidebar Details */}
 					<div className="space-y-6">
 						{/* Direct Details Card */}
-						<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-8 shadow-xs">
+						<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-8 shadow-xs">
 							<h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
 								Direct Info
 							</h3>
@@ -276,7 +267,7 @@ export const ContactPage = () => {
 								{/* Email Item */}
 								<div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5">
 									<div className="flex items-center gap-3">
-										<MailIcon className="size-4 text-emerald-800" />
+										<MailIcon className="size-4 text-brand-800" />
 										<div>
 											<p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
 												Email
@@ -288,11 +279,11 @@ export const ContactPage = () => {
 									</div>
 									<button
 										onClick={handleCopyEmail}
-										className="p-2 text-slate-400 hover:text-emerald-800 transition-colors cursor-pointer"
+										className="p-2 text-slate-400 hover:text-brand-800 transition-colors cursor-pointer"
 										title="Copy email"
 									>
 										{copiedEmail ? (
-											<CheckIcon className="size-4 text-emerald-700" />
+											<CheckIcon className="size-4 text-brand-700" />
 										) : (
 											<CopyIcon className="size-4" />
 										)}
@@ -301,7 +292,7 @@ export const ContactPage = () => {
 
 								{/* Phone Item */}
 								<div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5">
-									<PhoneIcon className="size-4 text-emerald-800" />
+									<PhoneIcon className="size-4 text-brand-800" />
 									<div>
 										<p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
 											Phone
@@ -314,7 +305,7 @@ export const ContactPage = () => {
 
 								{/* Address Item */}
 								<div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5">
-									<MapPinIcon className="size-4 text-emerald-800" />
+									<MapPinIcon className="size-4 text-brand-800" />
 									<div>
 										<p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
 											Address
@@ -327,7 +318,7 @@ export const ContactPage = () => {
 
 								{/* Hours Item */}
 								<div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5">
-									<Clock3Icon className="size-4 text-emerald-800" />
+									<Clock3Icon className="size-4 text-brand-800" />
 									<div>
 										<p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
 											Hours
@@ -341,9 +332,9 @@ export const ContactPage = () => {
 						</div>
 
 						{/* Quick Link Card to FAQ */}
-						<div className="rounded-[2.5rem] border border-emerald-900/10 bg-[#f2f8ef] p-6 sm:p-8">
+						<div className="rounded-hero border border-brand-900/10 bg-[#f2f8ef] p-6 sm:p-8">
 							<div className="flex items-start gap-3">
-								<div className="grid size-10 place-items-center rounded-2xl bg-emerald-900 text-white shrink-0">
+								<div className="grid size-10 place-items-center rounded-2xl bg-brand-900 text-white shrink-0">
 									<HelpCircleIcon className="size-5" />
 								</div>
 								<div>
@@ -357,7 +348,7 @@ export const ContactPage = () => {
 									<Button
 										asChild
 										variant="link"
-										className="mt-3 p-0 h-auto text-xs font-bold text-emerald-900 hover:text-emerald-950 cursor-pointer"
+										className="mt-3 p-0 h-auto text-xs font-bold text-brand-900 hover:text-brand-950 cursor-pointer"
 									>
 										<Link to={APP_ROUTES.PAGES.FAQ}>
 											Open Help Center
@@ -372,4 +363,4 @@ export const ContactPage = () => {
 			</div>
 		</div>
 	);
-};
+}

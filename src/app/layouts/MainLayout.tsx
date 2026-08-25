@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Outlet } from "react-router";
 import { Header } from "@/shared/components/Header";
 import { Footer } from "@/shared/components/Footer";
-import { FloatingQuizButton } from "@/shared/components/FloatingQuizButton";
+import { CartDrawer } from "@/features/cart/components/drawer/CartDrawer";
 
 export const MainLayout = () => {
 	const headerRef = useRef<HTMLElement>(null);
@@ -16,7 +16,7 @@ export const MainLayout = () => {
 				const totalHeight = rect.height + marginTop;
 				document.documentElement.style.setProperty(
 					"--header-height",
-					`${totalHeight}px`
+					`${totalHeight}px`,
 				);
 			}
 		};
@@ -27,17 +27,13 @@ export const MainLayout = () => {
 	}, []);
 
 	return (
-		<div className="min-h-screen bg-[#f7fbf3] text-slate-950 selection:bg-emerald-100 flex flex-col justify-between">
-			<div>
-				
-
+		<div className="min-h-screen bg-[#f7fbf3] text-slate-950 selection:bg-brand-100 flex flex-col justify-between">
+			<main>
 				<Header ref={headerRef} />
-
 				<Outlet />
-			</div>
-
+			</main>
 			<Footer />
-			<FloatingQuizButton />
+			<CartDrawer />
 		</div>
 	);
 };

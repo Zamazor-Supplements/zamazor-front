@@ -39,8 +39,8 @@ export const ProductGrid = ({
 	// Empty State
 	if (products.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center rounded-3xl border border-emerald-900/5 bg-white px-6 py-20 text-center shadow-sm">
-				<SlidersHorizontalIcon className="mb-4 size-16 text-emerald-900/25" />
+			<div className="flex flex-col items-center justify-center rounded-3xl border border-brand-900/5 bg-white px-6 py-20 text-center shadow-sm">
+				<SlidersHorizontalIcon className="mb-4 size-16 text-brand-900/25" />
 				<h3 className="font-playfair text-xl font-bold text-slate-900">
 					No supplement blends found
 				</h3>
@@ -50,7 +50,7 @@ export const ProductGrid = ({
 				</p>
 				<Button
 					onClick={handleResetFilters}
-					className="mt-6 h-11 cursor-pointer rounded-xl bg-emerald-900 px-6 font-bold text-white hover:bg-emerald-950 transition-colors"
+					className="mt-6 h-11 cursor-pointer rounded-lg bg-brand-900 px-6 font-bold text-white hover:bg-brand-950 transition-colors"
 				>
 					Reset filters
 				</Button>

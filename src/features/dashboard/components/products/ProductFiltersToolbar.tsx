@@ -26,18 +26,6 @@ type Pagination = {
 	size: number;
 };
 
-// type ProductFiltersToolbarProps = {
-// 	search?: string;
-// 	selectedCategoryFilter?: string;
-// 	sort: string;
-// 	categories: CategoryOption[];
-// 	totalElements: number;
-// 	isFilterActive: boolean;
-// 	onSearchChange: (value: string) => void;
-// 	onCategoryFilterChange: (value: string) => void;
-// 	onSortChange: (value: string) => void;
-// 	onResetFilters: () => void;
-// };
 type ProductFiltersToolbarProps = {
 	filters: Filters;
 	pagination: Pagination;
@@ -65,23 +53,23 @@ export const ProductFiltersToolbar = ({
 	const onSortChange = (sort: Sort) => updatePagination({ sort });
 
 	return (
-		<div className="flex flex-col gap-3 rounded-t-xl border-b border-slate-200/80 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+		<div className="flex flex-col gap-3 rounded-t-xl border-b border-brand-900/10 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
 			{/* Search & Filter Controls Group */}
 			<div className="flex flex-1 flex-wrap items-center gap-2.5">
 				{/* Search Input with Clear Button */}
 				<div className="relative min-w-50 flex-1 sm:max-w-xs">
-					<Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+					<Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-faint" />
 					<Input
 						value={filters.search}
 						onChange={(e) => onSearchChange(e.target.value)}
 						placeholder="Search products..."
-						className="h-9.5 w-full rounded-lg border-slate-200 bg-slate-50/50 pl-9 pr-8 text-xs transition-colors placeholder:text-slate-400 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-emerald-600"
+						className="h-9.5 w-full rounded-lg border-brand-900/10 bg-surface-2/50 pl-9 pr-8 text-xs transition-colors placeholder:text-ink-faint focus-visible:bg-card focus-visible:ring-2 focus-visible:ring-brand-600"
 					/>
 					{filters.search && (
 						<button
 							type="button"
 							onClick={() => onSearchChange("")}
-							className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-slate-400 hover:bg-slate-200/60 hover:text-slate-600"
+							className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-ink-faint hover:bg-brand-100 hover:text-ink"
 						>
 							<XIcon className="size-3.5" />
 						</button>
@@ -93,7 +81,7 @@ export const ProductFiltersToolbar = ({
 					<select
 						value={filters.categoryId}
 						onChange={(e) => onCategoryFilterChange(e.target.value)}
-						className="h-9.5 w-full appearance-none rounded-lg border border-slate-200 bg-slate-50/50 pl-3 pr-8 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+						className="h-9.5 w-full appearance-none rounded-lg border border-brand-900/10 bg-surface-2/50 pl-3 pr-8 text-xs font-medium text-ink transition-colors hover:bg-brand-100/70 focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-600"
 					>
 						<option value="">All Categories</option>
 						{categories.map((cat) => (
@@ -102,7 +90,7 @@ export const ProductFiltersToolbar = ({
 							</option>
 						))}
 					</select>
-					<ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
+					<ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-ink-faint" />
 				</div>
 
 				{/* Sort By Dropdown with Custom Arrow */}
@@ -110,7 +98,7 @@ export const ProductFiltersToolbar = ({
 					<select
 						value={pagination.sort}
 						onChange={(e) => onSortChange(e.target.value as Sort)}
-						className="h-9.5 w-full appearance-none rounded-lg border border-slate-200 bg-slate-50/50 pl-3 pr-8 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100/70 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+						className="h-9.5 w-full appearance-none rounded-lg border border-brand-900/10 bg-surface-2/50 pl-3 pr-8 text-xs font-medium text-ink transition-colors hover:bg-brand-100/70 focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-600"
 					>
 						<option value="createdAt,desc">Latest first</option>
 						<option value="createdAt,asc">Oldest first</option>
@@ -119,7 +107,7 @@ export const ProductFiltersToolbar = ({
 						<option value="price,asc">Price: Low to High</option>
 						<option value="price,desc">Price: High to Low</option>
 					</select>
-					<ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
+					<ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-ink-faint" />
 				</div>
 
 				{/* Reset Filters Pill */}
@@ -137,13 +125,13 @@ export const ProductFiltersToolbar = ({
 
 			{/* Results Counter Summary */}
 			<div className="flex shrink-0 items-center justify-between pt-1 sm:pt-0">
-				<span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
-					<SlidersHorizontalIcon className="size-3.5 text-slate-400" />
+				<span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-soft">
+					<SlidersHorizontalIcon className="size-3.5 text-ink-faint" />
 					{totalElements === 0 ? (
-						<span className="text-slate-400">No products found</span>
+						<span className="text-ink-faint">No products found</span>
 					) : (
 						<span>
-							<strong className="font-semibold text-slate-900">
+							<strong className="font-semibold text-ink">
 								{totalElements}
 							</strong>{" "}
 							{totalElements === 1 ? "product" : "products"}

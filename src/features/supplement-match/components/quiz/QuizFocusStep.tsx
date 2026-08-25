@@ -7,7 +7,7 @@ export const QuizFocusStep = ({
 }) => (
 	<div className="space-y-6">
 		<div>
-			<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">
+			<span className="text-[10px] font-black uppercase text-brand-800 tracking-wider">
 				Step 1 of 3
 			</span>
 			<h3 className="text-xl font-playfair text-slate-950 font-normal mt-1">
@@ -21,10 +21,10 @@ export const QuizFocusStep = ({
 					<button
 						key={opt.id}
 						onClick={() => onSelect(opt.id as QuizFocus)}
-						className="p-4 bg-white rounded-2xl border border-emerald-900/10 hover:border-emerald-700 hover:bg-emerald-50/20 text-left transition-all duration-150 cursor-pointer group shadow-sm hover:shadow-md"
+						className="p-4 bg-white rounded-2xl border border-brand-900/10 hover:border-brand-700 hover:bg-brand-50/20 text-left transition-all duration-150 cursor-pointer group shadow-sm hover:shadow-md"
 					>
 						{Icon && (
-							<Icon className="size-6 text-emerald-800 mb-3 group-hover:scale-110 transition-transform" />
+							<Icon className="size-6 text-brand-800 mb-3 group-hover:scale-110 transition-transform" />
 						)}
 						<p className="text-sm font-bold text-slate-900 leading-tight">
 							{opt.label}

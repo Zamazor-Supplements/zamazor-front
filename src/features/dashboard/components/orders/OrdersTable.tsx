@@ -23,7 +23,7 @@ interface OrdersTableProps {
 	isFetching: boolean;
 	onViewOrder: (order: Order) => void;
 	onChangeStatus: (orderId: string, status: OrderStatus) => void;
-	onCancelOrder: (orderId: string) => void;
+	onRefundOrder: (orderId: string) => void;
 	onPageChange: (page: number) => void;
 }
 
@@ -33,22 +33,22 @@ export const OrdersTable = ({
 	isFetching,
 	onViewOrder,
 	onChangeStatus,
-	onCancelOrder,
+	onRefundOrder,
 	onPageChange,
 }: OrdersTableProps) => {
 	const currentPage = orderPage.page;
 
 	const canChangeStatus = (status: OrderStatus) => !isFinalOrderStatus(status);
 	const nextPage = () =>
-		onPageChange(Math.min(orderPage.totalPages, currentPage + 1));
+		onPageChange(Math.min(orderPage.totalPages - 1, currentPage + 1));
 	const previousPage = () => onPageChange(Math.max(0, currentPage - 1));
 
 	return (
 		<>
 			{/* Background Refetch Progress Indicator */}
 			{isFetching && (
-				<div className="absolute top-0 left-0 right-0 h-1 bg-emerald-100 overflow-hidden z-20">
-					<div className="h-full bg-emerald-600 animate-pulse w-full" />
+				<div className="absolute top-0 left-0 right-0 z-20 h-1 overflow-hidden bg-brand-100">
+					<div className="h-full w-full animate-pulse bg-brand-600" />
 				</div>
 			)}
 
@@ -60,7 +60,7 @@ export const OrdersTable = ({
 			>
 				<table className="w-full min-w-240 border-collapse text-left text-sm">
 					<thead>
-						<tr className="border-b border-slate-200/80 bg-slate-50/80 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+						<tr className="border-b border-brand-900/10 bg-surface-2/80 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
 							<th className="px-6 py-3.5 w-28">Order ID</th>
 							<th className="px-6 py-3.5">Items</th>
 							<th className="px-6 py-3.5 w-32">Date</th>
@@ -70,18 +70,18 @@ export const OrdersTable = ({
 							<th className="px-6 py-3.5 text-right w-36">Actions</th>
 						</tr>
 					</thead>
-					<tbody className="divide-y divide-slate-100">
+					<tbody className="divide-y divide-brand-900/10">
 						{orderPage.items.length === 0 ? (
 							<tr>
 								<td colSpan={7} className="px-6 py-16 text-center">
 									<div className="mx-auto flex max-w-xs flex-col items-center gap-2">
-										<div className="flex size-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+										<div className="flex size-12 items-center justify-center rounded-full bg-surface-2 text-ink-faint">
 											<AlertCircleIcon className="size-6" />
 										</div>
-										<p className="text-sm font-medium text-slate-900">
+										<p className="text-sm font-medium text-ink">
 											No orders found
 										</p>
-										<p className="text-xs text-slate-500">
+										<p className="text-xs text-ink-soft">
 											No orders matched your current search or status filter.
 										</p>
 									</div>
@@ -100,12 +100,12 @@ export const OrdersTable = ({
 								return (
 									<tr
 										key={order.id}
-										className="group transition-colors duration-150 hover:bg-slate-50/60"
+										className="group transition-colors duration-150 hover:bg-surface-2/60"
 									>
 										{/* Order ID */}
 										<td className="px-6 py-3.5 whitespace-nowrap">
 											<Tooltip content={`Full ID: ${order.id}`}>
-												<span className="shrink-0 cursor-help rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-mono font-bold text-slate-600 select-all border border-slate-200/50">
+												<span className="shrink-0 cursor-help select-all rounded border border-brand-900/10 bg-surface-2 px-1.5 py-0.5 text-[10px] font-mono font-bold text-ink">
 													#{order.id.slice(0, 8).toUpperCase()}
 												</span>
 											</Tooltip>
@@ -117,14 +117,14 @@ export const OrdersTable = ({
 										</td>
 
 										{/* Date */}
-										<td className="px-6 py-3.5 text-xs text-slate-500 whitespace-nowrap">
+										<td className="px-6 py-3.5 text-xs text-ink-soft whitespace-nowrap">
 											{order.createdAt.toLocaleDateString(undefined, {
 												dateStyle: "medium",
 											})}
 										</td>
 
 										{/* Total */}
-										<td className="px-6 py-3.5 text-xs font-bold text-slate-900 whitespace-nowrap">
+										<td className="px-6 py-3.5 text-xs font-bold text-ink whitespace-nowrap">
 											{formatCurrency(order.total)}
 										</td>
 
@@ -132,10 +132,10 @@ export const OrdersTable = ({
 										<td className="px-6 py-3.5 max-w-55 truncate whitespace-nowrap">
 											<Tooltip content={shippingAddress}>
 												<div className="space-y-0.5 overflow-hidden">
-													<p className="truncate text-xs font-medium text-slate-700">
+													<p className="truncate text-xs font-medium text-ink">
 														{shippingAddress}
 													</p>
-													<p className="truncate text-[11px] text-slate-400">
+													<p className="truncate text-[11px] text-ink-faint">
 														Ph: {order.phone}
 													</p>
 												</div>
@@ -157,17 +157,17 @@ export const OrdersTable = ({
 												<Tooltip content="View Order Details">
 													<button
 														onClick={() => onViewOrder(order)}
-														className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+														className="rounded-lg p-1.5 text-ink-faint transition-colors hover:bg-surface-2 hover:text-ink active:scale-95"
 													>
 														<EyeIcon className="size-4" />
 													</button>
 												</Tooltip>
 
 												{canChangeStatus(order.status) && (
-													<Tooltip content="Cancel Order">
+													<Tooltip content="Refund Order">
 														<button
-															onClick={() => onCancelOrder(order.id)}
-															className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 active:scale-95"
+															onClick={() => onRefundOrder(order.id)}
+															className="rounded-lg p-1.5 text-ink-faint transition-colors hover:bg-rose-50 hover:text-rose-600 active:scale-95"
 														>
 															<XIcon className="size-4" />
 														</button>
@@ -192,12 +192,12 @@ export const OrdersTable = ({
 
 			{/* Pagination Footer */}
 			{orderPage.totalPages > 1 && (
-				<div className="flex items-center justify-center gap-2 border-t border-slate-200/80 bg-slate-50/50 p-4 select-none">
-					<div className="flex items-center gap-1.5 rounded-xl border border-slate-200/60 bg-white p-1">
+				<div className="flex items-center justify-center gap-2 border-t border-brand-900/10 bg-surface-2/50 p-4 select-none">
+					<div className="flex items-center gap-1.5 rounded-lg border border-brand-900/10 bg-card p-1">
 						<button
 							disabled={currentPage === 0 || isFetching}
 							onClick={previousPage}
-							className="flex size-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
+							className="flex size-8 items-center justify-center rounded-lg border border-brand-900/10 text-ink-soft transition-colors hover:bg-surface-2 disabled:opacity-40"
 							title="Previous Page"
 						>
 							<ChevronLeftIcon className="size-4" />
@@ -210,8 +210,8 @@ export const OrdersTable = ({
 								onClick={() => onPageChange(index)}
 								className={`flex size-8 items-center justify-center rounded-lg text-xs font-semibold transition-all ${
 									currentPage === index
-										? "bg-emerald-900 text-white shadow-xs"
-										: "border border-slate-200 text-slate-700 hover:bg-slate-100"
+										? "bg-brand-900 text-white shadow-xs"
+										: "border border-brand-900/10 text-ink hover:bg-surface-2"
 								}`}
 							>
 								{index + 1}
@@ -221,7 +221,7 @@ export const OrdersTable = ({
 						<button
 							disabled={currentPage >= orderPage.totalPages - 1 || isFetching}
 							onClick={nextPage}
-							className="flex size-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
+							className="flex size-8 items-center justify-center rounded-lg border border-brand-900/10 text-ink-soft transition-colors hover:bg-surface-2 disabled:opacity-40"
 							title="Next Page"
 						>
 							<ChevronRightIcon className="size-4" />

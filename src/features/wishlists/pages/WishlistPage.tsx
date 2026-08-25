@@ -3,6 +3,7 @@ import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/app/config/constants";
 import { APP_ROUTES } from "@/app/routes/paths";
 import { Button } from "@/shared/components/ui/button";
+import { EmptyState } from "@/shared/components/ui/empty-state";
 import {
 	ArrowLeftIcon,
 	ArrowRightIcon,
@@ -15,7 +16,7 @@ import { ProductCard } from "@/features/products/components/product/ProductCard"
 import { WishlistPageSkeleton } from "../components/feedback/WishlistPageSkeleton";
 import { WishlistPageError } from "../components/feedback/WishlistPageError";
 
-export const WishlistPage = () => {
+export default function WishlistPage() {
 	useDocumentTitle(`My Wishlist | ${CONFIG.APP_NAME}`);
 
 	const { data: wishlistProducts, isPending, isError, refetch } = useWishlist();
@@ -39,11 +40,11 @@ export const WishlistPage = () => {
 		<div className="min-h-screen bg-[#fcfdfa] px-4 py-12 sm:px-6 lg:px-8">
 			<div className="mx-auto max-w-7xl">
 				{/* Header Section */}
-				<div className="mb-8 flex flex-col justify-between gap-4 border-b border-emerald-900/10 pb-6 sm:flex-row sm:items-end">
+				<div className="mb-8 flex flex-col justify-between gap-4 border-b border-brand-900/10 pb-6 sm:flex-row sm:items-end">
 					<div>
 						<Link
 							to={APP_ROUTES.SHOP}
-							className="mb-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 transition-colors hover:text-emerald-950"
+							className="mb-3 inline-flex items-center gap-1.5 text-xs font-bold text-brand-800 transition-colors hover:text-brand-950"
 						>
 							<ArrowLeftIcon className="size-3.5" />
 							Back to shopping
@@ -61,7 +62,7 @@ export const WishlistPage = () => {
 							variant="ghost"
 							onClick={handleClearWishlist}
 							disabled={clearWishlistMutation.isPending}
-							className="h-10 cursor-pointer rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
+							className="h-10 cursor-pointer rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
 						>
 							<Trash2Icon className="mr-1.5 size-4" />
 							{clearWishlistMutation.isPending ? "Clearing..." : "Clear All"}
@@ -71,26 +72,20 @@ export const WishlistPage = () => {
 
 				{/* Content Grid */}
 				{!hasItems ? (
-					<div className="mx-auto max-w-md rounded-[2rem] border border-emerald-900/5 bg-white p-8 py-20 text-center shadow-xs">
-						<span className="mx-auto mb-5 grid size-16 place-items-center rounded-2xl bg-emerald-50 text-emerald-900/30">
-							<HeartIcon className="size-8" />
-						</span>
-						<h2 className="font-playfair text-xl text-slate-950">
-							Your wishlist is empty
-						</h2>
-						<p className="mt-2 text-sm text-slate-500">
-							Explore our targeted supplement stacks and save your favorites
-							here.
-						</p>
-						<Button
-							asChild
-							className="mt-6 h-11 rounded-xl bg-emerald-900 px-5 text-white hover:bg-emerald-950"
-						>
-							<Link to={APP_ROUTES.SHOP}>
-								Browse Formulas
-								<ArrowRightIcon className="ml-1.5 size-4" />
-							</Link>
-						</Button>
+					<div className="mx-auto max-w-md py-12">
+						<EmptyState
+							icon={HeartIcon}
+							title="Your wishlist is empty"
+							description="Explore our targeted supplement stacks and save your favorites here."
+							action={<Button
+								asChild
+								className="h-11 rounded-lg bg-brand-900 px-5 text-white hover:bg-brand-950"
+							>
+								<Link to={APP_ROUTES.SHOP}>
+									Browse Formulas
+									<ArrowRightIcon className="ml-1.5 size-4" />
+								</Link>
+							</Button>} />
 					</div>
 				) : (
 					<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -102,4 +97,4 @@ export const WishlistPage = () => {
 			</div>
 		</div>
 	);
-};
+}

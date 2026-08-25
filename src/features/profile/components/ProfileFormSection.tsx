@@ -8,6 +8,7 @@ import type {
 	UseFormRegister,
 } from "react-hook-form";
 import type { ProfileFormValues } from "@/features/auth/schemas/profileSchema";
+import { APP_COUNTRY } from "@/app/config/constants";
 
 interface ProfileFormSectionProps {
 	userFullName: string;
@@ -32,17 +33,17 @@ export const ProfileFormSection = ({
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 			{/* Personal Information Card */}
-			<div className="rounded-3xl border border-slate-200/60 bg-white p-6 sm:p-8 shadow-xl shadow-slate-900/5 space-y-6">
-				<div className="border-b border-slate-100 pb-5">
+			<div className="rounded-xl border border-brand-900/10 bg-card p-6 sm:p-8 shadow-xl shadow-brand-950/5 space-y-6">
+				<div className="border-b border-brand-900/10 pb-5">
 					<div className="flex items-center gap-3.5">
-						<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100/50">
+						<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-50 text-brand-700 shadow-sm border border-brand-100/50">
 							<UserIcon className="size-5" />
 						</div>
 						<div>
-							<h2 className="font-playfair text-lg font-bold tracking-tight text-slate-900">
+							<h2 className="font-playfair text-lg font-bold tracking-tight text-ink">
 								Personal Information
 							</h2>
-							<p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+							<p className="text-xs sm:text-sm text-ink-soft mt-0.5">
 								Update your contact details and account information.
 							</p>
 						</div>
@@ -51,17 +52,17 @@ export const ProfileFormSection = ({
 
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 					<div className="space-y-2">
-						<label className="text-xs font-semibold text-slate-700 block">
+						<label className="text-xs font-semibold text-ink block">
 							Full Name
 						</label>
 						<Input
 							type="text"
 							disabled={isSaving}
 							{...register("fullName")}
-							className={`h-12 rounded-2xl border bg-slate-50/50 text-sm px-4 transition-all focus-visible:bg-white focus-visible:ring-4 ${
+							className={`h-12 rounded-lg border bg-surface-2/50 text-sm px-4 transition-all focus-visible:bg-card focus-visible:ring-4 ${
 								errors.fullName
 									? "border-rose-300 focus-visible:border-rose-500 focus-visible:ring-rose-500/10"
-									: "border-slate-200 focus-visible:border-emerald-600 focus-visible:ring-emerald-600/10"
+									: "border-brand-900/10 focus-visible:border-brand-600 focus-visible:ring-brand-600/10"
 							}`}
 						/>
 						{errors.fullName && (
@@ -74,10 +75,10 @@ export const ProfileFormSection = ({
 
 					<div className="space-y-2">
 						<div className="flex items-center justify-between">
-							<label className="text-xs font-semibold text-slate-700 block">
+							<label className="text-xs font-semibold text-ink block">
 								Email Address
 							</label>
-							<span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100/80 px-2 py-0.5 rounded-md">
+							<span className="text-[10px] font-bold uppercase tracking-wider text-ink-faint bg-surface-2/80 px-2 py-0.5 rounded-md">
 								Read-only
 							</span>
 						</div>
@@ -85,24 +86,24 @@ export const ProfileFormSection = ({
 							type="email"
 							disabled
 							value={userEmail}
-							className="h-12 rounded-2xl border border-slate-200 bg-slate-100/50 text-slate-500 cursor-not-allowed text-sm px-4"
+							className="h-12 rounded-lg border border-brand-900/10 bg-surface-2/50 text-ink-soft cursor-not-allowed text-sm px-4"
 						/>
 					</div>
 				</div>
 			</div>
 
 			{/* Primary Shipping Address Card */}
-			<div className="rounded-3xl border border-slate-200/60 bg-white p-6 sm:p-8 shadow-xl shadow-slate-900/5 space-y-6">
-				<div className="border-b border-slate-100 pb-5">
+			<div className="rounded-xl border border-brand-900/10 bg-card p-6 sm:p-8 shadow-xl shadow-brand-950/5 space-y-6">
+				<div className="border-b border-brand-900/10 pb-5">
 					<div className="flex items-center gap-3.5">
-						<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100/50">
+						<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-50 text-brand-700 shadow-sm border border-brand-100/50">
 							<MapPin className="size-5" />
 						</div>
 						<div>
-							<h2 className="font-playfair text-lg font-bold tracking-tight text-slate-900">
+							<h2 className="font-playfair text-lg font-bold tracking-tight text-ink">
 								Primary Shipping Address
 							</h2>
-							<p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+							<p className="text-xs sm:text-sm text-ink-soft mt-0.5">
 								This address will be automatically selected during your store
 								checkout.
 							</p>
@@ -112,7 +113,7 @@ export const ProfileFormSection = ({
 
 				<div className="space-y-6">
 					<div className="space-y-2">
-						<label className="text-xs font-semibold text-slate-700 block">
+						<label className="text-xs font-semibold text-ink block">
 							Street Address
 						</label>
 						<Input
@@ -120,13 +121,13 @@ export const ProfileFormSection = ({
 							placeholder="123 Health Ave, Suite 400"
 							disabled={isSaving}
 							{...register("street")}
-							className="h-12 rounded-2xl border border-slate-200 bg-slate-50/50 text-sm px-4 transition-all focus-visible:bg-white focus-visible:border-emerald-600 focus-visible:ring-4 focus-visible:ring-emerald-600/10"
+							className="h-12 rounded-lg border border-brand-900/10 bg-surface-2/50 text-sm px-4 transition-all focus-visible:bg-card focus-visible:border-brand-600 focus-visible:ring-4 focus-visible:ring-brand-600/10"
 						/>
 					</div>
 
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 						<div className="space-y-2">
-							<label className="text-xs font-semibold text-slate-700 block">
+							<label className="text-xs font-semibold text-ink block">
 								City
 							</label>
 							<Input
@@ -134,30 +135,30 @@ export const ProfileFormSection = ({
 								placeholder="Casablanca"
 								disabled={isSaving}
 								{...register("city")}
-								className="h-12 rounded-2xl border border-slate-200 bg-slate-50/50 text-sm px-4 transition-all focus-visible:bg-white focus-visible:border-emerald-600 focus-visible:ring-4 focus-visible:ring-emerald-600/10"
+								className="h-12 rounded-lg border border-brand-900/10 bg-surface-2/50 text-sm px-4 transition-all focus-visible:bg-card focus-visible:border-brand-600 focus-visible:ring-4 focus-visible:ring-brand-600/10"
 							/>
 						</div>
 
 						<div className="space-y-2">
-							<label className="text-xs font-semibold text-slate-700 block">
+							<label className="text-xs font-semibold text-ink block">
 								Country
 							</label>
 							<Input
 								type="text"
-								placeholder="Morocco"
-								disabled={isSaving}
+								placeholder={APP_COUNTRY}
+								disabled
 								{...register("country")}
-								className="h-12 rounded-2xl border border-slate-200 bg-slate-50/50 text-sm px-4 transition-all focus-visible:bg-white focus-visible:border-emerald-600 focus-visible:ring-4 focus-visible:ring-emerald-600/10"
+								className="h-12 rounded-lg border border-brand-900/10 bg-surface-2/50 text-sm px-4 transition-all focus-visible:bg-card focus-visible:border-brand-600 focus-visible:ring-4 focus-visible:ring-brand-600/10 cursor-not-allowed"
 							/>
 						</div>
 					</div>
 
 					<div className="space-y-2">
-						<label className="text-xs font-semibold text-slate-700 block">
+						<label className="text-xs font-semibold text-ink block">
 							Phone Number
 						</label>
 						<div className="flex gap-2.5">
-							<div className="flex h-12 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-xs font-bold text-slate-700 shrink-0 shadow-sm">
+							<div className="flex h-12 items-center gap-2 rounded-lg border border-brand-900/10 bg-surface-2 px-4 text-xs font-bold text-ink shrink-0 shadow-sm">
 								<span>🇲🇦</span>
 								<span>+212</span>
 							</div>
@@ -166,7 +167,7 @@ export const ProfileFormSection = ({
 								placeholder="600-000000"
 								disabled={isSaving}
 								{...register("phone")}
-								className="h-12 rounded-2xl border border-slate-200 bg-slate-50/50 text-sm px-4 transition-all focus-visible:bg-white focus-visible:border-emerald-600 focus-visible:ring-4 focus-visible:ring-emerald-600/10"
+								className="h-12 rounded-lg border border-brand-900/10 bg-surface-2/50 text-sm px-4 transition-all focus-visible:bg-card focus-visible:border-brand-600 focus-visible:ring-4 focus-visible:ring-brand-600/10"
 							/>
 						</div>
 					</div>
@@ -174,25 +175,24 @@ export const ProfileFormSection = ({
 			</div>
 
 			{/* Static Action Footer Card */}
-			<div className="flex items-center justify-between rounded-3xl border border-slate-200/60 bg-white p-6 sm:p-8 shadow-xl shadow-slate-900/5">
-				<div className="text-xs text-slate-500 font-medium hidden sm:block">
+			<div className="flex items-center justify-between rounded-xl border border-brand-900/10 bg-card p-6 sm:p-8 shadow-xl shadow-brand-950/5">
+				<div className="text-xs text-ink-soft font-medium hidden sm:block">
 					{isDirty ? (
 						<span className="text-amber-700 font-semibold flex items-center gap-2">
 							<span className="size-2 rounded-full bg-amber-500 animate-pulse" />
 							You have unsaved changes.
 						</span>
 					) : (
-						<span className="text-slate-400">
+						<span className="text-ink-faint">
 							All changes are saved and synced.
 						</span>
 					)}
 				</div>
 
 				<OriginButton
-					variant="emerald"
 					type="submit"
 					disabled={isSaving || !isDirty}
-					className="h-12 w-full sm:w-auto px-8 rounded-2xl font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-900/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
+					className="h-12 w-full sm:w-auto px-8 rounded-lg font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-900/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
 				>
 					{isSaving ? (
 						<>

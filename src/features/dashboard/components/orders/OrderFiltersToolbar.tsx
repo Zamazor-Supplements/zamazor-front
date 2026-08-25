@@ -9,11 +9,12 @@ import {
 import {
 	ORDER_STATUS_META,
 	OrderStatus,
+	type OrderStatusFilter,
 } from "@/features/orders/constants/orderStatus";
 
 type Filters = {
 	search: string | undefined;
-	status: OrderStatus | undefined;
+	status: OrderStatusFilter;
 };
 
 type Sort =
@@ -66,18 +67,18 @@ export const OrderFiltersToolbar = ({
 		updatePagination({ page: Math.max(0, currentPage - 1) });
 
 	return (
-		<div className="border-b border-slate-200/80 bg-slate-50/50 p-4">
+		<div className="border-b border-brand-900/10 bg-surface-2/50 p-4">
 			<div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
 				{/* Left Section: SearchIcon & Select Inputs */}
 				<div className="flex flex-1 flex-col gap-2.5 sm:flex-row sm:items-center max-w-3xl">
 					{/* SearchIcon Input */}
 					<div className="relative flex-1 min-w-0">
-						<SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+						<SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-faint" />
 						<Input
 							value={filters.search}
 							onChange={(e) => onSearchChange(e.target.value)}
 							placeholder="SearchIcon order ID, address, item..."
-							className="h-10 rounded-xl border-slate-200 bg-white pl-9 text-xs focus-visible:ring-emerald-800"
+							className="h-10 rounded-lg border-brand-900/10 bg-card pl-9 text-xs focus-visible:ring-brand-800"
 						/>
 					</div>
 
@@ -85,7 +86,7 @@ export const OrderFiltersToolbar = ({
 					<select
 						value={filters.status}
 						onChange={(e) => onStatusChange(e.target.value as OrderStatus)}
-						className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-emerald-800"
+						className="h-10 rounded-lg border border-brand-900/10 bg-card px-3 text-xs font-semibold text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
 					>
 						<option value="">All Statuses</option>
 						{Object.entries(ORDER_STATUS_META).map(([key, meta]) => (
@@ -99,7 +100,7 @@ export const OrderFiltersToolbar = ({
 					<select
 						value={pagination.sort}
 						onChange={(e) => onSortChange(e.target.value as Sort)}
-						className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 outline-none focus-visible:ring-2 focus-visible:ring-emerald-800"
+						className="h-10 rounded-lg border border-brand-900/10 bg-card px-3 text-xs font-semibold text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
 					>
 						<option value="createdAt,desc">Newest first</option>
 						<option value="createdAt,asc">Oldest first</option>
@@ -113,7 +114,7 @@ export const OrderFiltersToolbar = ({
 						<Button
 							variant="outline"
 							onClick={onResetFilters}
-							className="h-10 shrink-0 rounded-xl border border-dashed border-rose-200 bg-rose-50/30 px-3 text-xs font-semibold text-rose-600 transition-all duration-150 hover:bg-rose-50 hover:text-rose-700"
+							className="h-10 shrink-0 rounded-lg border border-dashed border-rose-200 bg-rose-50/30 px-3 text-xs font-semibold text-rose-600 transition-all duration-150 hover:bg-rose-50 hover:text-rose-700"
 						>
 							Reset
 							<XIcon className="ml-1.5 size-3.5" />
@@ -123,15 +124,15 @@ export const OrderFiltersToolbar = ({
 
 				{/* Right Section: Pagination Summary & Quick Controls */}
 				<div className="flex items-center gap-2">
-					<div className="rounded-xl border border-slate-200/60 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
+					<div className="rounded-lg border border-brand-900/10 bg-card px-3 py-2 text-xs font-semibold text-ink">
 						{totalElements === 0 ? (
 							"No orders"
 						) : (
 							<>
 								Showing{" "}
-								<span className="font-bold text-slate-900">{start}</span>–
-								<span className="font-bold text-slate-900">{end}</span> of{" "}
-								<span className="font-bold text-slate-900">
+								<span className="font-bold text-ink">{start}</span>–
+								<span className="font-bold text-ink">{end}</span> of{" "}
+								<span className="font-bold text-ink">
 									{totalElements}
 								</span>
 							</>
@@ -139,19 +140,19 @@ export const OrderFiltersToolbar = ({
 					</div>
 
 					{totalPages > 1 && (
-						<div className="flex items-center gap-1 rounded-xl border border-slate-200/60 bg-white p-1 select-none">
+						<div className="flex items-center gap-1 rounded-lg border border-brand-900/10 bg-card p-1 select-none">
 							<Button
 								variant="outline"
 								size="icon"
 								disabled={currentPage === 0}
 								onClick={previousPage}
-								className="h-8 w-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+								className="h-8 w-8 rounded-lg border-brand-900/10 text-ink-soft hover:bg-surface-2 disabled:opacity-40"
 								title="Previous page"
 							>
 								<ChevronLeftIcon className="size-4" />
 							</Button>
 
-							<span className="min-w-16 px-1.5 text-center text-xs font-semibold text-slate-700">
+							<span className="min-w-16 px-1.5 text-center text-xs font-semibold text-ink">
 								{currentPage + 1} / {totalPages}
 							</span>
 
@@ -160,7 +161,7 @@ export const OrderFiltersToolbar = ({
 								size="icon"
 								disabled={currentPage >= totalPages - 1}
 								onClick={nextPage}
-								className="h-8 w-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+								className="h-8 w-8 rounded-lg border-brand-900/10 text-ink-soft hover:bg-surface-2 disabled:opacity-40"
 								title="Next page"
 							>
 								<ChevronRightIcon className="size-4" />

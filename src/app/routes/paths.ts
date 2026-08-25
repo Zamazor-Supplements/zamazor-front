@@ -1,16 +1,56 @@
-type AutoComplete<T extends string> = T | (string & {});
+// type AutoComplete<T extends string> = T | (string & {});
+
+type PathParams<TPath extends string> =
+	TPath extends `${string}:${infer Param}/${infer Rest}`
+		? { [K in Param | keyof PathParams<`/${Rest}`>]: string }
+		: TPath extends `${string}:${infer Param}`
+			? { [K in Param]: string }
+			: Record<never, never>;
+
+
+type ReplaceParams<
+	TPath extends string,
+	TParams extends Record<string, string>,
+> = TPath extends `${infer Start}:${infer Param}/${infer Rest}`
+	? Param extends keyof TParams
+		? `${Start}${TParams[Param]}/${ReplaceParams<`/${Rest}`, TParams> extends `/${infer R}` ? R : never}`
+		: TPath
+	: TPath extends `${infer Start}:${infer Param}`
+		? Param extends keyof TParams
+			? `${Start}${TParams[Param]}`
+			: TPath
+		: TPath;
+
+type Route<TPath extends string> = {
+	(): TPath;
+	<TParams extends PathParams<TPath>>(
+		params: TParams,
+	): ReplaceParams<TPath, TParams>;
+};
+
+const createRoute = <const TPath extends string>(
+	path: TPath,
+): Route<TPath> => {
+	const route = (params?: Record<string, string>) =>
+		params
+			? path.replace(
+					/:([a-zA-Z0-9_]+)/g,
+					(_, key: string) => params[key] ?? `:${key}`,
+				)
+			: path;
+
+	return route as Route<TPath>;
+};
 
 export const APP_ROUTES = {
 	HOME: "/",
-	PRODUCT: (id: AutoComplete<":id">) => `/product/${id}`,
+	PRODUCT: createRoute("/product/:id"),
 	SHOP: "/shop",
 	CART: "/cart",
 	CHECKOUT: {
 		ROOT: "/checkout",
-		SUCCESS: (orderId: AutoComplete<":orderId">) =>
-			`/checkout/orders/${orderId}/success`,
-		CANCEL: (orderId: AutoComplete<":orderId">) =>
-			`/checkout/orders/${orderId}/cancel`,
+		SUCCESS: createRoute("/checkout/orders/:orderId/success"),
+		CANCEL: createRoute("/checkout/orders/:orderId/cancel"),
 	},
 	DASHBOARD: {
 		ROOT: "/dashboard",

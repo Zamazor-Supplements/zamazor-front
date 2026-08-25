@@ -89,10 +89,6 @@ export function useDeleteProduct() {
 			queryClient.removeQueries({
 				queryKey: productKeys.detail(id),
 			});
-
-			queryClient.invalidateQueries({
-				queryKey: productKeys.lists(),
-			});
 		},
 		onError: (error, productId, context) => {
 			if (error.status < 400 && error.status !== 0) return; // request processed

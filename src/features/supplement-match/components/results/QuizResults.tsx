@@ -1,7 +1,7 @@
 import type { Product } from "@/features/products/schemas/productSchema";
 import type { QuizFocus } from "../../types/quiz";
 import { Button } from "@/shared/components/ui/button";
-import { formatCurrency } from "@/shared/utils/price";
+import { formatPrice } from "@/shared/utils/price";
 import { ShoppingBagIcon } from "lucide-react";
 import { APP_ROUTES } from "@/app/routes/paths";
 
@@ -38,15 +38,15 @@ export const QuizResults = ({
 	return (
 		<div className="space-y-6">
 			<div>
-				<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">
+				<span className="text-[10px] font-black uppercase text-brand-800 tracking-wider">
 					Your Recommendation
 				</span>
 				<h3 className="text-xl font-playfair text-slate-950 font-normal mt-1">
 					Here is your personalized clean formula match:
 				</h3>
 			</div>
-			<div className="flex flex-col md:flex-row gap-6 p-4 sm:p-6 bg-white rounded-2xl border border-emerald-900/10 shadow-md">
-				<div className="size-28 sm:size-36 shrink-0 bg-slate-50 border border-slate-100 rounded-xl p-2 flex items-center justify-center mx-auto md:mx-0">
+			<div className="flex flex-col md:flex-row gap-6 p-4 sm:p-6 bg-white rounded-2xl border border-brand-900/10 shadow-md">
+				<div className="size-28 sm:size-36 shrink-0 bg-slate-50 border border-slate-100 rounded-lg p-2 flex items-center justify-center mx-auto md:mx-0">
 					<img
 						src={recommended.imageUrl}
 						alt={recommended.name}
@@ -55,7 +55,7 @@ export const QuizResults = ({
 				</div>
 				<div className="flex-1 text-center md:text-left flex flex-col justify-between">
 					<div>
-						<span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider bg-emerald-50 border border-emerald-900/5 px-2.5 py-0.5 rounded-full inline-block">
+						<span className="text-[10px] font-black uppercase text-brand-800 tracking-wider bg-brand-50 border border-brand-900/5 px-2.5 py-0.5 rounded-full inline-block">
 							{recommended.category.label}
 						</span>
 						<h4 className="text-xl font-playfair font-bold text-slate-950 mt-1.5">
@@ -63,27 +63,27 @@ export const QuizResults = ({
 						</h4>
 						<p className="text-xs text-slate-500 mt-2 leading-relaxed">
 							Based on your wellness goals for{" "}
-							<strong className="text-emerald-950">{quizFocus}</strong> and
+							<strong className="text-brand-950">{quizFocus}</strong> and
 							active schedule, this premium clean formula delivers bioavailable
 							nourishment with zero synthetics.
 						</p>
 					</div>
 					<div className="mt-4 flex items-center justify-between flex-wrap gap-2 border-t border-slate-100 pt-3">
 						<span className="text-lg font-black text-slate-900">
-							{formatCurrency(recommended.price)}
+							{formatPrice(recommended.price)}
 						</span>
 						<div className="flex gap-2 w-full sm:w-auto">
 							<Button
 								onClick={() => onAddToCart(recommended)}
-								className="flex-1 sm:flex-initial h-10 px-5 bg-emerald-900 hover:bg-emerald-950 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer"
+								className="flex-1 sm:flex-initial h-10 px-5 bg-brand-900 hover:bg-brand-950 text-white rounded-lg font-bold flex items-center gap-1.5 cursor-pointer"
 							>
 								<ShoppingBagIcon className="size-3.5" />
 								Add to Cart
 							</Button>
 							<Button
 								variant="outline"
-								onClick={() => onNavigate(APP_ROUTES.PRODUCT(recommended.id))}
-								className="h-10 px-4 rounded-xl border-emerald-900/15 text-emerald-800 hover:bg-emerald-50 cursor-pointer"
+								onClick={() => onNavigate(APP_ROUTES.PRODUCT({ id: recommended.id }))}
+								className="h-10 px-4 rounded-lg border-brand-900/15 text-brand-800 hover:bg-brand-50 cursor-pointer"
 							>
 								Details
 							</Button>
@@ -95,7 +95,7 @@ export const QuizResults = ({
 				<Button
 					variant="ghost"
 					onClick={onReset}
-					className="text-slate-500 hover:bg-slate-50 rounded-xl cursor-pointer text-xs font-bold uppercase tracking-wider"
+					className="text-slate-500 hover:bg-slate-50 rounded-lg cursor-pointer text-xs font-bold uppercase tracking-wider"
 				>
 					Retake Quiz
 				</Button>

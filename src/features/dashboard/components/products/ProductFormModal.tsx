@@ -14,13 +14,7 @@ import {
 	type CreateProductOutput,
 	type Product,
 } from "@/features/products/schemas/productSchema";
-import {
-	AlertCircleIcon,
-	Loader2Icon,
-	CheckIcon,
-	UploadCloudIcon,
-	XIcon,
-} from "lucide-react";
+import { AlertCircleIcon, Loader2Icon, CheckIcon, XIcon } from "lucide-react";
 
 interface ProductFormModalProps {
 	isOpen: boolean;
@@ -98,15 +92,6 @@ export const ProductFormModal = ({
 		});
 	};
 
-	// const handleRemoveImage = (e: React.MouseEvent) => {
-	//   e.stopPropagation();
-	//   if (previewUrl?.startsWith("blob:")) {
-	//     URL.revokeObjectURL(previewUrl);
-	//   }
-	//   setPreviewUrl(null);
-	//   setValue("image", undefined, { shouldDirty: true, shouldValidate: true });
-	// };
-
 	const handleCreateCategory = async (values: CreateCategoryFormValues) => {
 		setCategoryError("");
 		setCategorySuccess(false);
@@ -128,15 +113,15 @@ export const ProductFormModal = ({
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-			<div className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xl sm:p-8 animate-in zoom-in-95 duration-200">
+		<div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-950/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+			<div className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-brand-900/10 bg-card p-6 shadow-2xl sm:p-8 animate-in zoom-in-95 duration-200">
 				{/* Header */}
-				<div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+				<div className="flex items-center justify-between border-b border-brand-900/10 pb-4 mb-6">
 					<div>
-						<h3 className="text-xl font-bold text-slate-900">
+						<h3 className="text-xl font-bold text-ink">
 							{isEditing ? "Edit Product" : "New Supplement Product"}
 						</h3>
-						<p className="text-xs text-slate-500 mt-0.5">
+						<p className="text-xs text-ink-soft mt-0.5">
 							{isEditing
 								? "Update inventory records and pricing details."
 								: "Fill out the information below to register a new product."}
@@ -146,7 +131,7 @@ export const ProductFormModal = ({
 						type="button"
 						onClick={handleClose}
 						disabled={isSubmitting}
-						className="flex size-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-700 disabled:opacity-50"
+						className="flex size-8 items-center justify-center rounded-full bg-surface-2 text-ink-faint transition-colors hover:bg-surface-2 hover:text-ink disabled:opacity-50"
 					>
 						<XIcon className="size-4" />
 					</button>
@@ -162,13 +147,13 @@ export const ProductFormModal = ({
 						{/* Title & Category Row */}
 						<div className="grid gap-4 sm:grid-cols-2">
 							<div className="space-y-1.5">
-								<label className="text-xs font-semibold text-slate-700">
+								<label className="text-xs font-semibold text-ink">
 									Product Name <span className="text-rose-500">*</span>
 								</label>
 								<Input
 									{...register("name")}
 									placeholder="e.g. Organic Greens Powder"
-									className={`rounded-xl border-slate-200 focus-visible:ring-emerald-700 ${
+									className={`rounded-lg border-brand-900/10 focus-visible:ring-brand-700 ${
 										errors.name
 											? "border-rose-500 focus-visible:ring-rose-500"
 											: ""
@@ -184,20 +169,20 @@ export const ProductFormModal = ({
 
 							<div className="space-y-1.5">
 								<div className="flex items-center justify-between">
-									<label className="text-xs font-semibold text-slate-700">
+									<label className="text-xs font-semibold text-ink">
 										Category <span className="text-rose-500">*</span>
 									</label>
 									<button
 										type="button"
 										onClick={() => setShowAddCategory(!showAddCategory)}
-										className="text-[11px] font-semibold text-emerald-700 hover:underline"
+										className="text-[11px] font-semibold text-brand-700 hover:underline"
 									>
 										{showAddCategory ? "Cancel" : "+ New Category"}
 									</button>
 								</div>
 								<select
 									{...register("categoryId")}
-									className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700"
+									className="flex h-10 w-full rounded-lg border border-brand-900/10 bg-card px-3 py-2 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
 								>
 									{categories.map((cat) => (
 										<option key={cat.id} value={cat.id}>
@@ -216,15 +201,15 @@ export const ProductFormModal = ({
 
 						{/* Collapsible Add Category Panel */}
 						{showAddCategory && (
-							<div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-3.5 space-y-2 animate-in fade-in duration-150">
-								<p className="text-xs font-semibold text-emerald-900">
+							<div className="rounded-2xl border border-brand-100 bg-brand-50/50 p-3.5 space-y-2 animate-in fade-in duration-150">
+								<p className="text-xs font-semibold text-brand-900">
 									Add New Category
 								</p>
 								<div className="flex gap-2">
 									<Input
 										{...createCategoryForm.register("label")}
 										placeholder="e.g. Immune Support"
-										className="rounded-xl border-slate-200 bg-white focus-visible:ring-emerald-700"
+										className="rounded-lg border-brand-900/10 bg-card focus-visible:ring-brand-700"
 									/>
 									<Button
 										type="button"
@@ -232,12 +217,12 @@ export const ProductFormModal = ({
 											handleCreateCategory,
 										)}
 										disabled={isCreatingCategory}
-										className="h-10 rounded-xl bg-emerald-800 px-4 text-xs font-semibold text-white hover:bg-emerald-900 shrink-0"
+										className="h-10 shrink-0 px-4 text-xs font-semibold"
 									>
 										{isCreatingCategory ? (
 											<Loader2Icon className="size-4 animate-spin" />
 										) : categorySuccess ? (
-											<CheckIcon className="size-4 text-emerald-200" />
+											<CheckIcon className="size-4 text-brand-200" />
 										) : (
 											"Add"
 										)}
@@ -259,7 +244,7 @@ export const ProductFormModal = ({
 						{/* Price & Stock Row */}
 						<div className="grid gap-4 sm:grid-cols-2">
 							<div className="space-y-1.5">
-								<label className="text-xs font-semibold text-slate-700">
+								<label className="text-xs font-semibold text-ink">
 									Price (MAD) <span className="text-rose-500">*</span>
 								</label>
 								<Input
@@ -267,7 +252,7 @@ export const ProductFormModal = ({
 									step="0.01"
 									{...register("price", { valueAsNumber: true })}
 									placeholder="e.g. 299.00"
-									className={`rounded-xl border-slate-200 focus-visible:ring-emerald-700 ${
+									className={`rounded-lg border-brand-900/10 focus-visible:ring-brand-700 ${
 										errors.price
 											? "border-rose-500 focus-visible:ring-rose-500"
 											: ""
@@ -282,14 +267,14 @@ export const ProductFormModal = ({
 							</div>
 
 							<div className="space-y-1.5">
-								<label className="text-xs font-semibold text-slate-700">
+								<label className="text-xs font-semibold text-ink">
 									Stock Quantity
 								</label>
 								<Input
 									type="number"
 									{...register("stockQuantity", { valueAsNumber: true })}
 									placeholder="e.g. 100"
-									className={`rounded-xl border-slate-200 focus-visible:ring-emerald-700 ${
+									className={`rounded-lg border-brand-900/10 focus-visible:ring-brand-700 ${
 										errors.stockQuantity
 											? "border-rose-500 focus-visible:ring-rose-500"
 											: ""
@@ -306,62 +291,50 @@ export const ProductFormModal = ({
 
 						{/* Description */}
 						<div className="space-y-1.5">
-							<label className="text-xs font-semibold text-slate-700">
+							<label className="text-xs font-semibold text-ink">
 								Description / Formula Notes
 							</label>
 							<textarea
 								{...register("description")}
 								placeholder="Describe product dosage, key ingredients, and target benefits..."
 								rows={3}
-								className="flex min-h-20 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700"
+								className="flex min-h-20 w-full rounded-lg border border-brand-900/10 bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700"
 							/>
 						</div>
 
 						{/* Thumbnail Upload */}
 						<div className="space-y-2">
-							<label className="text-xs font-semibold text-slate-700">
+							<label className="text-xs font-semibold text-ink">
 								Product Image
 							</label>
 							<div
 								className={`group relative flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-4 text-center transition-all ${
 									errors.image
 										? "border-rose-400 bg-rose-50/30 hover:border-rose-500"
-										: "border-slate-200 bg-slate-50/50 hover:border-emerald-700/60 hover:bg-emerald-50/20"
+										: "border-brand-900/10 bg-surface-2/50 hover:border-brand-700/60 hover:bg-brand-50/20"
 								}`}
 							>
 								{(previewUrl ?? editingProduct?.imageUrl) ? (
 									<div className="relative flex flex-col items-center gap-2">
-										<div className="relative size-20 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-sm transition-transform duration-200 group-hover:scale-105">
+										<div className="relative size-20 overflow-hidden rounded-lg border border-brand-900/10 bg-card p-1 shadow-sm transition-transform duration-200 group-hover:scale-105">
 											<img
 												src={previewUrl ?? editingProduct?.imageUrl}
 												alt="Preview"
 												className="h-full w-full object-contain"
 											/>
 										</div>
-										{/* <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-slate-900/80 text-white shadow hover:bg-rose-600"
-                    >
-                      <XIcon className="size-3.5" />
-                    </button> */}
-										<span className="text-[11px] font-semibold text-slate-500 group-hover:text-emerald-800">
+										<span className="text-[11px] font-semibold text-ink-soft group-hover:text-brand-800">
 											Click or drag to replace image
 										</span>
 									</div>
 								) : (
-									<div className="flex flex-col items-center gap-1.5">
-										<div className="rounded-full bg-emerald-100/60 p-2.5 text-emerald-800 group-hover:scale-110 transition-transform">
-											<UploadCloudIcon className="size-5" />
-										</div>
-										<div>
-											<span className="block text-xs font-semibold text-slate-700">
-												Upload Product Thumbnail
-											</span>
-											<span className="block text-[10px] text-slate-400 mt-0.5">
-												PNG, JPG, or WEBP up to 5MB
-											</span>
-										</div>
+									<div>
+										<span className="block text-xs font-semibold text-ink">
+											Upload Product Thumbnail
+										</span>
+										<span className="block text-[10px] text-ink-faint mt-0.5">
+											PNG, JPG, or WEBP up to 5MB
+										</span>
 									</div>
 								)}
 								<input
@@ -381,20 +354,20 @@ export const ProductFormModal = ({
 					</fieldset>
 
 					{/* Footer Actions */}
-					<div className="mt-6 flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
+					<div className="mt-6 flex items-center justify-end gap-3 border-t border-brand-900/10 pt-4">
 						<Button
 							type="button"
 							variant="outline"
 							onClick={handleClose}
 							disabled={isSubmitting}
-							className="h-10 rounded-xl border-slate-200 px-5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+							className="h-10 rounded-lg border-brand-900/10 px-5 text-xs font-semibold text-ink hover:bg-surface-2"
 						>
 							Cancel
 						</Button>
 						<Button
 							type="submit"
 							disabled={isSubmitting}
-							className="flex h-10 items-center gap-2 rounded-xl bg-emerald-800 px-6 text-xs font-bold text-white shadow-sm hover:bg-emerald-900 active:scale-95 disabled:opacity-60"
+							className="h-10 gap-2 px-6 text-xs font-bold"
 						>
 							{isSubmitting ? (
 								<>

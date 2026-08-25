@@ -22,7 +22,7 @@ export const OrderStatusSelect = ({
 			value={currentStatus}
 			disabled={isUpdating || !canChangeStatus}
 			onChange={(e) => onStatusChange(orderId, e.target.value as OrderStatus)}
-			className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-600 outline-none transition-colors hover:border-emerald-200 focus-visible:ring-2 focus-visible:ring-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+			className="h-8 rounded-lg border border-brand-900/10 bg-card px-2 text-[10px] font-semibold uppercase tracking-wider text-ink-soft outline-none transition-colors hover:border-brand-200 focus-visible:ring-2 focus-visible:ring-brand-800 disabled:cursor-not-allowed disabled:opacity-50"
 			title="Change order status"
 		>
 			{Object.entries(ORDER_STATUS_META).map(([status, meta]) => (

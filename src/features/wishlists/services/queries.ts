@@ -1,6 +1,6 @@
 import { useIsAuthenticated } from "@/features/auth/services/queries";
 import { useGuestWishlistStore } from "../stores/guestWishlistStore";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { wishlistKeys } from "./keys";
 import { getWishlist } from "./api";
 import { useBulkProducts } from "@/features/products/services/product/queries";
@@ -25,6 +25,7 @@ function useGuestWishlist(authenticated: boolean) {
 
 	const query = useBulkProducts(ids, {
 		enabled: !authenticated && hydrated && ids.length > 0,
+		placeholderData: keepPreviousData,
 	});
 
 	if (!hydrated) {

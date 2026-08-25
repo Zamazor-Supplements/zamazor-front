@@ -3,9 +3,12 @@ import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/app/config/constants";
 import { Button } from "@/shared/components/ui/button";
 import { ConfirmDialog } from "@/shared/components/ui/confirm-dialog";
-import { RefreshCwIcon } from "lucide-react";
+import { RotateCwIcon } from "lucide-react";
 import type { Order } from "@/features/orders/schemas/orderSchema";
-import type { OrderStatus } from "@/features/orders/constants/orderStatus";
+import {
+	OrderStatus,
+	type OrderStatusFilter,
+} from "@/features/orders/constants/orderStatus";
 
 import { OrderAnalyticsCards } from "../components/orders/OrderAnalyticsCards";
 import { OrderFiltersToolbar } from "../components/orders/OrderFiltersToolbar";
@@ -16,25 +19,23 @@ import {
 	useChangeOrderStatus,
 } from "@/features/orders/services/mutations";
 import { useOrders } from "@/features/orders/services/queries";
+import {
+	DASHBOARD_ORDER_PAGE_SIZE,
+	useDashboardOrderFilters,
+	type DashboardOrderSort,
+} from "../hooks/use-dashboard-order-filters";
 import { OrderPageSkeleton } from "../components/orders/OrdersPageSkeleton";
-
-const ORDERS_PER_PAGE = 6;
+import { PageHeader } from "../components/shared/PageHeader";
 
 type Filters = {
 	search: string | undefined;
-	status: OrderStatus | undefined;
+	status: OrderStatusFilter;
 };
 
-type Sort =
-	| "createdAt,desc"
-	| "createdAt,asc"
-	| "total,desc"
-	| "total,asc"
-	| "status,asc";
 type Pagination = {
 	page: number;
 	size: number;
-	sort: Sort;
+	sort: DashboardOrderSort;
 };
 
 type ConfirmState = {
@@ -46,17 +47,6 @@ type ConfirmState = {
 	confirmText: string;
 };
 
-const DEFAULT_FILTERS: Filters = {
-	search: undefined,
-	status: undefined,
-};
-
-const DEFAULT_PAGINATION: Pagination = {
-	page: 0,
-	size: ORDERS_PER_PAGE,
-	sort: "createdAt,desc",
-};
-
 const DEFAULT_CONFIRM: ConfirmState = {
 	open: false,
 	title: "",
@@ -66,12 +56,12 @@ const DEFAULT_CONFIRM: ConfirmState = {
 	confirmText: "Continue",
 };
 
-export const OrdersPage = () => {
+export default function OrdersPage() {
 	useDocumentTitle(`Orders Management | ${CONFIG.APP_NAME}`);
 
 	// Grouped states
-	const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-	const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
+	const { filters, updateFilters, setPage, resetFilters, isFilterActive } =
+		useDashboardOrderFilters();
 	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 	const [updatingStatusOrderId, setUpdatingStatusOrderId] = useState<
 		string | null
@@ -91,34 +81,19 @@ export const OrdersPage = () => {
 	} = useOrders({
 		status: filters.status,
 		userFullName: filters.search?.trim(),
-		page: pagination.page,
-		size: pagination.size,
-		sort: pagination.sort,
+		page: filters.page,
+		size: DASHBOARD_ORDER_PAGE_SIZE,
+		sort: filters.sort,
 	});
 
-	// Helper functions
-	const updateFilters = (next: Partial<Filters>) => {
-		setFilters((prev) => ({ ...prev, ...next }));
-		setPagination((prev) => ({ ...prev, page: 0 }));
+	// Helper functions — filter and sort changes both snap back to page 0.
+	const handleFilterChange = (next: Partial<Filters>) => {
+		updateFilters({ ...next, page: 0 });
 	};
 
-	const updatePagination = (next: Partial<Pagination>) => {
-		setPagination((prev) => ({ ...prev, page: 0, ...next }));
+	const handlePaginationChange = (next: Partial<Pagination>) => {
+		updateFilters({ ...next, page: next.page ?? 0 });
 	};
-
-	const setPage = (page: number) => {
-		setPagination((prev) => ({ ...prev, page }));
-	};
-
-	const resetFilters = () => {
-		setFilters(DEFAULT_FILTERS);
-		setPagination(DEFAULT_PAGINATION);
-	};
-
-	const isFilterActive =
-		!!filters.search ||
-		!!filters.status ||
-		pagination.sort !== DEFAULT_PAGINATION.sort;
 
 	const openConfirm = ({
 		title,
@@ -169,22 +144,31 @@ export const OrdersPage = () => {
 		[changeOrderStatusMutation, orderPage?.items],
 	);
 
-	const handleCancelOrder = (orderId: string) => {
+	const handleRefundOrder = (orderId: string) => {
 		const order = orderPage?.items.find((o) => o.id === orderId);
 		const orderLabel = order
 			? `#${order.id.slice(0, 8).toUpperCase()}`
 			: "this order";
 
 		openConfirm({
-			title: "Cancel Order",
-			description: `Are you sure you want to cancel order ${orderLabel}? This action is permanent.`,
-			action: async () => {
-				const response = await cancelOrderMutation.mutateAsync(orderId);
-				setSelectedOrder(response);
-				closeConfirm();
+			title: "Refund Order",
+			description: `Are you sure you want to refund order ${orderLabel}? This action is permanent.`,
+			action: () => {
+				changeOrderStatusMutation.mutate(
+					{ orderId, status: OrderStatus.Refunded },
+					{
+						onSuccess: (response) => {
+							setSelectedOrder(response);
+							closeConfirm();
+						},
+						onError: (error) => {
+							console.error("Failed to refund order:", error);
+						},
+					},
+				);
 			},
 			destructive: true,
-			confirmText: "Cancel Order",
+			confirmText: "Refund Order",
 		});
 	};
 
@@ -195,47 +179,45 @@ export const OrdersPage = () => {
 	return (
 		<div className="space-y-6">
 			{/* Header */}
-			<div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-				<div className="space-y-1">
-					<p className="text-[11px] font-extrabold uppercase tracking-widest text-emerald-800">
-						Orders
-					</p>
-					<h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-						Order list
-					</h2>
-					<p className="max-w-2xl text-xs sm:text-sm text-slate-500">
-						Filter, sort, and review checkout activity.
-					</p>
-				</div>
-				<div className="flex flex-wrap items-center gap-2">
-					<Button
-						variant="outline"
-						onClick={() => refetch()}
-						disabled={isFetching}
-						className="h-10 rounded-xl border-slate-200 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-					>
-						<RefreshCwIcon
-							className={`mr-1.5 size-3.5 ${isFetching ? "animate-spin text-emerald-800" : ""}`}
-						/>
-						Refresh
-					</Button>
-				</div>
-			</div>
+			<PageHeader
+				eyebrow="Orders"
+				title="Order list"
+				description="Filter, sort, and review checkout activity."
+			>
+				<Button
+					variant="outline"
+					onClick={() => refetch()}
+					disabled={isFetching}
+					className="h-10 rounded-lg border-brand-900/10 text-xs font-semibold text-ink transition-colors hover:bg-surface-2"
+				>
+					<RotateCwIcon
+						className={`mr-1.5 size-3.5 ${isFetching ? "animate-spin text-brand-800" : ""}`}
+					/>
+					Refresh
+				</Button>
+			</PageHeader>
 
 			{/* Analytics Cards */}
 			{orderPage && <OrderAnalyticsCards orderPage={orderPage} />}
 
 			{/* Table Container */}
-			<div className="relative rounded-3xl border border-slate-200/80 bg-white shadow-xs overflow-hidden">
+			<div className="relative overflow-hidden rounded-lg border border-brand-900/10 bg-card shadow-xs">
 				{/* Filters Toolbar */}
 				<OrderFiltersToolbar
-					filters={filters}
-					pagination={pagination}
+					filters={{
+						search: filters.search,
+						status: filters.status,
+					}}
+					pagination={{
+						page: filters.page,
+						sort: filters.sort,
+						size: DASHBOARD_ORDER_PAGE_SIZE,
+					}}
 					totalElements={orderPage?.totalElements ?? 0}
 					totalPages={orderPage?.totalPages ?? 0}
 					isFilterActive={isFilterActive}
-					updateFilters={updateFilters}
-					updatePagination={updatePagination}
+					updateFilters={handleFilterChange}
+					updatePagination={handlePaginationChange}
 					onResetFilters={resetFilters}
 				/>
 
@@ -247,7 +229,7 @@ export const OrdersPage = () => {
 						updatingStatusOrderId={updatingStatusOrderId}
 						onViewOrder={setSelectedOrder}
 						onChangeStatus={handleChangeOrderStatus}
-						onCancelOrder={handleCancelOrder}
+						onRefundOrder={handleRefundOrder}
 						onPageChange={setPage}
 					/>
 				)}
@@ -260,7 +242,7 @@ export const OrdersPage = () => {
 					updatingStatusOrderId={updatingStatusOrderId}
 					onClose={() => setSelectedOrder(null)}
 					onChangeStatus={handleChangeOrderStatus}
-					onCancelOrder={handleCancelOrder}
+					onRefundOrder={handleRefundOrder}
 				/>
 			)}
 
@@ -281,4 +263,4 @@ export const OrdersPage = () => {
 			/>
 		</div>
 	);
-};
+}

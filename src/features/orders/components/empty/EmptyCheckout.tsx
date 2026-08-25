@@ -1,24 +1,28 @@
 import { APP_ROUTES } from "@/app/routes/paths";
-import { Button } from "@/shared/components/ui/button";
+import { OriginButton } from "@/shared/components/ui/origin-button";
 import { ShoppingBagIcon } from "lucide-react";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 
 export const EmptyCheckout = () => {
+	const navigate = useNavigate();
+
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-[#fcfdfa] p-4 text-center">
-			<ShoppingBagIcon className="size-16 text-emerald-900/25 mb-4" />
-			<h1 className="text-3xl font-playfair text-slate-900">
-				Your checkout is empty
-			</h1>
-			<p className="mt-2 text-slate-500">
-				There are no items in your cart to checkout.
+		<div className="min-h-screen bg-[#fcfdfa] flex flex-col items-center justify-center p-6 text-center">
+			<div className="grid size-16 place-items-center rounded-full bg-brand-50 text-brand-500 shadow-inner mb-4">
+				<ShoppingBagIcon className="size-7" />
+			</div>
+			<h2 className="font-playfair text-xl font-bold text-slate-900 mb-1">
+				Your cart is empty
+			</h2>
+			<p className="text-sm text-slate-500 max-w-xs mb-6">
+				Add items to your cart before proceeding to checkout.
 			</p>
-			<Button
-				asChild
-				className="mt-6 bg-emerald-900 hover:bg-emerald-950 text-white rounded-xl"
+			<OriginButton
+				onClick={() => navigate(APP_ROUTES.SHOP)}
+				className="w-full max-w-xs h-11 rounded-lg font-bold"
 			>
-				<Link to={APP_ROUTES.SHOP}>Browse formulas</Link>
-			</Button>
+				Explore Shop
+			</OriginButton>
 		</div>
 	);
 };

@@ -17,8 +17,6 @@ import { useState } from "react";
 import CONFIG from "@/app/config/constants";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 
-// --- Accessibility Standards & Measures ---
-
 const ACCESSIBILITY_FEATURES = [
 	{
 		icon: KeyboardIcon,
@@ -67,18 +65,16 @@ const ACCESSIBILITY_FAQS = [
 	},
 ];
 
-// --- Main Accessibility Page Component ---
-
-export const AccessibilityPage = () => {
+export default function AccessibilityPage() {
 	const [openFaqId, setOpenFaqId] = useState<string | null>("standard");
 
 	useDocumentTitle(`Accessibility Statement | ${CONFIG.APP_NAME}`);
 
 	return (
-		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-emerald-100">
+		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-brand-100">
 			<div className="mx-auto max-w-7xl space-y-12">
 				{/* --- Hero Header --- */}
-				<div className="relative overflow-hidden rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-950 via-emerald-900 to-slate-950 p-8 sm:p-14 text-white shadow-xl shadow-emerald-950/10">
+				<div className="relative overflow-hidden rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-950 via-brand-900 to-slate-950 p-8 sm:p-14 text-white shadow-xl shadow-brand-950/10">
 					<div className="relative z-10 max-w-3xl">
 						<p className="text-[11px] font-black uppercase tracking-[0.26em] text-lime-300">
 							Inclusive Design
@@ -86,7 +82,7 @@ export const AccessibilityPage = () => {
 						<h1 className="mt-3 text-3xl sm:text-5xl font-playfair font-normal leading-tight">
 							Accessibility Statement
 						</h1>
-						<p className="mt-4 text-sm sm:text-base leading-relaxed text-emerald-100/80">
+						<p className="mt-4 text-sm sm:text-base leading-relaxed text-brand-100/80">
 							At ZAMAZOR, we are committed to making our digital experience
 							accessible to everyone, regardless of ability or technology. Last
 							updated: July 2026.
@@ -104,9 +100,9 @@ export const AccessibilityPage = () => {
 						return (
 							<div
 								key={feature.title}
-								className="rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs"
+								className="rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs"
 							>
-								<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+								<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 									<Icon className="size-6" />
 								</div>
 								<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -121,9 +117,9 @@ export const AccessibilityPage = () => {
 				</div>
 
 				{/* --- Our Commitment Details --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
 					<div>
-						<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+						<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 							Standards
 						</p>
 						<h2 className="text-2xl font-playfair font-normal text-slate-950 mt-1">
@@ -143,7 +139,7 @@ export const AccessibilityPage = () => {
 					<div className="grid gap-4 md:grid-cols-2 pt-2">
 						<div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-5 space-y-2">
 							<div className="flex items-center gap-2 font-bold text-slate-950 text-sm">
-								<CheckCircle2Icon className="size-4 text-emerald-800 shrink-0" />
+								<CheckCircle2Icon className="size-4 text-brand-800 shrink-0" />
 								<span>Semantic Markup & ARIA Labels</span>
 							</div>
 							<p className="text-xs text-slate-600 leading-relaxed">
@@ -155,7 +151,7 @@ export const AccessibilityPage = () => {
 
 						<div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-5 space-y-2">
 							<div className="flex items-center gap-2 font-bold text-slate-950 text-sm">
-								<CheckCircle2Icon className="size-4 text-emerald-800 shrink-0" />
+								<CheckCircle2Icon className="size-4 text-brand-800 shrink-0" />
 								<span>Focus Management</span>
 							</div>
 							<p className="text-xs text-slate-600 leading-relaxed">
@@ -167,9 +163,9 @@ export const AccessibilityPage = () => {
 				</div>
 
 				{/* --- Accessibility FAQs --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
 					<div className="flex items-center gap-3 border-b border-slate-100 pb-6">
-						<div className="grid size-10 place-items-center rounded-2xl bg-emerald-50 text-emerald-800">
+						<div className="grid size-10 place-items-center rounded-2xl bg-brand-50 text-brand-800">
 							<HelpCircleIcon className="size-5" />
 						</div>
 						<div>
@@ -201,10 +197,9 @@ export const AccessibilityPage = () => {
 										</span>
 										<ChevronDownIcon
 											className={cn(
-												"size-5 shrink-0 text-emerald-800 transition-transform duration-200",
-												isOpen && "rotate-180",
-											)}
-										/>
+												"size-5 shrink-0 text-brand-800 transition-transform duration-200",
+												isOpen && "rotate-180"
+											)} />
 									</button>
 
 									{isOpen && (
@@ -219,7 +214,7 @@ export const AccessibilityPage = () => {
 				</div>
 
 				{/* --- Feedback & Assistance Banner --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-900 to-slate-900 p-8 text-white shadow-xl">
+				<div className="rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-900 to-slate-900 p-8 text-white shadow-xl">
 					<div className="flex flex-col md:flex-row items-center justify-between gap-6">
 						<div className="flex items-start gap-4">
 							<div className="grid size-12 place-items-center rounded-2xl bg-white/10 text-lime-300 shrink-0">
@@ -229,7 +224,7 @@ export const AccessibilityPage = () => {
 								<h3 className="text-xl font-playfair font-normal">
 									Need assistance or have feedback?
 								</h3>
-								<p className="mt-1 text-xs text-emerald-100/80 max-w-xl">
+								<p className="mt-1 text-xs text-brand-100/80 max-w-xl">
 									We welcome your feedback on the accessibility of ZAMAZOR. If
 									you encounter accessibility barriers, please let us know so we
 									can resolve them promptly.
@@ -239,7 +234,7 @@ export const AccessibilityPage = () => {
 
 						<Button
 							asChild
-							className="rounded-xl bg-lime-400 px-6 py-3 font-bold text-slate-950 hover:bg-lime-300 shrink-0 cursor-pointer shadow-sm"
+							className="rounded-lg bg-lime-400 px-6 py-3 font-bold text-slate-950 hover:bg-lime-300 shrink-0 cursor-pointer shadow-sm"
 						>
 							<Link to={APP_ROUTES.PAGES.CONTACT}>
 								Submit Accessibility Feedback
@@ -251,4 +246,4 @@ export const AccessibilityPage = () => {
 			</div>
 		</div>
 	);
-};
+}

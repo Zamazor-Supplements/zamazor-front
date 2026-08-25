@@ -1,46 +1,41 @@
 import { productSchema } from "@/features/products/schemas/productSchema";
 import z from "zod/v4";
 
-const cartItemSchema = z.object({
-	id: z.uuid(),
+export const guestItemSchema = z.object({
+	id: z.null(),
 	product: productSchema,
 	quantity: z.int().positive(),
 });
+export type GuestItem = z.infer<typeof guestItemSchema>;
 
-export const populatedCartItemSchema = z.object({
+const cartItemSchema = z.object({
+	id: z.uuid().nullable(),
 	product: productSchema,
-	quantity: z.number().nonnegative(),
+	quantity: z.int().positive(),
 });
-export type PopulatedCartItem = z.infer<typeof populatedCartItemSchema>;
+export type CartItem = z.infer<typeof cartItemSchema>;
 
 const baseCartSummary = z.object({
-	items: z.array(populatedCartItemSchema),
+	id: z.uuid().nullable(), // id is null when Cart is not in DB
+	items: z.array(cartItemSchema),
 	subtotal: z.number().nonnegative(),
 	total: z.number().nonnegative(),
 });
 
-const guestCartSummarySchema = baseCartSummary.extend({
+const guestCartSchema = baseCartSummary.extend({
+	id: z.null(),
 	tax: z.null(),
 	shipping: z.null(),
 	discount: z.null(),
 });
+export type GuestCart = z.infer<typeof guestCartSchema>;
 
-const fullCartSummarySchema = baseCartSummary.extend({
+const fullCartSchema = baseCartSummary.extend({
+	id: z.uuid(),
 	tax: z.number().nonnegative(),
 	shipping: z.number().nonnegative(),
 	discount: z.number().nonnegative(),
 });
 
-const cartSummarySchema = z.union([
-	guestCartSummarySchema,
-	fullCartSummarySchema,
-]);
-export type CartSummary = z.infer<typeof cartSummarySchema>;
-
-export const cartSchema = z
-	.object({
-		id: z.uuid(),
-		items: z.array(cartItemSchema),
-	})
-	.and(cartSummarySchema);
+export const cartSchema = z.union([guestCartSchema, fullCartSchema]);
 export type Cart = z.infer<typeof cartSchema>;

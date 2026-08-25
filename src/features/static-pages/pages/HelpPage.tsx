@@ -114,7 +114,7 @@ const POPULAR_SEARCHES = [
 	"COD Payment",
 	"Casablanca Delivery",
 ];
-export const HelpPage = () => {
+export default function HelpPage() {
 	const navigate = useNavigate();
 
 	const [searchQuery, setSearchQuery] = useState("");
@@ -129,10 +129,8 @@ export const HelpPage = () => {
 	// Filter articles based on category and search query
 	const filteredArticles = useMemo(() => {
 		return ARTICLES.filter((article) => {
-			const matchesCategory =
-				selectedCategory === "All" || article.category === selectedCategory;
-			const matchesSearch =
-				article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			const matchesCategory = selectedCategory === "All" || article.category === selectedCategory;
+			const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				article.summary.toLowerCase().includes(searchQuery.toLowerCase());
 
 			return matchesCategory && matchesSearch;
@@ -144,15 +142,15 @@ export const HelpPage = () => {
 		if (!orderId) return;
 
 		setLookupResult(
-			`Order #${orderId.toUpperCase()} is currently in processing. Estimated delivery: 2-3 business days.`,
+			`Order #${orderId.toUpperCase()} is currently in processing. Estimated delivery: 2-3 business days.`
 		);
 	};
 
 	return (
-		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-emerald-100">
+		<div className="min-h-screen bg-[#fcfdfa] py-12 px-4 sm:px-6 lg:px-8 selection:bg-brand-100">
 			<div className="mx-auto max-w-7xl space-y-12">
 				{/* --- Hero Section with Live Search --- */}
-				<div className="relative overflow-hidden rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-950 via-emerald-900 to-slate-950 p-8 sm:p-14 text-white shadow-xl shadow-emerald-950/10">
+				<div className="relative overflow-hidden rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-950 via-brand-900 to-slate-950 p-8 sm:p-14 text-white shadow-xl shadow-brand-950/10">
 					<div className="relative z-10 max-w-3xl">
 						<div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-lime-300 backdrop-blur-md">
 							<SparklesIcon className="size-3.5" />
@@ -162,7 +160,7 @@ export const HelpPage = () => {
 						<h1 className="mt-4 text-3xl sm:text-5xl font-playfair font-normal leading-tight">
 							How can we help you today?
 						</h1>
-						<p className="mt-3 text-sm sm:text-base leading-relaxed text-emerald-100/80">
+						<p className="mt-3 text-sm sm:text-base leading-relaxed text-brand-100/80">
 							Search our knowledge base, track your package, or speak directly
 							with our team.
 						</p>
@@ -175,18 +173,17 @@ export const HelpPage = () => {
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
 								placeholder="Search for help (e.g., shipping times, returns, payment)..."
-								className="w-full rounded-2xl bg-white/10 border border-white/15 pl-12 pr-4 py-4 text-sm text-white placeholder:text-emerald-100/50 backdrop-blur-md focus:bg-white focus:text-slate-950 focus:placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-lime-400 transition-all duration-200"
-							/>
+								className="w-full rounded-2xl bg-white/10 border border-white/15 pl-12 pr-4 py-4 text-sm text-white placeholder:text-brand-100/50 backdrop-blur-md focus:bg-white focus:text-slate-950 focus:placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-lime-400 transition-all duration-200" />
 						</div>
 
 						{/* Quick Search Tags */}
-						<div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-emerald-100/70">
+						<div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-brand-100/70">
 							<span className="font-semibold">Popular:</span>
 							{POPULAR_SEARCHES.map((tag) => (
 								<button
 									key={tag}
 									onClick={() => setSearchQuery(tag)}
-									className="rounded-lg bg-white/10 px-2.5 py-1 text-emerald-100 hover:bg-white/20 hover:text-white transition-colors cursor-pointer"
+									className="rounded-lg bg-white/10 px-2.5 py-1 text-brand-100 hover:bg-white/20 hover:text-white transition-colors cursor-pointer"
 								>
 									{tag}
 								</button>
@@ -199,10 +196,10 @@ export const HelpPage = () => {
 				</div>
 
 				{/* --- Quick Order Status Lookup Tool --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-8 shadow-xs">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-8 shadow-xs">
 					<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
 						<div className="flex items-start gap-4">
-							<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800 shrink-0">
+							<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800 shrink-0">
 								<PackageIcon className="size-6" />
 							</div>
 							<div>
@@ -226,11 +223,10 @@ export const HelpPage = () => {
 								placeholder="Order ID (e.g. #1042)"
 								value={orderId}
 								onChange={(e) => setOrderId(e.target.value)}
-								className="rounded-xl border-slate-200 bg-slate-50 focus:bg-white"
-							/>
+								className="rounded-lg border-slate-200 bg-slate-50 focus:bg-white" />
 							<Button
 								type="submit"
-								className="rounded-xl bg-emerald-950 px-6 font-semibold text-white hover:bg-emerald-900 shrink-0 cursor-pointer"
+								className="rounded-lg bg-brand-950 px-6 font-semibold text-white hover:bg-brand-900 shrink-0 cursor-pointer"
 							>
 								Track
 							</Button>
@@ -239,9 +235,9 @@ export const HelpPage = () => {
 
 					{/* Order Status Output */}
 					{lookupResult && (
-						<div className="mt-6 flex items-start gap-3 rounded-2xl bg-emerald-50/70 p-4 border border-emerald-900/10 animate-in fade-in duration-200">
-							<CheckCircle2Icon className="size-5 text-emerald-800 mt-0.5 shrink-0" />
-							<p className="text-sm font-semibold text-emerald-950">
+						<div className="mt-6 flex items-start gap-3 rounded-2xl bg-brand-50/70 p-4 border border-brand-900/10 animate-in fade-in duration-200">
+							<CheckCircle2Icon className="size-5 text-brand-800 mt-0.5 shrink-0" />
+							<p className="text-sm font-semibold text-brand-950">
 								{lookupResult}
 							</p>
 						</div>
@@ -260,12 +256,10 @@ export const HelpPage = () => {
 							return (
 								<div
 									key={topic.id}
-									onClick={() =>
-										setSelectedCategory(topic.label.split(" ")[0] ?? "")
-									}
-									className="group rounded-3xl border border-emerald-900/10 bg-white p-6 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-emerald-900/30 cursor-pointer"
+									onClick={() => setSelectedCategory(topic.label.split(" ")[0] ?? "")}
+									className="group rounded-3xl border border-brand-900/10 bg-white p-6 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-brand-900/30 cursor-pointer"
 								>
-									<div className="grid size-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-800 group-hover:bg-emerald-900 group-hover:text-white transition-colors">
+									<div className="grid size-12 place-items-center rounded-2xl bg-brand-50 text-brand-800 group-hover:bg-brand-900 group-hover:text-white transition-colors">
 										<Icon className="size-6" />
 									</div>
 									<h3 className="mt-4 text-base font-bold text-slate-950">
@@ -274,7 +268,7 @@ export const HelpPage = () => {
 									<p className="mt-1 text-xs text-slate-500 leading-relaxed">
 										{topic.description}
 									</p>
-									<div className="mt-4 flex items-center text-xs font-bold text-emerald-800 group-hover:translate-x-1 transition-transform">
+									<div className="mt-4 flex items-center text-xs font-bold text-brand-800 group-hover:translate-x-1 transition-transform">
 										<span>View articles</span>
 										<ChevronRightIcon className="ml-1 size-3.5" />
 									</div>
@@ -285,10 +279,10 @@ export const HelpPage = () => {
 				</div>
 
 				{/* --- Filtered Knowledge Base Articles --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
+				<div className="rounded-hero border border-brand-900/10 bg-white p-6 sm:p-10 shadow-xs space-y-6">
 					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
 						<div>
-							<p className="text-xs font-black uppercase tracking-wider text-emerald-800">
+							<p className="text-xs font-black uppercase tracking-wider text-brand-800">
 								Knowledge Base
 							</p>
 							<h3 className="text-2xl font-playfair font-normal text-slate-950 mt-1">
@@ -308,13 +302,13 @@ export const HelpPage = () => {
 										className={cn(
 											"px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer",
 											selectedCategory === cat
-												? "bg-emerald-950 text-white shadow-sm"
-												: "bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-900",
+												? "bg-brand-950 text-white shadow-sm"
+												: "bg-slate-100 text-slate-600 hover:bg-brand-50 hover:text-brand-900"
 										)}
 									>
 										{cat}
 									</button>
-								),
+								)
 							)}
 						</div>
 					</div>
@@ -335,11 +329,11 @@ export const HelpPage = () => {
 							filteredArticles.map((article) => (
 								<div
 									key={article.id}
-									className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-slate-50/40 p-5 hover:bg-slate-50 hover:border-emerald-900/20 transition-all"
+									className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-slate-50/40 p-5 hover:bg-slate-50 hover:border-brand-900/20 transition-all"
 								>
 									<div>
 										<div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-											<span className="font-bold text-emerald-800 uppercase tracking-wider">
+											<span className="font-bold text-brand-800 uppercase tracking-wider">
 												{article.category}
 											</span>
 											<span className="flex items-center gap-1">
@@ -357,7 +351,7 @@ export const HelpPage = () => {
 
 									<Link
 										to={APP_ROUTES.PAGES.FAQ}
-										className="mt-4 inline-flex items-center text-xs font-bold text-emerald-900 hover:underline"
+										className="mt-4 inline-flex items-center text-xs font-bold text-brand-900 hover:underline"
 									>
 										Read full guide
 										<ArrowRightIcon className="ml-1 size-3" />
@@ -369,13 +363,13 @@ export const HelpPage = () => {
 				</div>
 
 				{/* --- Still Need Assistance CTA Banner --- */}
-				<div className="rounded-[2.5rem] border border-emerald-900/10 bg-linear-to-br from-emerald-900 to-slate-900 p-8 sm:p-10 text-white shadow-xl">
+				<div className="rounded-hero border border-brand-900/10 bg-linear-to-br from-brand-900 to-slate-900 p-8 sm:p-10 text-white shadow-xl">
 					<div className="flex flex-col lg:flex-row items-center justify-between gap-8">
 						<div className="space-y-2 text-center lg:text-left">
 							<h2 className="text-2xl sm:text-3xl font-playfair font-normal">
 								Still haven't found what you need?
 							</h2>
-							<p className="text-xs sm:text-sm text-emerald-100/80 max-w-xl">
+							<p className="text-xs sm:text-sm text-brand-100/80 max-w-xl">
 								Our support agents are available Monday to Friday to assist you
 								with active orders or product questions.
 							</p>
@@ -384,7 +378,7 @@ export const HelpPage = () => {
 						<div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
 							<Button
 								onClick={() => navigate(APP_ROUTES.PAGES.CONTACT)}
-								className="w-full sm:w-auto rounded-xl bg-lime-400 px-6 py-3 font-bold text-slate-950 hover:bg-lime-300 cursor-pointer shadow-md"
+								className="w-full sm:w-auto rounded-lg bg-lime-400 px-6 py-3 font-bold text-slate-950 hover:bg-lime-300 cursor-pointer shadow-md"
 							>
 								<MessageSquareIcon className="mr-2 size-4" />
 								Contact Support
@@ -394,9 +388,9 @@ export const HelpPage = () => {
 								href="https://wa.me/212611423116"
 								target="_blank"
 								rel="noreferrer"
-								className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white/10 px-6 py-3 font-semibold text-white hover:bg-white/20 transition-colors border border-white/15"
+								className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-white/10 px-6 py-3 font-semibold text-white hover:bg-white/20 transition-colors border border-white/15"
 							>
-								<PhoneIcon className="mr-2 size-4 text-emerald-300" />
+								<PhoneIcon className="mr-2 size-4 text-brand-300" />
 								WhatsApp Live
 							</a>
 						</div>
@@ -405,4 +399,4 @@ export const HelpPage = () => {
 			</div>
 		</div>
 	);
-};
+}

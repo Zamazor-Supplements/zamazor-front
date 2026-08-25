@@ -50,14 +50,14 @@ export const Header = forwardRef<HTMLElement, { className?: string }>(
 
 		const handleSelectProduct = (productId: string) => {
 			setIsMobileMenuOpen(false);
-			navigate(APP_ROUTES.PRODUCT(productId));
+			navigate(APP_ROUTES.PRODUCT({ id: productId }));
 		};
 
 		return (
 			<header
 				ref={ref}
 				className={cn(
-					"sticky top-2 z-40 mx-auto mt-2 w-[calc(100%-2rem)] max-w-7xl rounded-3xl border border-emerald-900/10 bg-[#f7fbf3]/95 shadow-md backdrop-blur transition-all duration-300",
+					"sticky top-2 z-40 mx-auto mt-2 w-[calc(100%-2rem)] max-w-7xl rounded-xl border border-brand-900/10 bg-surface/95 shadow-md backdrop-blur transition-all duration-300",
 					className,
 				)}
 			>
@@ -69,13 +69,15 @@ export const Header = forwardRef<HTMLElement, { className?: string }>(
 							variant="ghost"
 							size="icon"
 							aria-label="Toggle navigation menu"
+							aria-expanded={isMobileMenuOpen}
+							aria-controls="mobile-menu"
 							className="cursor-pointer lg:hidden"
 							onClick={() => setIsMobileMenuOpen((prev) => !prev)}
 						>
 							{isMobileMenuOpen ? (
-								<XIcon className="size-5 text-emerald-900" />
+								<XIcon className="size-5 text-brand-900" />
 							) : (
-								<MenuIcon className="size-5 text-emerald-900" />
+								<MenuIcon className="size-5 text-brand-900" />
 							)}
 						</Button>
 
@@ -86,9 +88,9 @@ export const Header = forwardRef<HTMLElement, { className?: string }>(
 							<img
 								src={logo}
 								alt="Zamazor logo"
-								className="size-9 rounded-xl border border-emerald-900/10 bg-white"
+								className="size-9 rounded-lg border border-brand-900/10 bg-card"
 							/>
-							<span className="font-playfair text-xl font-black tracking-tight text-emerald-950">
+							<span className="font-playfair text-xl font-black tracking-tight text-brand-950">
 								Zamazor
 							</span>
 						</Link>
@@ -116,13 +118,11 @@ export const Header = forwardRef<HTMLElement, { className?: string }>(
 									isAuthenticated ? profileTargetRoute : APP_ROUTES.AUTH.LOGIN,
 								)
 							}
-							variant="emerald"
 							className="hidden h-9 cursor-pointer items-center gap-1.5 rounded-full px-4 text-xs font-semibold sm:inline-flex"
 						>
 							<UserIcon className="size-3.5" />
 							{isAuthenticated ? profileDisplayName : "Sign In"}
 						</OriginButton>
-
 						<BouncingCart />
 					</div>
 				</div>
@@ -135,7 +135,7 @@ export const Header = forwardRef<HTMLElement, { className?: string }>(
 				/>
 
 				{/* Desktop Category Navigation */}
-				<nav className="hidden items-center justify-between border-t border-emerald-900/5 bg-transparent px-6 py-2 font-sans lg:flex">
+				<nav className="hidden items-center justify-between border-t border-brand-900/5 bg-transparent px-6 py-2 font-sans lg:flex">
 					<div className="flex items-center gap-1.5">
 						{NAV_LINKS.map((link) => {
 							const Icon = link.icon;
@@ -143,15 +143,15 @@ export const Header = forwardRef<HTMLElement, { className?: string }>(
 								<Link
 									key={link.path}
 									to={link.path}
-									className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-bold text-slate-700 transition-colors hover:bg-emerald-50/50 hover:text-emerald-900"
+									className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-bold text-ink-soft transition-colors hover:bg-brand-50/50 hover:text-brand-900"
 								>
-									<Icon className="size-3.5 text-emerald-850" />
+									<Icon className="size-3.5 text-brand-800" />
 									{link.label}
 								</Link>
 							);
 						})}
 					</div>
-					<span className="text-[10px] font-black uppercase tracking-widest text-emerald-950/40">
+					<span className="text-[10px] font-black uppercase tracking-widest text-brand-950/40">
 						100% Organic & Clean Formulas
 					</span>
 				</nav>

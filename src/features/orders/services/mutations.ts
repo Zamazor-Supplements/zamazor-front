@@ -15,9 +15,10 @@ import type { OrderStatus } from "../constants/orderStatus";
 
 export function useCheckout() {
 	const queryClient = useQueryClient();
-	const { mutate: getPaymentUrl } = useGetPaymentUrl();
+	const { mutate: getPaymentUrl, isPending: isRedirectingToGateway } =
+		useGetPaymentUrl();
 
-	return useMutation({
+	const checkoutMutation = useMutation({
 		mutationFn: (payload: CheckoutFormValues) => checkout(payload),
 		onSuccess: async (newOrder) => {
 			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
@@ -32,14 +33,27 @@ export function useCheckout() {
 			getPaymentUrl(newOrder.id);
 		},
 	});
+
+	// Redirecting to the payment gateway is a second mutation; keep the
+	// submit button disabled across both so it can't be re-clicked
+	// mid-redirect.
+	return {
+		...checkoutMutation,
+		isPending: checkoutMutation.isPending || isRedirectingToGateway,
+	};
 }
 
 export function useChangeOrderStatus() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ orderId, status }: { orderId: string; status: OrderStatus }) =>
-			changeOrderStatus(orderId, status),
+		mutationFn: ({
+			orderId,
+			status,
+		}: {
+			orderId: string;
+			status: OrderStatus;
+		}) => changeOrderStatus(orderId, status),
 		onSuccess: (updatedOrder) => {
 			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 			queryClient.setQueryData(orderKeys.detail(updatedOrder.id), updatedOrder);

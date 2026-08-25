@@ -52,7 +52,7 @@ export const SupplementQuiz = ({ onClose }: SupplementQuizProps) => {
 			aria-modal="true"
 			aria-labelledby="quiz-modal-title"
 		>
-			<div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-linear-to-br from-emerald-50/95 to-lime-50/60 border border-emerald-900/10 rounded-3xl shadow-2xl p-6 sm:p-10">
+			<div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-linear-to-br from-brand-50/95 to-lime-50/60 border border-brand-900/10 rounded-3xl shadow-2xl p-6 sm:p-10">
 				<button
 					onClick={onClose}
 					className="absolute top-4 right-4 size-8 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-sm z-10"
@@ -63,7 +63,7 @@ export const SupplementQuiz = ({ onClose }: SupplementQuizProps) => {
 
 				{/* Modal Header */}
 				<div className="text-center mb-8">
-					<span className="text-xs font-black uppercase tracking-widest text-emerald-800">
+					<span className="text-xs font-black uppercase tracking-widest text-brand-800">
 						Smart Supplement Finder
 					</span>
 					<h2

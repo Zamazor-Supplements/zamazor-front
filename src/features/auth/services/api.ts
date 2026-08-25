@@ -4,8 +4,6 @@ import {
 	type RefreshResponse,
 } from "../schemas/authSchema";
 import { API_ENDPOINTS } from "@/app/config/apiEndpoints";
-import router from "@/app/routes/router";
-import { APP_ROUTES } from "@/app/routes/paths";
 import {
 	loginResponseSchema,
 	type LoginRequest,
@@ -62,12 +60,17 @@ export const login = async (data: LoginRequest) => {
 };
 
 export const logout = async () => {
-	await router.navigate(APP_ROUTES.AUTH.LOGIN);
-
-	publicApiRequest<void>({
-		url: API_ENDPOINTS.AUTH.LOGOUT,
-		method: "POST",
-	});
+	// Revoke the refresh token on the server first so the session is truly
+	// closed even if the tab is closed right after. Best-effort: a failed
+	// POST (e.g. offline) must not block the client-side logout.
+	try {
+		await publicApiRequest<void>({
+			url: API_ENDPOINTS.AUTH.LOGOUT,
+			method: "POST",
+		});
+	} catch {
+		// Session is cleared client-side regardless.
+	}
 };
 
 export const refresh = async () => {

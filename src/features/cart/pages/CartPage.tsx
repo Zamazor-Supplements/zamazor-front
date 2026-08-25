@@ -13,7 +13,7 @@ import { Button } from "@/shared/components/ui/button";
 import { CartErrorFallback } from "@/features/cart/components/feedback/CartErrorFallback";
 import { CartPageSkeleton } from "@/features/cart/components/feedback/CartPageSkeleton";
 
-export const CartPage = () => {
+export default function CartPage() {
 	const { t } = useLanguage();
 
 	const { data: summary, isLoading, isFetching, isError, refetch } = useCart();
@@ -46,7 +46,7 @@ export const CartPage = () => {
 							<Button
 								asChild
 								variant="ghost"
-								className="group inline-flex items-center gap-2 p-0 text-xs font-bold text-emerald-800 hover:text-emerald-950 hover:bg-transparent cursor-pointer"
+								className="group inline-flex items-center gap-2 p-0 text-xs font-bold text-brand-800 hover:text-brand-950 hover:bg-transparent cursor-pointer"
 							>
 								<Link to={APP_ROUTES.SHOP}>
 									<ArrowLeftIcon className="size-3.5 transition-transform group-hover:-translate-x-1" />
@@ -62,4 +62,4 @@ export const CartPage = () => {
 			)}
 		</main>
 	);
-};
+}

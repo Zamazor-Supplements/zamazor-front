@@ -1,4 +1,10 @@
-import { useState, useEffect, type ReactNode } from "react";
+import {
+	useState,
+	useEffect,
+	useCallback,
+	useMemo,
+	type ReactNode,
+} from "react";
 import { LanguageContext, type Language } from "../hooks/use-language";
 
 interface TranslationDictionary {
@@ -33,6 +39,9 @@ const translations: Record<Language, TranslationDictionary> = {
 			adding: "Adding...",
 			noDescription: "No description provided.",
 			delete: "Delete",
+			free: "Free",
+			viewCart: "View Cart",
+			backToShop: "Back to Shop",
 		},
 		homepage: {
 			hero: {
@@ -80,6 +89,18 @@ const translations: Record<Language, TranslationDictionary> = {
 			benefits: "Key Benefits",
 			usage: "Recommended Usage",
 			ingredients: "Active Ingredients",
+			goals: "Shop by Goal",
+			dietary: "Dietary",
+			dietaryNote: "All formulas are free from artificial colors, GMOs, and gluten.",
+			goalPerformance: "Performance",
+			goalGreens: "Daily Greens",
+			goalEnergy: "Energy",
+			goalRecovery: "Recovery",
+			goalWellness: "Wellness",
+			dietVegan: "Vegan",
+			dietOrganic: "Organic",
+			dietKeto: "Keto",
+			dietGlutenFree: "Gluten Free",
 		},
 		cart: {
 			title: "Your Cart",
@@ -91,9 +112,39 @@ const translations: Record<Language, TranslationDictionary> = {
 			total: "Total",
 			checkoutBtn: "Proceed to Checkout",
 			freeShipping: "Free shipping active on all orders.",
+			freeShippingLeft: "You're {amount} away from free shipping",
+			freeShippingUnlocked: "Free shipping unlocked",
+			freeShippingThreshold: "Free shipping on orders over {amount}",
 			promoCode: "Promo Code",
 			apply: "Apply",
 			remove: "Remove",
+		},
+		pdp: {
+			dosage: "Dosage",
+			dosageTitle: "Recommended Dosage",
+			ingredientsTitle: "Ingredients",
+			ingredients: "Active Ingredients",
+			reviews: "Reviews",
+			reviewsTitle: "Customer Reviews",
+			reviewsNote: "Curated preview while verified reviews arrive.",
+			cleanNote: "All Zamazor formulas are free from artificial colors, GMOs, and gluten.",
+			optimalWindow: "Optimal Daily Window",
+			evidence: "Evidence",
+			verifiedBadge: "Verified purchase",
+			outOfStock: "Out of Stock",
+		},
+		hero: {
+			trustLabTested: "Lab Tested",
+			trustGmp: "GMP Certified",
+			trustNatural: "100% Natural",
+		},
+		cartDrawer: {
+			title: "Your Cart",
+			description: "Review the items in your cart before checkout.",
+			viewFullCart: "View Full Cart",
+			emptyTitle: "Your cart is empty",
+			emptyDesc: "Choose some clean formulas to get started.",
+			continueShopping: "Continue Shopping",
 		},
 		checkout: {
 			title: "Secure Checkout",
@@ -178,6 +229,9 @@ const translations: Record<Language, TranslationDictionary> = {
 			adding: "Ajoutant...",
 			noDescription: "Aucune description fournie.",
 			delete: "Supprimer",
+			free: "Gratuit",
+			viewCart: "Voir le Panier",
+			backToShop: "Retour à la Boutique",
 		},
 		homepage: {
 			hero: {
@@ -225,6 +279,18 @@ const translations: Record<Language, TranslationDictionary> = {
 			benefits: "Avantages Clés",
 			usage: "Conseils d'Utilisation",
 			ingredients: "Ingrédients Actifs",
+			goals: "Objectif",
+			dietary: "Régime",
+			dietaryNote: "Toutes les formules sont exemptes de colorants artificiels, d'OGM et de gluten.",
+			goalPerformance: "Performance",
+			goalGreens: "Verts Quotidiens",
+			goalEnergy: "Énergie",
+			goalRecovery: "Récupération",
+			goalWellness: "Bien-être",
+			dietVegan: "Vegan",
+			dietOrganic: "Bio",
+			dietKeto: "Kéto",
+			dietGlutenFree: "Sans Gluten",
 		},
 		cart: {
 			title: "Votre Panier",
@@ -236,9 +302,39 @@ const translations: Record<Language, TranslationDictionary> = {
 			total: "Total",
 			checkoutBtn: "Passer commande",
 			freeShipping: "Livraison gratuite active sur toutes les commandes.",
+			freeShippingLeft: "Plus que {amount} pour la livraison gratuite",
+			freeShippingUnlocked: "Livraison gratuite débloquée",
+			freeShippingThreshold: "Livraison gratuite dès {amount}",
 			promoCode: "Code Promo",
 			apply: "Appliquer",
 			remove: "Retirer",
+		},
+		pdp: {
+			dosage: "Dosage",
+			dosageTitle: "Dosage Recommandé",
+			ingredientsTitle: "Ingrédients",
+			ingredients: "Ingrédients Actifs",
+			reviews: "Avis",
+			reviewsTitle: "Avis Clients",
+			reviewsNote: "Aperçu sélectionné en attendant les avis vérifiés.",
+			cleanNote: "Toutes les formules Zamazor sont exemptes de colorants artificiels, d'OGM et de gluten.",
+			optimalWindow: "Fenêtre Quotidienne Optimale",
+			evidence: "Preuves",
+			verifiedBadge: "Achat vérifié",
+			outOfStock: "Rupture de Stock",
+		},
+		hero: {
+			trustLabTested: "Testé en Laboratoire",
+			trustGmp: "Certifié GMP",
+			trustNatural: "100% Naturel",
+		},
+		cartDrawer: {
+			title: "Votre Panier",
+			description: "Vérifiez les articles de votre panier avant le paiement.",
+			viewFullCart: "Voir le Panier Complet",
+			emptyTitle: "Votre panier est vide",
+			emptyDesc: "Choisissez des formules propres pour commencer.",
+			continueShopping: "Continuer Mes Achats",
 		},
 		checkout: {
 			title: "Paiement Sécurisé",
@@ -306,33 +402,41 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 		return (stored === "fr" || stored === "en" ? stored : "en") as Language;
 	});
 
-	const setLanguage = (lang: Language) => {
+	const setLanguage = useCallback((lang: Language) => {
 		setLanguageState(lang);
 		localStorage.setItem("zamazor-language", lang);
 		document.documentElement.lang = lang;
-	};
+	}, []);
 
 	useEffect(() => {
 		document.documentElement.lang = language;
 	}, [language]);
 
 	// Dot notation translator: e.g. t("homepage.hero.title")
-	const t = (key: string): string => {
-		const keys = key.split(".");
-		let current: TranslationValue = translations[language];
+	const t = useCallback(
+		(key: string): string => {
+			const keys = key.split(".");
+			let current: TranslationValue = translations[language];
 
-		for (const k of keys) {
-			if (typeof current === "string" || !(k in current)) {
-				return key;
+			for (const k of keys) {
+				if (typeof current === "string" || !(k in current)) {
+					return key;
+				}
+				current = current[k] || "";
 			}
-			current = current[k] || "";
-		}
 
-		return typeof current === "string" ? current : key;
-	};
+			return typeof current === "string" ? current : key;
+		},
+		[language],
+	);
+
+	const value = useMemo(
+		() => ({ language, setLanguage, t }),
+		[language, setLanguage, t],
+	);
 
 	return (
-		<LanguageContext.Provider value={{ language, setLanguage, t }}>
+		<LanguageContext.Provider value={value}>
 			{children}
 		</LanguageContext.Provider>
 	);

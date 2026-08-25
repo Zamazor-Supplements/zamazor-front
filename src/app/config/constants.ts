@@ -21,10 +21,18 @@ if (!parsed.success) {
 	);
 }
 
+export const APP_COUNTRY = "Morocco" as const;
+
+/** ISO 3166-1 alpha-2 code derived from {@link APP_COUNTRY}. Used for compact
+ *  display chips (e.g. Footer "MA · MAD"). */
+export const COUNTRY_CODE = "MA" as const;
+
 const CONFIG = {
 	API_BASE_URL: parsed.data.VITE_API_BASE_URL,
 	TIMEOUT: 5000,
 	APP_NAME: parsed.data.VITE_APP_NAME,
+	COUNTRY: APP_COUNTRY,
+	COUNTRY_CODE,
 	FORMSPREE_FORM_ID: "mzdnavwv",
 	SUPPORT_EMAIL: "support@zamazor.ma",
 	SUPPORT_PHONE: "+212 6 11 42 31 16",

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { SectionHeading } from "../shared/SectionHeading";
 import { StarIcon } from "lucide-react";
+import { sectionLift } from "@/shared/config/motion";
 
 interface Review {
 	name: string;
@@ -14,7 +15,12 @@ interface CustomerReviewsProps {
 
 export const CustomerReviews = ({ reviews }: CustomerReviewsProps) => {
 	return (
-		<section
+		<motion.section
+			variants={sectionLift}
+			initial="hidden"
+			whileInView="visible"
+			viewport={{ once: true, amount: 0.16 }}
+			transition={{ duration: 0.5, ease: "easeOut" }}
 			id="reviews"
 			className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
 		>
@@ -31,7 +37,7 @@ export const CustomerReviews = ({ reviews }: CustomerReviewsProps) => {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, amount: 0.35 }}
 						transition={{ duration: 0.45 }}
-						className="rounded-2xl border border-emerald-900/10 bg-white p-6 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between"
+						className="rounded-2xl border border-brand-900/10 bg-card p-6 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between"
 					>
 						<div>
 							<div
@@ -46,19 +52,17 @@ export const CustomerReviews = ({ reviews }: CustomerReviewsProps) => {
 									/>
 								))}
 							</div>
-							<p className="mt-4 text-base leading-relaxed text-slate-700 font-sans italic">
+							<p className="mt-4 text-base leading-relaxed text-ink-soft font-sans italic">
 								"{review.quote}"
 							</p>
 						</div>
-						<div className="mt-6 pt-4 border-t border-slate-100">
-							<p className="font-bold text-slate-950 text-sm">{review.name}</p>
-							<p className="text-xs text-slate-500 font-medium">
-								{review.meta}
-							</p>
+						<div className="mt-6 pt-4 border-t border-brand-100">
+							<p className="font-bold text-ink text-sm">{review.name}</p>
+							<p className="text-xs text-ink-soft font-medium">{review.meta}</p>
 						</div>
 					</motion.article>
 				))}
 			</div>
-		</section>
+		</motion.section>
 	);
 };

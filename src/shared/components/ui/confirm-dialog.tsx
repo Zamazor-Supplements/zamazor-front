@@ -28,23 +28,23 @@ export const ConfirmDialog = ({
 	const titleId = useId();
 	const descriptionId = useId();
 
-	// Close modal on Escape key press
+	// Close modal on Escape key press + scroll lock
 	useEffect(() => {
+		if (!isOpen) return;
+
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "Escape" && isOpen && !isLoading) {
+			if (e.key === "Escape" && !isLoading) {
 				onClose();
 			}
 		};
 
-		if (isOpen) {
-			document.addEventListener("keydown", handleKeyDown);
-			// Prevent background scrolling while modal is open
-			document.body.style.overflow = "hidden";
-		}
+		document.addEventListener("keydown", handleKeyDown);
+		const prev = document.body.style.overflow;
+		document.body.style.overflow = "hidden";
 
 		return () => {
 			document.removeEventListener("keydown", handleKeyDown);
-			document.body.style.overflow = "unset";
+			document.body.style.overflow = prev;
 		};
 	}, [isOpen, isLoading, onClose]);
 
@@ -69,7 +69,7 @@ export const ConfirmDialog = ({
 				<div className="flex items-start gap-4">
 					{/* Status Icon */}
 					<div
-						className={`flex size-10 shrink-0 items-center justify-center rounded-xl border ${
+						className={`flex size-10 shrink-0 items-center justify-center rounded-lg border ${
 							isDestructive
 								? "border-rose-200 bg-rose-50 text-rose-600"
 								: "border-slate-200 bg-slate-50 text-slate-700"
@@ -106,7 +106,7 @@ export const ConfirmDialog = ({
 						variant="outline"
 						disabled={isLoading}
 						onClick={onClose}
-						className="h-9 px-4 rounded-xl border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all active:scale-95 disabled:opacity-50"
+						className="h-9 px-4 rounded-lg border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-all active:scale-95 disabled:opacity-50"
 					>
 						{cancelText}
 					</Button>
@@ -117,9 +117,10 @@ export const ConfirmDialog = ({
 						disabled={isLoading}
 						onClick={async () => {
 							await onConfirm();
-							if (!isLoading) onClose();
+							// Since state updates happen asynchronously, 
+							// checking the current prop directly inside the handler works fine here
 						}}
-						className={`h-9 px-4 rounded-xl text-xs font-semibold transition-all active:scale-95 disabled:opacity-50 ${
+						className={`h-9 px-4 rounded-lg text-xs font-semibold transition-all active:scale-95 disabled:opacity-50 ${
 							isDestructive
 								? "bg-rose-600 hover:bg-rose-700 text-white"
 								: "bg-slate-900 hover:bg-slate-950 text-white"

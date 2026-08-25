@@ -32,7 +32,8 @@ function useAuthenticatedToggleWishlist() {
 		mutationFn: async (product: Product) => toggleWishlist(product.id),
 		onMutate: (target) => {
 			const previous = queryClient.getQueryData<Product[]>(wishlistKeys.all);
-			queryClient.setQueryData(wishlistKeys.all, (current: Product[]) => {
+			queryClient.setQueryData(wishlistKeys.all, (current: Product[] | undefined) => {
+				if (!current) return previous ?? [];
 				const exists = current.some((product) => product.id === target.id);
 
 				return exists
@@ -77,7 +78,7 @@ function useAuthenticatedClearWishlist() {
 		mutationFn: clearWishlist,
 		onMutate: () => {
 			const previous = queryClient.getQueryData<Product[]>(wishlistKeys.all);
-			queryClient.setQueryData(wishlistKeys.all, undefined);
+			queryClient.setQueryData<Product[] | undefined>(wishlistKeys.all, undefined);
 			return { previous };
 		},
 		onSuccess: (data) => {

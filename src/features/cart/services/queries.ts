@@ -5,7 +5,7 @@ import { cartKeys } from "./keys";
 import { getCart } from "./api";
 import { useBulkProducts } from "@/features/products/services/product/queries";
 import { useMemo } from "react";
-import type { PopulatedCartItem } from "../schemas/cartSchema";
+import type { GuestCart } from "../schemas/cartSchema";
 
 /**
  * Hook to fetch the main authenticated cart.
@@ -18,8 +18,9 @@ function useAuthenticatedCart(authenticated: boolean) {
 	});
 }
 
-const EMPTY_CART = {
-	items: [] as PopulatedCartItem[],
+const EMPTY_CART: GuestCart = {
+	id: null,
+	items: [],
 	subtotal: 0,
 	tax: null,
 	shipping: null,
@@ -51,6 +52,7 @@ function useGuestCart(authenticated: boolean) {
 				items: [
 					...acc.items,
 					{
+						id: null,
 						product,
 						quantity: item.quantity,
 					},
