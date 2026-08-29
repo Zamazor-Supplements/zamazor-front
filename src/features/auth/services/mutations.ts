@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { login, logout, register } from "./api";
+import { forgotPassword, login, logout, register, resetPassword } from "./api";
 import { tokenManager } from "../globals/tokenManager";
 import { authKeys } from "./keys";
 import { useAuthStore } from "../stores/authStore";
@@ -59,4 +59,24 @@ export function clearAuth() {
 		queryKey: authKeys.me(),
 	});
 	useAuthStore.getState().setUnauthenticated();
+}
+
+export function useForgotPassword() {
+	const navigate = useNavigate();
+	return useMutation({
+		mutationFn: forgotPassword,
+		onSuccess: () => {
+			navigate(APP_ROUTES.AUTH.LOGIN);
+		},
+	});
+}
+
+export function useResetPassword() {
+	const navigate = useNavigate();
+	return useMutation({
+		mutationFn: resetPassword,
+		onSuccess: () => {
+			navigate(APP_ROUTES.AUTH.LOGIN);
+		},
+	});
 }
