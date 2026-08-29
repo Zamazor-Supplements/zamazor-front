@@ -101,10 +101,21 @@ const router = createBrowserRouter([
 				element: withSuspense(lazyPages.LazyLoginPage, { fullScreen: true }),
 			},
 			{
+				path: APP_ROUTES.AUTH.FORGOT_PASSWORD,
+				element: withSuspense(lazyPages.LazyForgotPasswordPage, {
+					fullScreen: true,
+				}),
+			},
+			{
+				path: APP_ROUTES.AUTH.RESET_PASSWORD,
+				element: withSuspense(lazyPages.LazyResetPasswordPage, {
+					fullScreen: true,
+				}),
+			},
+			{
 				path: APP_ROUTES.AUTH.REGISTER,
 				element: withSuspense(lazyPages.LazyRegisterPage, { fullScreen: true }),
 			},
-
 			{
 				element: <RequireAuth />,
 				children: [

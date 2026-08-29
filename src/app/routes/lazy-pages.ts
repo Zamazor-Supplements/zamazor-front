@@ -19,6 +19,12 @@ export const LazyHomePage = lazy(
 export const LazyLoginPage = lazy(
 	() => import("@/features/auth/pages/LoginPage"),
 );
+export const LazyForgotPasswordPage = lazy(
+	() => import("@/features/auth/pages/ForgotPasswordPage"),
+);
+export const LazyResetPasswordPage = lazy(
+	() => import("@/features/auth/pages/ResetPasswordPage"),
+);
 export const LazyRegisterPage = lazy(
 	() => import("@/features/auth/pages/RegisterPage"),
 );
