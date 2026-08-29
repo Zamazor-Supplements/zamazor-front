@@ -1,14 +1,13 @@
 import CONFIG from "@/app/config/constants";
 import { LoginForm } from "@/features/auth/components/login/LoginForm";
-import { RegisterLink } from "@/features/auth/components/login/RegisterLink";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
-import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router";
 import { APP_ROUTES } from "@/app/routes/paths";
 import heroProtein from "@/assets/images/hero_protein.png";
 import logo from "@/assets/images/zamazor.svg";
+import { AuthRedirectPrompt } from "../components/shared/AuthRedirectPrompt";
+import { AuthTopActionLink } from "../components/shared/AuthTopActionLink";
 
-const LoginPage = () => {
+export default function LoginPage() {
 	useDocumentTitle(`Login | ${CONFIG.APP_NAME}`);
 
 	return (
@@ -47,15 +46,9 @@ const LoginPage = () => {
 				{/* Right Side: Login Form */}
 				<div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col bg-white dark:bg-gray-900 z-10 text-gray-900 dark:text-gray-100 justify-center overflow-y-auto max-h-screen md:max-h-[90vh] relative">
 					{/* Go to Store Button */}
-					<div className="flex md:absolute md:top-6 md:right-6 mb-4 md:mb-0 z-20 justify-start md:justify-end">
-						<Link
-							to={APP_ROUTES.HOME}
-							className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-brand-800 dark:text-lime-300 border border-gray-200 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
-						>
-							<ArrowLeft className="h-3.5 w-3.5" />
-							Go to Store
-						</Link>
-					</div>
+					<AuthTopActionLink to={APP_ROUTES.HOME}>
+						Go to Store
+					</AuthTopActionLink>
 
 					<div className="flex flex-col items-center text-center mb-6 mt-2 md:mt-0">
 						<img
@@ -75,13 +68,13 @@ const LoginPage = () => {
 						<LoginForm />
 					</div>
 
-					<div className="mt-6 text-center">
-						<RegisterLink />
-					</div>
+					<AuthRedirectPrompt
+						message="Don't have an account?"
+						linkText="Register"
+						to={APP_ROUTES.AUTH.REGISTER}
+					/>
 				</div>
 			</div>
 		</div>
 	);
-};
-
-export default LoginPage;
+}
