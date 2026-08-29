@@ -1,26 +1,55 @@
-# Logs
-logs
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Logs & Output
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
 *.local
 
-# Editor directories and files
+# Build & Distribution
+/dist/
+/dist-ssr/
+*.tsbuildinfo
+.vite/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# VS Code
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.vscode/settings.json
+.vscode/launch.json
+
+# JetBrains
+.idea/
+*.iml
+
+# Visual Studio / Others
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-.env
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# AI & Automation Tools
+.agents/*
+.playwright-mcp/*
+/skills*.json
+/*.png
+
+# Documentation
+docs/

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -87,7 +87,8 @@
 	--color-gold: oklch(0.72 0.13 80); /* #c7a629  star ratings */
 	--color-accent-soft: oklch(0.965 0.045 105); /* #f4fbd7 */
 
-	--shadow-soft: 0 2px 8px -2px rgb(6 32 23 / 0.06), 0 8px 24px -12px rgb(6 32 23 / 0.08);
+	--shadow-soft:
+		0 2px 8px -2px rgb(6 32 23 / 0.06), 0 8px 24px -12px rgb(6 32 23 / 0.08);
 	--shadow-lift: 0 8px 30px -8px rgb(6 32 23 / 0.14);
 
 	--radius-hero: 2.5rem;
@@ -235,4 +236,3 @@
 	border-radius: 0.2rem !important;
 	box-shadow: none !important;
 }
-
