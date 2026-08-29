@@ -37,7 +37,7 @@ export function ProductCard({ product }: ProductCardProps) {
 		e.preventDefault();
 		e.stopPropagation();
 		if (isAddingToCart) return;
-		addToCartMutation.mutate({ product, quantity: 1 });
+		addToCartMutation.mutate({ id: null, product, quantity: 1 });
 	};
 
 	const wishlistLabel = isFavorite ? "Remove from wishlist" : "Add to wishlist";

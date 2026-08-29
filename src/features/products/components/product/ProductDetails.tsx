@@ -100,7 +100,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 		e.preventDefault();
 		e.stopPropagation();
 		if (isAddingToCart) return;
-		addToCartMutation.mutate({ product, quantity });
+		addToCartMutation.mutate({ id: null, product, quantity });
 	};
 
 	const wishlistLabel = isFavorite ? "Remove from wishlist" : "Add to wishlist";

@@ -14,7 +14,7 @@ export const SupplementRecommendation = ({
 	className,
 }: SupplementAdvisorProps) => {
 	const navigate = useNavigate();
-	const addItemMutation = useAddToCart();
+	const addToCartMutation = useAddToCart();
 
 	const {
 		quizStep,
@@ -30,9 +30,9 @@ export const SupplementRecommendation = ({
 
 	const handleAddToCart = useCallback(
 		(product: Product, quantity = 1) => {
-			addItemMutation.mutate({ product, quantity });
+			addToCartMutation.mutate({ id: null, product, quantity });
 		},
-		[addItemMutation],
+		[addToCartMutation],
 	);
 
 	return (
