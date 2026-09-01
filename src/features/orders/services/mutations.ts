@@ -4,7 +4,7 @@ import {
 	cancelOrder,
 	changeOrderStatus,
 	checkout,
-	getCheckoutPaymentUrl,
+	generateCheckoutPaymentUrl,
 } from "./api";
 import { useNavigate } from "react-router";
 import { orderKeys } from "./keys";
@@ -80,7 +80,7 @@ export function useGetPaymentUrl() {
 	const navigate = useNavigate();
 
 	return useMutation({
-		mutationFn: (orderId: string) => getCheckoutPaymentUrl(orderId),
+		mutationFn: (orderId: string) => generateCheckoutPaymentUrl(orderId),
 		onSuccess: (data) => {
 			if (data.paymentUrl) {
 				window.location.href = data.paymentUrl;

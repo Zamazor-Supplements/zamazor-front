@@ -45,22 +45,20 @@ export function useMyOrders(
 
 export function useVerifyOrderPayment({
 	orderId,
-	sessionId,
 }: {
 	orderId: string | undefined;
-	sessionId: string | undefined;
 }) {
 	const queryClient = useQueryClient();
 
 	return useQuery({
 		queryKey: orderKeys.status(orderId!),
 		queryFn: async () => {
-			const data = await verifyCheckoutPayment(orderId!, sessionId!);
+			const data = await verifyCheckoutPayment(orderId!);
 			await queryClient.setQueryData(orderKeys.detail(data.id), data);
 			await queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 			return data;
 		},
-		enabled: !!orderId && !!sessionId,
+		enabled: !!orderId,
 		staleTime: Infinity,
 	});
 }

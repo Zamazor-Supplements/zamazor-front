@@ -7,6 +7,8 @@ export const API_ENDPOINTS = {
 		FORGOT_PASSWORD: "/auth/password-reset/request",
 		RESET_PASSWORD: "/auth/password-reset/confirm",
 		ME: "/auth/me",
+		SEND_VERIFICATION: "/auth/send-verification",
+		VERIFY_EMAIL: "/auth/verify-email",
 	},
 	USERS: {
 		ROOT: "/users",
@@ -52,10 +54,6 @@ export const API_ENDPOINTS = {
 		STATUS: (id: string) => `/orders/${id}/status`,
 		CHECKOUT: "/orders/checkout",
 		GET_PAYMENT_URL: (orderId: string) => `/orders/checkout/${orderId}/pay`,
-		VERIFY_PAYMENT: (
-			orderId: string,
-			sessionId: string,
-		) =>
-			`/orders/checkout/${orderId}/verify?sessionId=${encodeURIComponent(sessionId)}`,
+		VERIFY_PAYMENT: (orderId: string) => `/orders/checkout/${orderId}/verify`,
 	},
 } as const;
