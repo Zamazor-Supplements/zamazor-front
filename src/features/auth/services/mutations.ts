@@ -1,5 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { forgotPassword, login, logout, register, resetPassword } from "./api";
+import {
+	forgotPassword,
+	login,
+	logout,
+	register,
+	resetPassword,
+	sendVerificationEmail,
+	verifyEmail,
+} from "./api";
 import { tokenManager } from "../globals/tokenManager";
 import { authKeys } from "./keys";
 import { useAuthStore } from "../stores/authStore";
@@ -77,6 +85,23 @@ export function useResetPassword() {
 		mutationFn: resetPassword,
 		onSuccess: () => {
 			navigate(APP_ROUTES.AUTH.LOGIN);
+		},
+	});
+}
+
+export function useSendVerificationEmail() {
+	return useMutation({
+		mutationFn: sendVerificationEmail,
+	});
+}
+
+export function useVerifyEmail() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: verifyEmail,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: authKeys.me() });
 		},
 	});
 }
