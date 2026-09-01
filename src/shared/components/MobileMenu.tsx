@@ -5,6 +5,7 @@ import {
 	Layers3Icon,
 	MessageSquareIcon,
 	StoreIcon,
+	PackageIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router";
@@ -147,12 +148,32 @@ export const MobileMenu = ({
 							<span className="font-bold text-ink">{userName}</span>
 						</div>
 					)}
-					<OriginButton
-						onClick={() => handleAuthAction(authRoute)}
-						className="h-10 w-full cursor-pointer justify-center rounded-lg text-xs font-bold shadow-xs active:scale-95"
-					>
-						{authButtonLabel}
-					</OriginButton>
+					<div className="flex gap-2">
+						<OriginButton
+							onClick={() => handleAuthAction(authRoute)}
+							className="h-10 flex-1 cursor-pointer justify-center rounded-lg text-xs font-bold shadow-xs active:scale-95"
+						>
+							{authButtonLabel}
+						</OriginButton>
+						{user && user.role !== "ADMIN" && (
+							<OriginButton
+								variant="outline"
+								disabled={!user.emailVerified}
+								onClick={() => {
+									if (user.emailVerified)
+										handleAuthAction(APP_ROUTES.USER.ORDERS);
+								}}
+								title={
+									!user.emailVerified
+										? "Please verify your email to access orders"
+										: "View your orders"
+								}
+								className="h-10 cursor-pointer justify-center rounded-lg text-xs font-bold shadow-xs active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+							>
+								<PackageIcon className="size-4" />
+							</OriginButton>
+						)}
+					</div>
 				</div>
 			</div>
 		</div>
