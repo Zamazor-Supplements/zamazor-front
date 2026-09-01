@@ -14,6 +14,7 @@ import {
 	MessageSquareIcon,
 	AwardIcon,
 	Layers3Icon,
+	PackageIcon,
 } from "lucide-react";
 import { BouncingCart } from "../../features/cart/components/shared/BouncingCart";
 import { WishlistCountButton } from "@/features/wishlists/components/WishlistCountButton";
@@ -37,7 +38,7 @@ export const Header = forwardRef<HTMLElement, { className?: string }>(
 		const { language, setLanguage } = useLanguage();
 		const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-		const { isAuthenticated, profileDisplayName, profileTargetRoute } =
+		const { user, isAuthenticated, profileDisplayName, profileTargetRoute } =
 			useUserProfile();
 
 		// Handlers
@@ -110,6 +111,26 @@ export const Header = forwardRef<HTMLElement, { className?: string }>(
 							language={language}
 							onLanguageChange={setLanguage}
 						/>
+
+						{/* Desktop Orders Button (Only for authenticated, non-admin users) */}
+						{isAuthenticated && user?.role !== "ADMIN" && (
+							<OriginButton
+								variant="outline"
+								disabled={!user?.emailVerified}
+								onClick={() => {
+									if (user?.emailVerified) navigate(APP_ROUTES.USER.ORDERS);
+								}}
+								title={
+									!user?.emailVerified
+										? "Please verify your email to access orders"
+										: "View your orders"
+								}
+								className="hidden h-9 cursor-pointer items-center gap-1.5 rounded-full px-4 text-xs font-semibold sm:inline-flex disabled:cursor-not-allowed disabled:opacity-50"
+							>
+								<PackageIcon className="size-3.5" />
+								Orders
+							</OriginButton>
+						)}
 
 						{/* Desktop Auth Button */}
 						<OriginButton

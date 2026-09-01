@@ -41,6 +41,29 @@ export const register = async (data: RegisterRequest) => {
 	);
 };
 
+export const sendVerificationEmail = async () => {
+	await privateApiRequest<void>(
+		{
+			url: API_ENDPOINTS.AUTH.SEND_VERIFICATION,
+			method: "POST",
+		},
+		{
+			successMessage: {
+				title: "Verification email sent",
+				description: "Please check your inbox for the verification link.",
+			},
+		},
+	);
+};
+
+export const verifyEmail = async (data: { token: string }) => {
+	await publicApiRequest<void>({
+		url: API_ENDPOINTS.AUTH.VERIFY_EMAIL,
+		method: "POST",
+		data,
+	});
+};
+
 export const login = async (data: LoginRequest) => {
 	const response = await publicApiRequest<LoginResponse>(
 		{
@@ -104,7 +127,13 @@ export const forgotPassword = async (data: RequestPasswordResetInput) => {
 			method: "POST",
 			data,
 		},
-		{ ignoreErrors: true },
+		{
+			ignoreErrors: true,
+			successMessage: {
+				title: "Password reset request sent",
+				description: "Please check your inbox for the reset link.",
+			},
+		},
 	);
 };
 
@@ -115,7 +144,13 @@ export const resetPassword = async (data: ResetPasswordRequest) => {
 			method: "POST",
 			data,
 		},
-		{ ignoreErrors: true },
+		{
+			ignoreErrors: true,
+			successMessage: {
+				title: "Password reset successful",
+				description: "Your password has been reset successfully.",
+			},
+		},
 	);
 };
 

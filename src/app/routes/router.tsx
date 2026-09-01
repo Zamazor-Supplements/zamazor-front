@@ -93,6 +93,15 @@ const router = createBrowserRouter([
 							},
 						],
 					},
+					{
+						element: <RequireAuth requiresVerification />,
+						children: [
+							{
+								path: APP_ROUTES.USER.ORDERS,
+								element: withSuspense(lazyPages.LazyUserOrdersPage),
+							},
+						],
+					},
 				],
 			},
 
@@ -113,11 +122,17 @@ const router = createBrowserRouter([
 				}),
 			},
 			{
+				path: APP_ROUTES.AUTH.VERIFY_EMAIL,
+				element: withSuspense(lazyPages.LazyVerifyEmailPage, {
+					fullScreen: true,
+				}),
+			},
+			{
 				path: APP_ROUTES.AUTH.REGISTER,
 				element: withSuspense(lazyPages.LazyRegisterPage, { fullScreen: true }),
 			},
 			{
-				element: <RequireAuth />,
+				element: <RequireAuth requiresVerification />,
 				children: [
 					{
 						path: APP_ROUTES.CHECKOUT.ROOT,

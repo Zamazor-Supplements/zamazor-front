@@ -1,6 +1,13 @@
 import { Input } from "@/shared/components/ui/input";
 import { OriginButton } from "@/shared/components/ui/origin-button";
-import { Loader2, MapPin, Save, User as UserIcon } from "lucide-react";
+import {
+	Loader2Icon,
+	MapPinIcon,
+	SaveIcon,
+	UserIcon,
+	ShieldAlertIcon,
+	CheckCircle2Icon,
+} from "lucide-react";
 import type {
 	FieldErrorsImpl,
 	SubmitHandler,
@@ -9,10 +16,13 @@ import type {
 } from "react-hook-form";
 import type { ProfileFormValues } from "@/features/auth/schemas/profileSchema";
 import { APP_COUNTRY } from "@/app/config/constants";
+import { useSendVerificationEmail } from "@/features/auth/services/mutations";
+import { Button } from "@/shared/components/ui/button";
 
 interface ProfileFormSectionProps {
 	userFullName: string;
 	userEmail: string;
+	emailVerified: boolean;
 	register: UseFormRegister<ProfileFormValues>;
 	errors: FieldErrorsImpl<ProfileFormValues>;
 	handleSubmit: UseFormHandleSubmit<ProfileFormValues>;
@@ -23,6 +33,7 @@ interface ProfileFormSectionProps {
 
 export const ProfileFormSection = ({
 	userEmail,
+	emailVerified,
 	register,
 	errors,
 	handleSubmit,
@@ -30,6 +41,8 @@ export const ProfileFormSection = ({
 	isSaving,
 	isDirty,
 }: ProfileFormSectionProps) => {
+	const sendEmailVerificationMutation = useSendVerificationEmail();
+
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 			{/* Personal Information Card */}
@@ -75,19 +88,47 @@ export const ProfileFormSection = ({
 
 					<div className="space-y-2">
 						<div className="flex items-center justify-between">
-							<label className="text-xs font-semibold text-ink block">
+							<label className="text-xs font-semibold text-ink flex items-center gap-2">
 								Email Address
+								{emailVerified ? (
+									<span className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-md">
+										<CheckCircle2Icon className="size-3" />
+										Verified
+									</span>
+								) : (
+									<span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">
+										<ShieldAlertIcon className="size-3" />
+										Unverified
+									</span>
+								)}
 							</label>
 							<span className="text-[10px] font-bold uppercase tracking-wider text-ink-faint bg-surface-2/80 px-2 py-0.5 rounded-md">
 								Read-only
 							</span>
 						</div>
-						<Input
-							type="email"
-							disabled
-							value={userEmail}
-							className="h-12 rounded-lg border border-brand-900/10 bg-surface-2/50 text-ink-soft cursor-not-allowed text-sm px-4"
-						/>
+						<div className="flex gap-2">
+							<Input
+								type="email"
+								disabled
+								value={userEmail}
+								className="h-12 rounded-lg border border-brand-900/10 bg-surface-2/50 text-ink-soft cursor-not-allowed text-sm px-4 flex-1"
+							/>
+							{!emailVerified && (
+								<Button
+									type="button"
+									variant="outline"
+									className="h-12 px-4 whitespace-nowrap"
+									onClick={() => sendEmailVerificationMutation.mutate()}
+									disabled={sendEmailVerificationMutation.isPending}
+								>
+									{sendEmailVerificationMutation.isPending ? (
+										<Loader2Icon className="size-4 animate-spin" />
+									) : (
+										"Resend Link"
+									)}
+								</Button>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -97,7 +138,7 @@ export const ProfileFormSection = ({
 				<div className="border-b border-brand-900/10 pb-5">
 					<div className="flex items-center gap-3.5">
 						<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-50 text-brand-700 shadow-sm border border-brand-100/50">
-							<MapPin className="size-5" />
+							<MapPinIcon className="size-5" />
 						</div>
 						<div>
 							<h2 className="font-playfair text-lg font-bold tracking-tight text-ink">
@@ -196,12 +237,12 @@ export const ProfileFormSection = ({
 				>
 					{isSaving ? (
 						<>
-							<Loader2 className="size-4 animate-spin text-white" />
+							<Loader2Icon className="size-4 animate-spin text-white" />
 							<span>Saving changes...</span>
 						</>
 					) : (
 						<>
-							<Save className="size-4" />
+							<SaveIcon className="size-4" />
 							<span>Save Changes</span>
 						</>
 					)}

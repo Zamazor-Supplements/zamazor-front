@@ -69,10 +69,10 @@ export const checkout = async (payload: CheckoutFormValues) => {
 	return parseResponse(response, orderSchema, "Order data validation failed");
 };
 
-export const getCheckoutPaymentUrl = async (orderId: string) => {
+export const generateCheckoutPaymentUrl = async (orderId: string) => {
 	const response = await privateApiRequest<PaymentSessionResponse>({
 		url: API_ENDPOINTS.ORDERS.GET_PAYMENT_URL(orderId),
-		method: "GET",
+		method: "POST",
 	});
 
 	return parseResponse(
@@ -84,11 +84,10 @@ export const getCheckoutPaymentUrl = async (orderId: string) => {
 
 export const verifyCheckoutPayment = async (
 	orderId: string,
-	sessionId: string,
 ) => {
 	const response = await privateApiRequest<Order>({
-		url: API_ENDPOINTS.ORDERS.VERIFY_PAYMENT(orderId, sessionId),
-		method: "POST",
+		url: API_ENDPOINTS.ORDERS.VERIFY_PAYMENT(orderId),
+		method: "GET",
 	});
 
 	return parseResponse(response, orderSchema, "Order data validation failed");

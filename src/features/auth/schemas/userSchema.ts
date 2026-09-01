@@ -10,5 +10,6 @@ export const userSchema = z.object({
 	fullName: z.string().min(2),
 	address: addressSchema.nullable(),
 	role: roleSchema,
+	emailVerified: z.boolean(),
 });
 export type User = z.infer<typeof userSchema>;
