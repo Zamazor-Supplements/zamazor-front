@@ -18,9 +18,9 @@ export const ProfileOrdersSection = ({
 	const { t } = useLanguage();
 	const { data: orderPage, isPending, isError, refetch } = useMyOrders();
 
-	if (isPending || !orderPage) {
+	if (isPending) {
 		return (
-			<div className="rounded-3xl border border-brand-900/10 bg-card p-6 sm:p-10 shadow-2xl shadow-brand-950/5 backdrop-blur-xl">
+			<div className="rounded-md border border-brand-900/10 bg-card p-6 sm:p-10 shadow-md shadow-brand-950/5 backdrop-blur-xl">
 				<div className="flex flex-col items-center justify-center py-20 sm:py-28 text-center px-4">
 					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-brand-900 mb-4 shadow-sm ring-1 ring-brand-900/10">
 						<Loader2Icon className="size-6 animate-spin text-brand-900" />
@@ -48,7 +48,7 @@ export const ProfileOrdersSection = ({
 
 	if (orderPage.items.length === 0) {
 		return (
-			<div className="rounded-3xl border border-brand-900/10 bg-card p-6 sm:p-10 shadow-2xl shadow-brand-950/5">
+			<div className="rounded-md border border-brand-900/10 bg-card p-6 sm:p-10 shadow-md shadow-brand-950/5">
 				<div className="border-b border-brand-900/10 pb-6 mb-8">
 					<h2 className="font-playfair text-xl sm:text-2xl font-extrabold tracking-tight text-ink">
 						{t("profile.ordersHistory")}
@@ -81,7 +81,7 @@ export const ProfileOrdersSection = ({
 	}
 
 	return (
-		<div className="rounded-3xl border border-brand-900/10 bg-card p-5 sm:p-8 lg:p-10 shadow-2xl shadow-brand-950/5">
+		<div className="rounded-md border border-brand-900/10 bg-card p-5 sm:p-8 lg:p-10 shadow-md shadow-brand-950/5">
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-brand-900/10 pb-6 mb-6 sm:mb-8 gap-4">
 				<div>
 					<h2 className="font-playfair text-xl sm:text-2xl font-extrabold tracking-tight text-ink">

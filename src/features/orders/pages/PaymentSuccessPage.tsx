@@ -28,11 +28,10 @@ export default function PaymentSuccessPage() {
 
 	const { isPending, isError, error, data, refetch } = useVerifyOrderPayment({
 		orderId,
-		sessionId,
 	});
 
 	useDocumentTitle(
-		`${isPending ? "Verifying Payment..." : "Payment Succeeded"} | ${CONFIG.APP_NAME}`
+		`${isPending ? "Verifying Payment..." : "Payment Succeeded"} | ${CONFIG.APP_NAME}`,
 	);
 
 	if (!orderId || !sessionId) return <Navigate to={APP_ROUTES.SHOP} replace />;
@@ -49,7 +48,8 @@ export default function PaymentSuccessPage() {
 						{ label: "Home", href: APP_ROUTES.HOME },
 						{ label: "Order Confirmed" },
 					]}
-					className="mb-5" />
+					className="mb-5"
+				/>
 				<div className="grid size-16 place-items-center rounded-full bg-brand-50 text-brand-600 mx-auto mb-5 shadow-inner">
 					<CheckCircle2Icon className="size-8" />
 				</div>

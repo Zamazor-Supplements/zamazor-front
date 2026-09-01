@@ -47,7 +47,7 @@ export const ProfileOrderCard = ({
 	return (
 		<div
 			className={cn(
-				"group rounded-3xl border transition-all duration-300 bg-card shadow-xl shadow-brand-950/5 overflow-hidden w-full min-w-0",
+				"group rounded-md border transition-all duration-300 bg-card shadow-xl shadow-brand-950/5 overflow-hidden w-full min-w-0",
 				isPendingPayment
 					? "border-brand-900/30 bg-linear-to-b from-brand-50/20 via-card to-card ring-2 ring-brand-900/5"
 					: "border-brand-900/10 hover:border-brand-900/20",
@@ -63,7 +63,7 @@ export const ProfileOrderCard = ({
 				)}
 			>
 				<div className="flex items-center gap-3 flex-wrap min-w-0">
-					<div className="flex items-center gap-2 bg-card px-3.5 py-1.5 rounded-2xl border border-brand-900/10/80 shadow-xs">
+					<div className="flex items-center gap-2 bg-card px-3.5 py-1.5 rounded-md border border-brand-900/10/80 shadow-xs">
 						<PackageIcon className="size-4 text-brand-900 shrink-0" />
 						<span className="font-mono text-xs font-extrabold tracking-tight text-ink truncate">
 							#{order.id.slice(0, 8).toUpperCase()}
@@ -119,7 +119,7 @@ export const ProfileOrderCard = ({
 					{order.items.map((item) => (
 						<div
 							key={item.id}
-							className="flex items-center justify-between gap-3 rounded-2xl border border-brand-900/10 bg-surface-2/50 p-3.5 transition-colors hover:bg-surface-2 min-w-0 overflow-hidden"
+							className="flex items-center justify-between gap-3 rounded-md border border-brand-900/10 bg-surface-2/50 p-3.5 transition-colors hover:bg-surface-2 min-w-0 overflow-hidden"
 						>
 							<div className="flex items-center gap-3 min-w-0 flex-1">
 								<div className="size-10 sm:size-11 rounded-lg bg-card border border-brand-900/10/80 text-brand-900 flex items-center justify-center shrink-0 shadow-xs font-bold text-xs">
