@@ -7,13 +7,12 @@ import { Button } from "@/shared/components/ui/button";
 import { APP_ROUTES } from "@/app/routes/paths";
 import CONFIG from "@/app/config/constants";
 
-export const SummaryPanel = ({
-	summary,
-	isFetching,
-}: {
+interface SummaryPannelProps {
 	summary: Cart;
 	isFetching: boolean;
-}) => {
+}
+
+export const SummaryPanel = ({ summary, isFetching }: SummaryPannelProps) => {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 	const subtotal = summary.subtotal;

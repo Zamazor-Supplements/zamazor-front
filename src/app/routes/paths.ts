@@ -7,7 +7,6 @@ type PathParams<TPath extends string> =
 			? { [K in Param]: string }
 			: Record<never, never>;
 
-
 type ReplaceParams<
 	TPath extends string,
 	TParams extends Record<string, string>,
@@ -28,9 +27,7 @@ type Route<TPath extends string> = {
 	): ReplaceParams<TPath, TParams>;
 };
 
-const createRoute = <const TPath extends string>(
-	path: TPath,
-): Route<TPath> => {
+const createRoute = <const TPath extends string>(path: TPath): Route<TPath> => {
 	const route = (params?: Record<string, string>) =>
 		params
 			? path.replace(

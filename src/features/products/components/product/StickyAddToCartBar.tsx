@@ -41,7 +41,7 @@ export const StickyAddToCartBar = ({ product }: StickyAddToCartBarProps) => {
 	const shouldDisplay = show && !isRouteHidden;
 
 	const handleAdd = () => {
-		addToCartMutation.mutate({ product, quantity });
+		addToCartMutation.mutate({ id: null, product, quantity });
 	};
 
 	return (

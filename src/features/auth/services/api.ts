@@ -14,6 +14,10 @@ import { userSchema, type User } from "../schemas/userSchema";
 import { parseResponse } from "@/shared/utils/parseResponse";
 import { privateApiRequest } from "@/shared/utils/axiosPrivate";
 import { tokenManager } from "../globals/tokenManager";
+import type {
+	RequestPasswordResetInput,
+	ResetPasswordRequest,
+} from "../schemas/resetPasswordSchema";
 
 export const register = async (data: RegisterRequest) => {
 	const response = await publicApiRequest<User>(
@@ -91,6 +95,28 @@ export const refresh = async () => {
 
 	tokenManager.setAccessToken(parsed.accessToken);
 	return parsed.accessToken;
+};
+
+export const forgotPassword = async (data: RequestPasswordResetInput) => {
+	await publicApiRequest<void>(
+		{
+			url: API_ENDPOINTS.AUTH.FORGOT_PASSWORD,
+			method: "POST",
+			data,
+		},
+		{ ignoreErrors: true },
+	);
+};
+
+export const resetPassword = async (data: ResetPasswordRequest) => {
+	await publicApiRequest<void>(
+		{
+			url: API_ENDPOINTS.AUTH.RESET_PASSWORD,
+			method: "POST",
+			data,
+		},
+		{ ignoreErrors: true },
+	);
 };
 
 export const fetchCurrentUser = async () => {

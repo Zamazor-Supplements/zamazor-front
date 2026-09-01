@@ -10,9 +10,12 @@ import {
 } from "@/features/products/schemas/categorySchema";
 import {
 	createProductSchema,
+	updateProductSchema,
 	type CreateProductInput,
 	type CreateProductOutput,
 	type Product,
+	type UpdateProductInput,
+	type UpdateProductOutput,
 } from "@/features/products/schemas/productSchema";
 import { AlertCircleIcon, Loader2Icon, CheckIcon, XIcon } from "lucide-react";
 
@@ -57,8 +60,14 @@ export const ProductFormModal = ({
 		setValue,
 		handleSubmit,
 		formState: { errors, isSubmitting },
-	} = useForm<CreateProductInput, undefined, CreateProductOutput>({
-		resolver: zodResolver(createProductSchema),
+	} = useForm<
+		CreateProductInput | UpdateProductInput,
+		undefined,
+		CreateProductOutput | UpdateProductOutput
+	>({
+		resolver: zodResolver(
+			isEditing ? updateProductSchema : createProductSchema,
+		),
 		defaultValues,
 	});
 

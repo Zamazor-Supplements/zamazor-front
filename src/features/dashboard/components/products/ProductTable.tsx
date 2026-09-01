@@ -43,7 +43,7 @@ export const ProductTable = ({
 	);
 
 	const onViewProduct = (productId: string) =>
-		window.open(APP_ROUTES.PRODUCT(productId), "_blank");
+		window.open(APP_ROUTES.PRODUCT({ id: productId }), "_blank");
 
 	return (
 		<div className="relative flex flex-col overflow-hidden border border-brand-900/10 bg-card shadow-sm">
@@ -210,12 +210,9 @@ export const ProductTable = ({
 			{tableTotalElements > 0 && (
 				<div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-brand-900/10 bg-surface-2/50 px-6 py-3 select-none">
 					<p className="text-xs text-ink-soft font-medium">
-						Showing{" "}
-						<span className="font-semibold text-ink">{start}</span>–
+						Showing <span className="font-semibold text-ink">{start}</span>–
 						<span className="font-semibold text-ink">{end}</span> of{" "}
-						<span className="font-semibold text-ink">
-							{tableTotalElements}
-						</span>{" "}
+						<span className="font-semibold text-ink">{tableTotalElements}</span>{" "}
 						items
 					</p>
 

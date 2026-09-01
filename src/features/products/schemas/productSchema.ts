@@ -2,6 +2,12 @@ import z from "zod/v4";
 import { categorySchema } from "./categorySchema";
 import { createPageResponseSchema } from "@/shared/schemas/pageSchema";
 
+const ACCEPTED_IMAGE_TYPES = [
+	"image/jpeg",
+	"image/png",
+	"image/gif",
+	"image/webp",
+];
 /**
  * Customer review — all fields except author/rating/body are optional so the
  * backend can grow into them without breaking existing payloads.
@@ -47,9 +53,8 @@ export const createProductSchema = z.object({
 		.instanceof(File)
 		.optional()
 		.refine((file) => {
-			if (!file) return true; // Allow optional file
-			const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-			return allowedTypes.includes(file.type);
+			if (!file) return false; // Allow optional file
+			return ACCEPTED_IMAGE_TYPES.includes(file.type);
 		}, "Invalid image type. Please upload a JPEG, PNG, or GIF file."),
 });
 export type CreateProductInput = z.input<typeof createProductSchema>;
@@ -66,8 +71,7 @@ export const updateProductSchema = z.object({
 		.optional()
 		.refine((file) => {
 			if (!file) return true; // Allow optional file
-			const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-			return allowedTypes.includes(file.type);
+			return ACCEPTED_IMAGE_TYPES.includes(file.type);
 		}, "Invalid image type. Please upload a JPEG, PNG, or GIF file."),
 });
 export type UpdateProductInput = z.input<typeof updateProductSchema>;

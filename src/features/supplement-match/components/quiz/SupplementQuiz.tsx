@@ -30,7 +30,7 @@ export const SupplementQuiz = ({ onClose }: SupplementQuizProps) => {
 
 	const handleAddToCart = useCallback(
 		(product: Product) => {
-			addToCartMutation.mutate({ product, quantity: 1 });
+			addToCartMutation.mutate({ id: null, product, quantity: 1 });
 		},
 		[addToCartMutation],
 	);
