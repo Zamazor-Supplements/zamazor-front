@@ -66,6 +66,7 @@ export const APP_ROUTES = {
 		REGISTER: "/register",
 		FORGOT_PASSWORD: "/forgot-password",
 		RESET_PASSWORD: "/reset-password",
+		VERIFY_EMAIL: "/verify-email",
 	},
 	PAGES: {
 		ABOUT: "/story",

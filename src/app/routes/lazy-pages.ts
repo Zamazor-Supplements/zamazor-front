@@ -25,6 +25,9 @@ export const LazyForgotPasswordPage = lazy(
 export const LazyResetPasswordPage = lazy(
 	() => import("@/features/auth/pages/ResetPasswordPage"),
 );
+export const LazyVerifyEmailPage = lazy(
+	() => import("@/features/auth/pages/VerifyEmailPage"),
+);
 export const LazyRegisterPage = lazy(
 	() => import("@/features/auth/pages/RegisterPage"),
 );
@@ -48,6 +51,9 @@ export const LazyFAQPage = lazy(
 );
 export const LazyProfilePage = lazy(
 	() => import("@/features/profile/pages/ProfilePage"),
+);
+export const LazyUserOrdersPage = lazy(
+	() => import("@/features/profile/pages/UserOrdersPage"),
 );
 export const LazyPaymentSuccessPage = lazy(
 	() => import("@/features/orders/pages/PaymentSuccessPage"),
