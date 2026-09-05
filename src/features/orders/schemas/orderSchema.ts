@@ -10,7 +10,8 @@ const productSnapshotSchema = z.object({
 	price: z.number().positive(),
 });
 
-const userMinSchema = z.object({
+// Orders embed a trimmed customer, not the full profile user.
+const orderUserSchema = z.object({
 	id: z.uuid(),
 	email: z.email(),
 	fullName: z.string().min(1),
@@ -37,7 +38,7 @@ export const orderSchema = z.object({
 	shippingCity: z.string().min(1),
 	shippingStreet: z.string().min(1),
 	phone: z.string().min(1),
-	user: userMinSchema,
+	user: orderUserSchema,
 	createdAt: z.iso.datetime().pipe(z.coerce.date()),
 });
 export type Order = z.infer<typeof orderSchema>;

@@ -11,6 +11,7 @@ import { orderKeys } from "./keys";
 import { useQueryClient } from "@tanstack/react-query";
 import type { CheckoutFormValues } from "../schemas/checkoutSchema";
 import { cartKeys } from "@/features/cart/services/keys";
+import { dashboardKeys } from "@/features/dashboard/services/keys";
 import type { OrderStatus } from "../constants/orderStatus";
 
 export function useCheckout() {
@@ -22,6 +23,7 @@ export function useCheckout() {
 		mutationFn: (payload: CheckoutFormValues) => checkout(payload),
 		onSuccess: async (newOrder) => {
 			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+			queryClient.invalidateQueries({ queryKey: dashboardKeys.overview() });
 
 			queryClient.setQueryData(orderKeys.detail(newOrder.id), newOrder);
 
@@ -56,6 +58,7 @@ export function useChangeOrderStatus() {
 		}) => changeOrderStatus(orderId, status),
 		onSuccess: (updatedOrder) => {
 			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+			queryClient.invalidateQueries({ queryKey: dashboardKeys.overview() });
 			queryClient.setQueryData(orderKeys.detail(updatedOrder.id), updatedOrder);
 		},
 	});
@@ -68,6 +71,7 @@ export function useCancelOrder() {
 		mutationFn: (orderId: string) => cancelOrder(orderId),
 		onSuccess: (updatedOrder) => {
 			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+			queryClient.invalidateQueries({ queryKey: dashboardKeys.overview() });
 			queryClient.setQueryData(orderKeys.detail(updatedOrder.id), updatedOrder);
 		},
 	});

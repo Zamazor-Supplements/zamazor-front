@@ -1,42 +1,35 @@
 import { useCallback, useState } from "react";
+import { keepPreviousData } from "@tanstack/react-query";
+import { RotateCwIcon } from "lucide-react";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/app/config/constants";
 import { Button } from "@/shared/components/ui/button";
 import { ConfirmDialog } from "@/shared/components/ui/confirm-dialog";
-import { RotateCwIcon } from "lucide-react";
+import { ErrorFallback } from "@/shared/components/ui/error-fallback";
 import type { Order } from "@/features/orders/schemas/orderSchema";
-import {
-	OrderStatus,
-	type OrderStatusFilter,
-} from "@/features/orders/constants/orderStatus";
-
-import { OrderAnalyticsCards } from "../components/orders/OrderAnalyticsCards";
-import { OrderFiltersToolbar } from "../components/orders/OrderFiltersToolbar";
-import { OrdersTable } from "../components/orders/OrdersTable";
-import { OrderDetailModal } from "../components/orders/OrderDetailModal";
+import { OrderStatus } from "@/features/orders/constants/orderStatus";
 import {
 	useCancelOrder,
 	useChangeOrderStatus,
 } from "@/features/orders/services/mutations";
 import { useOrders } from "@/features/orders/services/queries";
+
+import { OrderDetailModal } from "../components/orders/OrderDetailModal";
+import {
+	OrderFiltersToolbar,
+	type OrderFilters,
+} from "../components/orders/OrderFiltersToolbar";
+import { OrdersTable } from "../components/orders/OrdersTable";
+import { OrderPageSkeleton } from "../components/orders/OrdersPageSkeleton";
+import { AnalyticsCards } from "../components/shared/AnalyticsCards";
+import { PageHeader } from "../components/shared/PageHeader";
+import { ORDER_METRICS_CONFIG } from "../config/metrics";
 import {
 	DASHBOARD_ORDER_PAGE_SIZE,
 	useDashboardOrderFilters,
-	type DashboardOrderSort,
+	type OrderSort,
 } from "../hooks/use-dashboard-order-filters";
-import { OrderPageSkeleton } from "../components/orders/OrdersPageSkeleton";
-import { PageHeader } from "../components/shared/PageHeader";
-
-type Filters = {
-	search: string | undefined;
-	status: OrderStatusFilter;
-};
-
-type Pagination = {
-	page: number;
-	size: number;
-	sort: DashboardOrderSort;
-};
+import { useDashboardOverview } from "../services/queries";
 
 type ConfirmState = {
 	open: boolean;
@@ -59,7 +52,6 @@ const DEFAULT_CONFIRM: ConfirmState = {
 export default function OrdersPage() {
 	useDocumentTitle(`Orders Management | ${CONFIG.APP_NAME}`);
 
-	// Grouped states
 	const { filters, updateFilters, setPage, resetFilters, isFilterActive } =
 		useDashboardOrderFilters();
 	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -68,31 +60,45 @@ export default function OrdersPage() {
 	>(null);
 	const [confirm, setConfirm] = useState<ConfirmState>(DEFAULT_CONFIRM);
 
-	// Mutations
 	const changeOrderStatusMutation = useChangeOrderStatus();
 	const cancelOrderMutation = useCancelOrder();
 
-	// Query
+	const {
+		data: overview,
+		isPending: isOverviewPending,
+		isFetching: isOverviewFetching,
+		refetch: refetchOverview,
+	} = useDashboardOverview();
+
 	const {
 		data: orderPage,
-		isPending,
-		isFetching,
-		refetch,
-	} = useOrders({
-		status: filters.status,
-		userFullName: filters.search?.trim(),
-		page: filters.page,
-		size: DASHBOARD_ORDER_PAGE_SIZE,
-		sort: filters.sort,
-	});
+		isPending: isOrdersPending,
+		isFetching: isOrdersFetching,
+		refetch: refetchOrders,
+	} = useOrders(
+		{
+			status: filters.status,
+			userFullName: filters.search?.trim() || undefined,
+			page: filters.page,
+			size: DASHBOARD_ORDER_PAGE_SIZE,
+			sort: filters.sort,
+		},
+		{ placeholderData: keepPreviousData },
+	);
 
-	// Helper functions — filter and sort changes both snap back to page 0.
-	const handleFilterChange = (next: Partial<Filters>) => {
+	const isRefreshing = isOrdersFetching || isOverviewFetching;
+
+	const handleRefresh = () => {
+		refetchOrders();
+		refetchOverview();
+	};
+
+	const handleFiltersChange = (next: Partial<OrderFilters>) => {
 		updateFilters({ ...next, page: 0 });
 	};
 
-	const handlePaginationChange = (next: Partial<Pagination>) => {
-		updateFilters({ ...next, page: next.page ?? 0 });
+	const handleSortChange = (sort: OrderSort) => {
+		updateFilters({ sort, page: 0 });
 	};
 
 	const openConfirm = ({
@@ -172,13 +178,23 @@ export default function OrdersPage() {
 		});
 	};
 
-	if (isPending) {
+	if (isOrdersPending || isOverviewPending) {
 		return <OrderPageSkeleton />;
+	}
+
+	if (!orderPage) {
+		return (
+			<ErrorFallback
+				title="Couldn't load orders"
+				description="The orders service did not return a valid response. Please try again."
+				onRetry={() => refetchOrders()}
+				className="min-h-96"
+			/>
+		);
 	}
 
 	return (
 		<div className="space-y-6">
-			{/* Header */}
 			<PageHeader
 				eyebrow="Orders"
 				title="Order list"
@@ -186,56 +202,41 @@ export default function OrdersPage() {
 			>
 				<Button
 					variant="outline"
-					onClick={() => refetch()}
-					disabled={isFetching}
+					onClick={handleRefresh}
+					disabled={isRefreshing}
 					className="h-10 rounded-lg border-brand-900/10 text-xs font-semibold text-ink transition-colors hover:bg-surface-2"
 				>
 					<RotateCwIcon
-						className={`mr-1.5 size-3.5 ${isFetching ? "animate-spin text-brand-800" : ""}`}
+						className={`mr-1.5 size-3.5 ${isRefreshing ? "animate-spin text-brand-800" : ""}`}
 					/>
 					Refresh
 				</Button>
 			</PageHeader>
 
-			{/* Analytics Cards */}
-			{orderPage && <OrderAnalyticsCards orderPage={orderPage} />}
+			{overview && <AnalyticsCards metrics={ORDER_METRICS_CONFIG(overview)} />}
 
-			{/* Table Container */}
 			<div className="relative overflow-hidden rounded-lg border border-brand-900/10 bg-card shadow-xs">
-				{/* Filters Toolbar */}
 				<OrderFiltersToolbar
-					filters={{
-						search: filters.search,
-						status: filters.status,
-					}}
-					pagination={{
-						page: filters.page,
-						sort: filters.sort,
-						size: DASHBOARD_ORDER_PAGE_SIZE,
-					}}
-					totalElements={orderPage?.totalElements ?? 0}
-					totalPages={orderPage?.totalPages ?? 0}
+					filters={{ search: filters.search, status: filters.status }}
+					sort={filters.sort}
+					totalElements={orderPage.totalElements}
 					isFilterActive={isFilterActive}
-					updateFilters={handleFilterChange}
-					updatePagination={handlePaginationChange}
+					onFiltersChange={handleFiltersChange}
+					onSortChange={handleSortChange}
 					onResetFilters={resetFilters}
 				/>
 
-				{/* Table Component */}
-				{orderPage && (
-					<OrdersTable
-						orderPage={orderPage}
-						isFetching={isFetching}
-						updatingStatusOrderId={updatingStatusOrderId}
-						onViewOrder={setSelectedOrder}
-						onChangeStatus={handleChangeOrderStatus}
-						onRefundOrder={handleRefundOrder}
-						onPageChange={setPage}
-					/>
-				)}
+				<OrdersTable
+					orderPage={orderPage}
+					isFetching={isOrdersFetching}
+					updatingStatusOrderId={updatingStatusOrderId}
+					onViewOrder={setSelectedOrder}
+					onChangeStatus={handleChangeOrderStatus}
+					onRefundOrder={handleRefundOrder}
+					onPageChange={setPage}
+				/>
 			</div>
 
-			{/* Detail Modal */}
 			{selectedOrder && (
 				<OrderDetailModal
 					order={selectedOrder}
@@ -246,7 +247,6 @@ export default function OrdersPage() {
 				/>
 			)}
 
-			{/* Confirm Dialog */}
 			<ConfirmDialog
 				isOpen={confirm.open}
 				title={confirm.title}

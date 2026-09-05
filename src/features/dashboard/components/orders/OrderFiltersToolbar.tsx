@@ -1,175 +1,102 @@
-import { Input } from "@/shared/components/ui/input";
-import { Button } from "@/shared/components/ui/button";
-import {
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	SearchIcon,
-	XIcon,
-} from "lucide-react";
+import { useState } from "react";
 import {
 	ORDER_STATUS_META,
-	OrderStatus,
+	type OrderStatus,
 	type OrderStatusFilter,
 } from "@/features/orders/constants/orderStatus";
+import type { OrderSort } from "../../hooks/use-dashboard-order-filters";
+import { ResetFiltersButton } from "../shared/ResetFiltersButton";
+import { ResultsSummary } from "../shared/ResultsSummary";
+import { ToolbarSearchInput } from "../shared/ToolbarSearchInput";
+import {
+	ToolbarSelect,
+	type ToolbarSelectOption,
+} from "../shared/ToolbarSelect";
 
-type Filters = {
+export type OrderFilters = {
 	search: string | undefined;
 	status: OrderStatusFilter;
 };
 
-type Sort =
-	| "createdAt,desc"
-	| "createdAt,asc"
-	| "total,desc"
-	| "total,asc"
-	| "status,asc";
-type Pagination = {
-	page: number;
-	size: number;
-	sort: Sort;
-};
+const SORT_OPTIONS: readonly ToolbarSelectOption<OrderSort>[] = [
+	{ value: "createdAt,desc", label: "Newest first" },
+	{ value: "createdAt,asc", label: "Oldest first" },
+	{ value: "total,desc", label: "Highest total" },
+	{ value: "total,asc", label: "Lowest total" },
+	{ value: "status,asc", label: "Status" },
+];
+
+const STATUS_OPTIONS: readonly ToolbarSelectOption<OrderStatus | "">[] = [
+	{ value: "", label: "All Statuses" },
+	...(Object.keys(ORDER_STATUS_META) as OrderStatus[]).map((status) => ({
+		value: status,
+		label: ORDER_STATUS_META[status].label,
+	})),
+];
 
 interface OrderFiltersToolbarProps {
-	filters: Filters;
-	isFilterActive: boolean;
-	pagination: Pagination;
+	filters: OrderFilters;
+	sort: OrderSort;
 	totalElements: number;
-	totalPages: number;
-	updateFilters: (value: Partial<Filters>) => void;
-	updatePagination: (value: Partial<Pagination>) => void;
+	isFilterActive: boolean;
+	onFiltersChange: (next: Partial<OrderFilters>) => void;
+	onSortChange: (sort: OrderSort) => void;
 	onResetFilters: () => void;
 }
 
 export const OrderFiltersToolbar = ({
 	filters,
-	isFilterActive,
-	pagination,
+	sort,
 	totalElements,
-	totalPages,
-	updateFilters,
-	updatePagination,
+	isFilterActive,
+	onFiltersChange,
+	onSortChange,
 	onResetFilters,
 }: OrderFiltersToolbarProps) => {
-	const currentPage = pagination.page;
-	const start = totalElements === 0 ? 0 : currentPage * pagination.size + 1;
-	const end = Math.min((currentPage + 1) * pagination.size, totalElements);
+	// Remounting the search input on reset discards a draft that has not
+	// committed yet, so it cannot re-apply itself right after the reset.
+	const [resetKey, setResetKey] = useState(0);
 
-	const onSearchChange = (value: string) => updateFilters({ search: value });
-	const onSortChange = (value: Sort) => updatePagination({ sort: value });
-	const onStatusChange = (value: OrderStatus) =>
-		updateFilters({ status: value });
-
-	const nextPage = () =>
-		updatePagination({ page: Math.min(totalPages - 1, currentPage + 1) });
-
-	// Fixed logic: using Math.max to prevent negative indexes
-	const previousPage = () =>
-		updatePagination({ page: Math.max(0, currentPage - 1) });
+	const handleReset = () => {
+		setResetKey((key) => key + 1);
+		onResetFilters();
+	};
 
 	return (
-		<div className="border-b border-brand-900/10 bg-surface-2/50 p-4">
-			<div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-				{/* Left Section: SearchIcon & Select Inputs */}
-				<div className="flex flex-1 flex-col gap-2.5 sm:flex-row sm:items-center max-w-3xl">
-					{/* SearchIcon Input */}
-					<div className="relative flex-1 min-w-0">
-						<SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-faint" />
-						<Input
-							value={filters.search}
-							onChange={(e) => onSearchChange(e.target.value)}
-							placeholder="SearchIcon order ID, address, item..."
-							className="h-10 rounded-lg border-brand-900/10 bg-card pl-9 text-xs focus-visible:ring-brand-800"
-						/>
-					</div>
+		<div className="flex flex-col gap-3 border-b border-brand-900/10 bg-surface-2/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+			<div className="flex flex-1 flex-wrap items-center gap-2.5">
+				<ToolbarSearchInput
+					key={resetKey}
+					value={filters.search}
+					onCommit={(search) => onFiltersChange({ search })}
+					placeholder="Search by customer name..."
+				/>
 
-					{/* Status Filter */}
-					<select
-						value={filters.status}
-						onChange={(e) => onStatusChange(e.target.value as OrderStatus)}
-						className="h-10 rounded-lg border border-brand-900/10 bg-card px-3 text-xs font-semibold text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
-					>
-						<option value="">All Statuses</option>
-						{Object.entries(ORDER_STATUS_META).map(([key, meta]) => (
-							<option key={key} value={key}>
-								{meta.label}
-							</option>
-						))}
-					</select>
+				<ToolbarSelect
+					value={filters.status ?? ""}
+					options={STATUS_OPTIONS}
+					onChange={(status) =>
+						onFiltersChange({ status: status || undefined })
+					}
+					ariaLabel="Filter by status"
+				/>
 
-					{/* Sort Selector */}
-					<select
-						value={pagination.sort}
-						onChange={(e) => onSortChange(e.target.value as Sort)}
-						className="h-10 rounded-lg border border-brand-900/10 bg-card px-3 text-xs font-semibold text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand-800"
-					>
-						<option value="createdAt,desc">Newest first</option>
-						<option value="createdAt,asc">Oldest first</option>
-						<option value="total,desc">Highest total</option>
-						<option value="total,asc">Lowest total</option>
-						<option value="status,asc">Status</option>
-					</select>
+				<ToolbarSelect
+					value={sort}
+					options={SORT_OPTIONS}
+					onChange={onSortChange}
+					ariaLabel="Sort orders"
+					className="min-w-37.5"
+				/>
 
-					{/* Reset Button */}
-					{isFilterActive && (
-						<Button
-							variant="outline"
-							onClick={onResetFilters}
-							className="h-10 shrink-0 rounded-lg border border-dashed border-rose-200 bg-rose-50/30 px-3 text-xs font-semibold text-rose-600 transition-all duration-150 hover:bg-rose-50 hover:text-rose-700"
-						>
-							Reset
-							<XIcon className="ml-1.5 size-3.5" />
-						</Button>
-					)}
-				</div>
-
-				{/* Right Section: Pagination Summary & Quick Controls */}
-				<div className="flex items-center gap-2">
-					<div className="rounded-lg border border-brand-900/10 bg-card px-3 py-2 text-xs font-semibold text-ink">
-						{totalElements === 0 ? (
-							"No orders"
-						) : (
-							<>
-								Showing{" "}
-								<span className="font-bold text-ink">{start}</span>–
-								<span className="font-bold text-ink">{end}</span> of{" "}
-								<span className="font-bold text-ink">
-									{totalElements}
-								</span>
-							</>
-						)}
-					</div>
-
-					{totalPages > 1 && (
-						<div className="flex items-center gap-1 rounded-lg border border-brand-900/10 bg-card p-1 select-none">
-							<Button
-								variant="outline"
-								size="icon"
-								disabled={currentPage === 0}
-								onClick={previousPage}
-								className="h-8 w-8 rounded-lg border-brand-900/10 text-ink-soft hover:bg-surface-2 disabled:opacity-40"
-								title="Previous page"
-							>
-								<ChevronLeftIcon className="size-4" />
-							</Button>
-
-							<span className="min-w-16 px-1.5 text-center text-xs font-semibold text-ink">
-								{currentPage + 1} / {totalPages}
-							</span>
-
-							<Button
-								variant="outline"
-								size="icon"
-								disabled={currentPage >= totalPages - 1}
-								onClick={nextPage}
-								className="h-8 w-8 rounded-lg border-brand-900/10 text-ink-soft hover:bg-surface-2 disabled:opacity-40"
-								title="Next page"
-							>
-								<ChevronRightIcon className="size-4" />
-							</Button>
-						</div>
-					)}
-				</div>
+				{isFilterActive && <ResetFiltersButton onClick={handleReset} />}
 			</div>
+
+			<ResultsSummary
+				totalElements={totalElements}
+				itemLabel="order"
+				className="pt-1 sm:pt-0"
+			/>
 		</div>
 	);
 };

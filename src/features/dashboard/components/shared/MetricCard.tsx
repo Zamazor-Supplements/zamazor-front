@@ -2,15 +2,17 @@ import { motion } from "framer-motion";
 import { CARD_ANIMATION } from "../../config/motion";
 import { type LucideIcon } from "lucide-react";
 
+export type Metric = {
+	label: string;
+	value: string;
+	subtitle: string;
+	accent: string;
+	icon: LucideIcon;
+	alert: boolean;
+};
+
 interface MetricCardProps {
-	metric: {
-		label: string;
-		value: string;
-		subtitle: string;
-		accent: string;
-		icon: LucideIcon;
-		alert: boolean;
-	};
+	metric: Metric;
 	index: number;
 }
 

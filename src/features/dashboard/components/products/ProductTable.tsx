@@ -1,23 +1,19 @@
-import { Button } from "@/shared/components/ui/button";
 import { Tooltip } from "@/shared/components/ui/tooltip";
-import {
-	ExternalLink,
-	Edit,
-	Trash2,
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	PackageXIcon,
-} from "lucide-react";
+import { ExternalLink, Edit, Trash2, PackageXIcon } from "lucide-react";
 import type {
 	Product,
 	ProductPage,
 } from "@/features/products/schemas/productSchema";
 import { formatCurrency } from "@/shared/utils/price";
 import { APP_ROUTES } from "@/app/routes/paths";
+import { TableEmptyRow } from "../shared/TableEmptyRow";
+import { TableFetchBar } from "../shared/TableFetchBar";
+import { TablePagination } from "../shared/TablePagination";
 
 type ProductTableProps = {
 	productPage: ProductPage;
 	highlightedProductId: string | null;
+	isFetching: boolean;
 	onEditProduct: (product: Product) => void;
 	onDeleteProduct: (productId: string) => void;
 	onPageChange: (page: number) => void;
@@ -30,29 +26,15 @@ export const ProductTable = ({
 	onEditProduct,
 	onDeleteProduct,
 	onPageChange,
-}: ProductTableProps & { isFetching?: boolean }) => {
+}: ProductTableProps) => {
 	const products = productPage.items;
-	const tableTotalPages = productPage.totalPages;
-	const tableTotalElements = productPage.totalElements;
-
-	const currentPage = productPage.page;
-	const start = currentPage * productPage.size + 1;
-	const end = Math.min(
-		(currentPage + 1) * productPage.size,
-		productPage.totalElements,
-	);
 
 	const onViewProduct = (productId: string) =>
 		window.open(APP_ROUTES.PRODUCT({ id: productId }), "_blank");
 
 	return (
-		<div className="relative flex flex-col overflow-hidden border border-brand-900/10 bg-card shadow-sm">
-			{/* Subtle Top Loader Bar during background refetching/pagination */}
-			{isFetching && (
-				<div className="absolute top-0 left-0 right-0 z-20 h-1 overflow-hidden bg-brand-100">
-					<div className="h-full w-full animate-pulse bg-brand-600" />
-				</div>
-			)}
+		<>
+			<TableFetchBar isFetching={isFetching} />
 
 			{/* Table Area */}
 			<div
@@ -70,21 +52,12 @@ export const ProductTable = ({
 					</thead>
 					<tbody className="divide-y divide-brand-900/10">
 						{products.length === 0 ? (
-							<tr>
-								<td colSpan={5} className="px-6 py-16 text-center">
-									<div className="mx-auto flex max-w-xs flex-col items-center gap-2">
-										<div className="flex size-12 items-center justify-center rounded-full bg-surface-2 text-ink-faint">
-											<PackageXIcon className="size-6" />
-										</div>
-										<p className="text-sm font-medium text-ink">
-											No products found
-										</p>
-										<p className="text-xs text-ink-soft">
-											No products matched your current filters or search query.
-										</p>
-									</div>
-								</td>
-							</tr>
+							<TableEmptyRow
+								colSpan={5}
+								icon={PackageXIcon}
+								title="No products found"
+								description="No products matched your current filters or search query."
+							/>
 						) : (
 							products.map((product) => {
 								const isOut = product.stockQuantity === 0;
@@ -163,9 +136,7 @@ export const ProductTable = ({
 																: "bg-brand-500"
 													}`}
 												/>
-												{isOut
-													? "Out of stock"
-													: `${product.stockQuantity} in stock`}
+												{isOut ? "Out of stock" : `${product.stockQuantity} in stock`}
 											</span>
 										</td>
 
@@ -206,47 +177,15 @@ export const ProductTable = ({
 				</table>
 			</div>
 
-			{/* Pagination Controls */}
-			{tableTotalElements > 0 && (
-				<div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-brand-900/10 bg-surface-2/50 px-6 py-3 select-none">
-					<p className="text-xs text-ink-soft font-medium">
-						Showing <span className="font-semibold text-ink">{start}</span>–
-						<span className="font-semibold text-ink">{end}</span> of{" "}
-						<span className="font-semibold text-ink">{tableTotalElements}</span>{" "}
-						items
-					</p>
-
-					{tableTotalPages > 1 && (
-						<div className="flex items-center gap-1.5">
-							<Button
-								variant="outline"
-								size="icon"
-								disabled={currentPage === 0 || isFetching}
-								onClick={() => onPageChange(Math.max(0, currentPage - 1))}
-								className="h-8 w-8 rounded-lg border-brand-900/10 text-ink-soft hover:bg-surface-2 disabled:opacity-40"
-							>
-								<ChevronLeftIcon className="size-4" />
-							</Button>
-
-							<div className="flex items-center gap-1 px-2 text-xs font-semibold text-ink">
-								Page {currentPage + 1} of {tableTotalPages}
-							</div>
-
-							<Button
-								variant="outline"
-								size="icon"
-								disabled={currentPage >= tableTotalPages - 1 || isFetching}
-								onClick={() =>
-									onPageChange(Math.min(tableTotalPages - 1, currentPage + 1))
-								}
-								className="h-8 w-8 rounded-lg border-brand-900/10 text-ink-soft hover:bg-surface-2 disabled:opacity-40"
-							>
-								<ChevronRightIcon className="size-4" />
-							</Button>
-						</div>
-					)}
-				</div>
-			)}
-		</div>
+			<TablePagination
+				page={productPage.page}
+				size={productPage.size}
+				totalPages={productPage.totalPages}
+				totalElements={productPage.totalElements}
+				itemLabel="products"
+				disabled={isFetching}
+				onPageChange={onPageChange}
+			/>
+		</>
 	);
 };

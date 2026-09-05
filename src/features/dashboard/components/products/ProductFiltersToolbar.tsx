@@ -1,144 +1,102 @@
-import { Input } from "@/shared/components/ui/input";
-import { Button } from "@/shared/components/ui/button";
-import {
-	ChevronDownIcon,
-	Search,
-	SlidersHorizontalIcon,
-	XIcon,
-} from "lucide-react";
+import { useMemo, useState } from "react";
 import type { Category } from "@/features/products/schemas/categorySchema";
+import type { DashboardProductSort } from "../../hooks/use-dashboard-product-filters";
+import { ResetFiltersButton } from "../shared/ResetFiltersButton";
+import { ResultsSummary } from "../shared/ResultsSummary";
+import { ToolbarSearchInput } from "../shared/ToolbarSearchInput";
+import {
+	ToolbarSelect,
+	type ToolbarSelectOption,
+} from "../shared/ToolbarSelect";
 
-type Filters = {
-	search: string;
+export type ProductFilters = {
+	search: string | undefined;
 	categoryId: string;
 };
 
-type Sort =
-	| "createdAt,desc"
-	| "createdAt,asc"
-	| "name,asc"
-	| "name,desc"
-	| "price,asc"
-	| "price,desc";
-type Pagination = {
-	page: number;
-	sort: Sort;
-	size: number;
-};
+const SORT_OPTIONS: readonly ToolbarSelectOption<DashboardProductSort>[] = [
+	{ value: "createdAt,desc", label: "Latest first" },
+	{ value: "createdAt,asc", label: "Oldest first" },
+	{ value: "name,asc", label: "Name (A–Z)" },
+	{ value: "name,desc", label: "Name (Z–A)" },
+	{ value: "price,asc", label: "Price: Low to High" },
+	{ value: "price,desc", label: "Price: High to Low" },
+];
 
 type ProductFiltersToolbarProps = {
-	filters: Filters;
-	pagination: Pagination;
+	filters: ProductFilters;
+	sort: DashboardProductSort;
 	categories: Category[];
 	totalElements: number;
 	isFilterActive: boolean;
-	updateFilters: (filters: Partial<Filters>) => void;
-	updatePagination: (value: Partial<Pagination>) => void;
+	onFiltersChange: (next: Partial<ProductFilters>) => void;
+	onSortChange: (sort: DashboardProductSort) => void;
 	onResetFilters: () => void;
 };
 
 export const ProductFiltersToolbar = ({
-	categories,
 	filters,
-	pagination,
+	sort,
+	categories,
 	totalElements,
 	isFilterActive,
-	updateFilters,
-	updatePagination,
+	onFiltersChange,
+	onSortChange,
 	onResetFilters,
 }: ProductFiltersToolbarProps) => {
-	const onSearchChange = (value: string) => updateFilters({ search: value });
-	const onCategoryFilterChange = (categoryId: string) =>
-		updateFilters({ categoryId });
-	const onSortChange = (sort: Sort) => updatePagination({ sort });
+	const categoryOptions = useMemo<readonly ToolbarSelectOption<string>[]>(
+		() => [
+			{ value: "", label: "All Categories" },
+			...categories.map((category) => ({
+				value: category.id,
+				label: category.label,
+			})),
+		],
+		[categories],
+	);
+
+	// Remounting the search input on reset discards a draft that has not
+	// committed yet, so it cannot re-apply itself right after the reset.
+	const [resetKey, setResetKey] = useState(0);
+
+	const handleReset = () => {
+		setResetKey((key) => key + 1);
+		onResetFilters();
+	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-t-xl border-b border-brand-900/10 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-			{/* Search & Filter Controls Group */}
+		<div className="flex flex-col gap-3 border-b border-brand-900/10 bg-surface-2/50 p-4 sm:flex-row sm:items-center sm:justify-between">
 			<div className="flex flex-1 flex-wrap items-center gap-2.5">
-				{/* Search Input with Clear Button */}
-				<div className="relative min-w-50 flex-1 sm:max-w-xs">
-					<Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-faint" />
-					<Input
-						value={filters.search}
-						onChange={(e) => onSearchChange(e.target.value)}
-						placeholder="Search products..."
-						className="h-9.5 w-full rounded-lg border-brand-900/10 bg-surface-2/50 pl-9 pr-8 text-xs transition-colors placeholder:text-ink-faint focus-visible:bg-card focus-visible:ring-2 focus-visible:ring-brand-600"
-					/>
-					{filters.search && (
-						<button
-							type="button"
-							onClick={() => onSearchChange("")}
-							className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-ink-faint hover:bg-brand-100 hover:text-ink"
-						>
-							<XIcon className="size-3.5" />
-						</button>
-					)}
-				</div>
+				<ToolbarSearchInput
+					key={resetKey}
+					value={filters.search}
+					onCommit={(search) => onFiltersChange({ search })}
+					placeholder="Search products..."
+				/>
 
-				{/* Category Filter Dropdown with Custom Arrow */}
-				<div className="relative min-w-35">
-					<select
-						value={filters.categoryId}
-						onChange={(e) => onCategoryFilterChange(e.target.value)}
-						className="h-9.5 w-full appearance-none rounded-lg border border-brand-900/10 bg-surface-2/50 pl-3 pr-8 text-xs font-medium text-ink transition-colors hover:bg-brand-100/70 focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-600"
-					>
-						<option value="">All Categories</option>
-						{categories.map((cat) => (
-							<option key={cat.id} value={cat.id}>
-								{cat.label}
-							</option>
-						))}
-					</select>
-					<ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-ink-faint" />
-				</div>
+				<ToolbarSelect
+					value={filters.categoryId}
+					options={categoryOptions}
+					onChange={(categoryId) => onFiltersChange({ categoryId })}
+					ariaLabel="Filter by category"
+				/>
 
-				{/* Sort By Dropdown with Custom Arrow */}
-				<div className="relative min-w-37.5">
-					<select
-						value={pagination.sort}
-						onChange={(e) => onSortChange(e.target.value as Sort)}
-						className="h-9.5 w-full appearance-none rounded-lg border border-brand-900/10 bg-surface-2/50 pl-3 pr-8 text-xs font-medium text-ink transition-colors hover:bg-brand-100/70 focus:bg-card focus:outline-none focus:ring-2 focus:ring-brand-600"
-					>
-						<option value="createdAt,desc">Latest first</option>
-						<option value="createdAt,asc">Oldest first</option>
-						<option value="name,asc">Name (A–Z)</option>
-						<option value="name,desc">Name (Z–A)</option>
-						<option value="price,asc">Price: Low to High</option>
-						<option value="price,desc">Price: High to Low</option>
-					</select>
-					<ChevronDownIcon className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-ink-faint" />
-				</div>
+				<ToolbarSelect
+					value={sort}
+					options={SORT_OPTIONS}
+					onChange={onSortChange}
+					ariaLabel="Sort products"
+					className="min-w-37.5"
+				/>
 
-				{/* Reset Filters Pill */}
-				{isFilterActive && (
-					<Button
-						variant="ghost"
-						onClick={onResetFilters}
-						className="h-9.5 gap-1.5 rounded-lg border border-rose-200/80 bg-rose-50/50 px-3 text-xs font-semibold text-rose-600 transition-all hover:bg-rose-100/60 hover:text-rose-700 active:scale-95"
-					>
-						<XIcon className="size-3.5" />
-						Reset
-					</Button>
-				)}
+				{isFilterActive && <ResetFiltersButton onClick={handleReset} />}
 			</div>
 
-			{/* Results Counter Summary */}
-			<div className="flex shrink-0 items-center justify-between pt-1 sm:pt-0">
-				<span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-soft">
-					<SlidersHorizontalIcon className="size-3.5 text-ink-faint" />
-					{totalElements === 0 ? (
-						<span className="text-ink-faint">No products found</span>
-					) : (
-						<span>
-							<strong className="font-semibold text-ink">
-								{totalElements}
-							</strong>{" "}
-							{totalElements === 1 ? "product" : "products"}
-						</span>
-					)}
-				</span>
-			</div>
+			<ResultsSummary
+				totalElements={totalElements}
+				itemLabel="product"
+				className="pt-1 sm:pt-0"
+			/>
 		</div>
 	);
 };
