@@ -13,21 +13,21 @@ import {
 	type OrderStatusFilter,
 } from "@/features/orders/constants/orderStatus";
 
-export type DashboardOrderSort =
+export type OrderSort =
 	| "createdAt,desc"
 	| "createdAt,asc"
 	| "total,desc"
 	| "total,asc"
 	| "status,asc";
 
-export interface DashboardOrderFilters {
+export interface OrderFilters {
 	search: string | undefined;
 	status: OrderStatusFilter;
-	sort: DashboardOrderSort;
+	sort: OrderSort;
 	page: number;
 }
 
-const DEFAULT_FILTERS: DashboardOrderFilters = {
+const DEFAULT_FILTERS: OrderFilters = {
 	search: undefined,
 	status: undefined,
 	sort: "createdAt,desc",
@@ -36,7 +36,7 @@ const DEFAULT_FILTERS: DashboardOrderFilters = {
 
 const PAGE_SIZE = 6;
 
-const VALID_SORTS: readonly DashboardOrderSort[] = [
+const VALID_SORTS: readonly OrderSort[] = [
 	"createdAt,desc",
 	"createdAt,asc",
 	"total,desc",
@@ -48,11 +48,11 @@ function isOrderStatus(value: string): value is OrderStatus {
 	return value in ORDER_STATUS_META;
 }
 
-function readFilters(params: URLSearchParams): DashboardOrderFilters {
+function readFilters(params: URLSearchParams): OrderFilters {
 	const sortRaw = params.get("sort");
-	const sort: DashboardOrderSort =
+	const sort: OrderSort =
 		sortRaw && (VALID_SORTS as readonly string[]).includes(sortRaw)
-			? (sortRaw as DashboardOrderSort)
+			? (sortRaw as OrderSort)
 			: DEFAULT_FILTERS.sort;
 
 	const statusRaw = params.get("status");
@@ -63,7 +63,7 @@ function readFilters(params: URLSearchParams): DashboardOrderFilters {
 	const pageNum = pageRaw ? Number(pageRaw) : 0;
 
 	return {
-		search: params.get("search") ?? "",
+		search: params.get("search") ?? undefined,
 		status,
 		sort,
 		page: Number.isFinite(pageNum) && pageNum >= 0 ? Math.floor(pageNum) : 0,
@@ -71,8 +71,8 @@ function readFilters(params: URLSearchParams): DashboardOrderFilters {
 }
 
 export interface UseDashboardOrderFiltersReturn {
-	filters: DashboardOrderFilters;
-	updateFilters: (next: Partial<DashboardOrderFilters>) => void;
+	filters: OrderFilters;
+	updateFilters: (next: Partial<OrderFilters>) => void;
 	setPage: (page: number) => void;
 	resetFilters: () => void;
 	isFilterActive: boolean;
@@ -90,7 +90,7 @@ export function useDashboardOrderFilters(): UseDashboardOrderFiltersReturn {
 	}, [filters]);
 
 	const writeFilters = useCallback(
-		(next: DashboardOrderFilters) => {
+		(next: OrderFilters) => {
 			const params = new URLSearchParams(searchParams);
 
 			const setOrDelete = (key: string, value: string | undefined) => {
@@ -108,19 +108,13 @@ export function useDashboardOrderFilters(): UseDashboardOrderFiltersReturn {
 		[searchParams, setSearchParams],
 	);
 
-	const updateFilters = useCallback(
-		(next: Partial<DashboardOrderFilters>) => {
-			writeFilters({ ...filtersRef.current, ...next });
-		},
-		[writeFilters],
-	);
+	const updateFilters = (next: Partial<OrderFilters>) => {
+		writeFilters({ ...filtersRef.current, ...next });
+	};
 
-	const setPage = useCallback(
-		(page: number) => {
-			updateFilters({ page });
-		},
-		[updateFilters],
-	);
+	const setPage = (page: number) => {
+		updateFilters({ page });
+	};
 
 	const resetFilters = useCallback(() => {
 		writeFilters(DEFAULT_FILTERS);

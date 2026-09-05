@@ -1,10 +1,4 @@
-import {
-	AlertCircleIcon,
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	EyeIcon,
-	XIcon,
-} from "lucide-react";
+import { AlertCircleIcon, EyeIcon, XIcon } from "lucide-react";
 import { Tooltip } from "@/shared/components/ui/tooltip";
 import type { Order, OrderPage } from "@/features/orders/schemas/orderSchema";
 import type { OrderStatus } from "@/features/orders/constants/orderStatus";
@@ -14,6 +8,9 @@ import {
 } from "@/features/orders/constants/orderStatus";
 import { formatCurrency } from "@/shared/utils/price";
 import { buildShippingAddressString } from "@/features/addresses/utils/addressHelpers";
+import { TableEmptyRow } from "../shared/TableEmptyRow";
+import { TableFetchBar } from "../shared/TableFetchBar";
+import { TablePagination } from "../shared/TablePagination";
 import { OrderStatusSelect } from "./OrderStatusSelect";
 import { OrderItemsPopover } from "./OrderItemPopover";
 
@@ -36,21 +33,11 @@ export const OrdersTable = ({
 	onRefundOrder,
 	onPageChange,
 }: OrdersTableProps) => {
-	const currentPage = orderPage.page;
-
 	const canChangeStatus = (status: OrderStatus) => !isFinalOrderStatus(status);
-	const nextPage = () =>
-		onPageChange(Math.min(orderPage.totalPages - 1, currentPage + 1));
-	const previousPage = () => onPageChange(Math.max(0, currentPage - 1));
 
 	return (
 		<>
-			{/* Background Refetch Progress Indicator */}
-			{isFetching && (
-				<div className="absolute top-0 left-0 right-0 z-20 h-1 overflow-hidden bg-brand-100">
-					<div className="h-full w-full animate-pulse bg-brand-600" />
-				</div>
-			)}
+			<TableFetchBar isFetching={isFetching} />
 
 			{/* Table Area */}
 			<div
@@ -72,21 +59,12 @@ export const OrdersTable = ({
 					</thead>
 					<tbody className="divide-y divide-brand-900/10">
 						{orderPage.items.length === 0 ? (
-							<tr>
-								<td colSpan={7} className="px-6 py-16 text-center">
-									<div className="mx-auto flex max-w-xs flex-col items-center gap-2">
-										<div className="flex size-12 items-center justify-center rounded-full bg-surface-2 text-ink-faint">
-											<AlertCircleIcon className="size-6" />
-										</div>
-										<p className="text-sm font-medium text-ink">
-											No orders found
-										</p>
-										<p className="text-xs text-ink-soft">
-											No orders matched your current search or status filter.
-										</p>
-									</div>
-								</td>
-							</tr>
+							<TableEmptyRow
+								colSpan={7}
+								icon={AlertCircleIcon}
+								title="No orders found"
+								description="No orders matched your current search or status filter."
+							/>
 						) : (
 							orderPage.items.map((order) => {
 								const meta = ORDER_STATUS_META[order.status];
@@ -190,45 +168,15 @@ export const OrdersTable = ({
 				</table>
 			</div>
 
-			{/* Pagination Footer */}
-			{orderPage.totalPages > 1 && (
-				<div className="flex items-center justify-center gap-2 border-t border-brand-900/10 bg-surface-2/50 p-4 select-none">
-					<div className="flex items-center gap-1.5 rounded-lg border border-brand-900/10 bg-card p-1">
-						<button
-							disabled={currentPage === 0 || isFetching}
-							onClick={previousPage}
-							className="flex size-8 items-center justify-center rounded-lg border border-brand-900/10 text-ink-soft transition-colors hover:bg-surface-2 disabled:opacity-40"
-							title="Previous Page"
-						>
-							<ChevronLeftIcon className="size-4" />
-						</button>
-
-						{Array.from({ length: orderPage.totalPages }).map((_, index) => (
-							<button
-								key={index}
-								disabled={isFetching}
-								onClick={() => onPageChange(index)}
-								className={`flex size-8 items-center justify-center rounded-lg text-xs font-semibold transition-all ${
-									currentPage === index
-										? "bg-brand-900 text-white shadow-xs"
-										: "border border-brand-900/10 text-ink hover:bg-surface-2"
-								}`}
-							>
-								{index + 1}
-							</button>
-						))}
-
-						<button
-							disabled={currentPage >= orderPage.totalPages - 1 || isFetching}
-							onClick={nextPage}
-							className="flex size-8 items-center justify-center rounded-lg border border-brand-900/10 text-ink-soft transition-colors hover:bg-surface-2 disabled:opacity-40"
-							title="Next Page"
-						>
-							<ChevronRightIcon className="size-4" />
-						</button>
-					</div>
-				</div>
-			)}
+			<TablePagination
+				page={orderPage.page}
+				size={orderPage.size}
+				totalPages={orderPage.totalPages}
+				totalElements={orderPage.totalElements}
+				itemLabel="orders"
+				disabled={isFetching}
+				onPageChange={onPageChange}
+			/>
 		</>
 	);
 };

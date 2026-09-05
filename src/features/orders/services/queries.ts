@@ -2,6 +2,7 @@ import {
 	useQuery,
 	useQueryClient,
 	type UndefinedInitialDataOptions,
+	type UseQueryOptions,
 } from "@tanstack/react-query";
 import type { OrderPageQueryParams } from "./api";
 import type { OrderPage } from "../schemas/orderSchema";
@@ -14,10 +15,17 @@ import {
 	verifyCheckoutPayment,
 } from "./api";
 
-export function useOrders(params: OrderPageQueryParams = {}) {
+export function useOrders<TData = OrderPage>(
+	params: OrderPageQueryParams = {},
+	options?: Omit<
+		UseQueryOptions<OrderPage, SystemError, TData>,
+		"queryKey" | "queryFn"
+	>,
+) {
 	return useQuery({
 		queryKey: orderKeys.list(params),
 		queryFn: () => getAllOrders(params),
+		...options,
 	});
 }
 

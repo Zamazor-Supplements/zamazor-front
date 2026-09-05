@@ -7,6 +7,7 @@ import { PlusIcon, RotateCwIcon } from "lucide-react";
 import type {
 	CreateProductOutput,
 	Product,
+	UpdateProductOutput,
 } from "@/features/products/schemas/productSchema";
 import { useCategories } from "@/features/products/services/category/queries";
 import { useCreateCategory } from "@/features/products/services/category/mutations";
@@ -17,30 +18,22 @@ import {
 	useDashboardProductFilters,
 	type DashboardProductSort,
 } from "@/features/dashboard/hooks/use-dashboard-product-filters";
-import { ProductAnalyticsCards } from "@/features/dashboard/components/products/ProductAnalyticsCards";
-import { ProductFiltersToolbar } from "@/features/dashboard/components/products/ProductFiltersToolbar";
+import {
+	ProductFiltersToolbar,
+	type ProductFilters,
+} from "@/features/dashboard/components/products/ProductFiltersToolbar";
 import { ProductFormModal } from "@/features/dashboard/components/products/ProductFormModal";
 import { ProductTable } from "@/features/dashboard/components/products/ProductTable";
-import { useDebounce } from "@/shared/hooks/use-debounce";
 import { keepPreviousData } from "@tanstack/react-query";
 import { ProductPageSkeleton } from "@/features/dashboard/components/products/ProductPageSkeleton";
+import { AnalyticsCards } from "@/features/dashboard/components/shared/AnalyticsCards";
 import { PageHeader } from "@/features/dashboard/components/shared/PageHeader";
+import { PRODUCT_METRICS_CONFIG } from "@/features/dashboard/config/metrics";
 import {
 	useCreateProduct,
 	useDeleteProduct,
 	useUpdateProduct,
 } from "@/features/products/services/product/mutations";
-
-type Filters = {
-	search: string;
-	categoryId: string;
-};
-
-type Pagination = {
-	page: number;
-	sort: DashboardProductSort;
-	size: number;
-};
 
 type ModalState = {
 	open: boolean;
@@ -95,8 +88,6 @@ export default function ProductsPage() {
 	const deleteProductMutation = useDeleteProduct();
 	const createCategoryMutation = useCreateCategory();
 
-	const debouncedSearch = useDebounce(filters.search, 500);
-
 	const {
 		data: productPage,
 		isLoading: isLoadingProducts,
@@ -104,7 +95,7 @@ export default function ProductsPage() {
 		refetch: refetchProducts,
 	} = useProducts(
 		{
-			q: debouncedSearch.trim() || undefined,
+			q: filters.search.trim() || undefined,
 			categoryId: filters.categoryId || undefined,
 			page: filters.page,
 			size: DASHBOARD_PRODUCT_PAGE_SIZE,
@@ -121,6 +112,17 @@ export default function ProductsPage() {
 
 	const handlePageChange = (page: number) => {
 		setPage(page);
+	};
+
+	const handleFiltersChange = (next: Partial<ProductFilters>) => {
+		const cleaned = Object.fromEntries(
+			Object.entries({ ...next, page: 0 }).filter(([, v]) => v !== undefined),
+		);
+		updateFilters(cleaned);
+	};
+
+	const handleSortChange = (sort: DashboardProductSort) => {
+		updateFilters({ sort, page: 0 });
 	};
 
 	useEffect(() => {
@@ -165,13 +167,31 @@ export default function ProductsPage() {
 		return await createCategoryMutation.mutateAsync(trimmedName);
 	};
 
-	const handleProductSubmit = async (values: CreateProductOutput) => {
-		const product = modal.editingProduct
-			? await updateProductMutation.mutateAsync({
-					id: modal.editingProduct.id,
-					data: values,
-				})
-			: await createProductMutation.mutateAsync(values);
+	const handleCreateProduct = async (values: CreateProductOutput) => {
+		const product = await createProductMutation.mutateAsync(values);
+
+		if (product) {
+			closeProductModal();
+			resetFilters();
+			setHighlightedProductId(product.id);
+
+			if (highlightTimeoutRef.current) {
+				window.clearTimeout(highlightTimeoutRef.current);
+			}
+
+			highlightTimeoutRef.current = window.setTimeout(() => {
+				setHighlightedProductId(null);
+			}, 2200);
+		}
+	};
+
+	const handleUpdateProduct = async (values: UpdateProductOutput) => {
+		if (!modal.editingProduct) return;
+
+		const product = await updateProductMutation.mutateAsync({
+			id: modal.editingProduct.id,
+			data: values,
+		});
 
 		if (product) {
 			closeProductModal();
@@ -245,54 +265,59 @@ export default function ProductsPage() {
 			</PageHeader>
 
 			{/* Analytics Cards Header */}
-			{analytics && <ProductAnalyticsCards analytics={analytics} />}
+			{analytics && (
+				<AnalyticsCards metrics={PRODUCT_METRICS_CONFIG(analytics)} />
+			)}
 
 			{/* Main Table Wrapper */}
-			<div className="overflow-hidden rounded-lg border border-brand-900/10 bg-card shadow-sm">
+			<div className="relative overflow-hidden rounded-lg border border-brand-900/10 bg-card shadow-sm">
 				<ProductFiltersToolbar
 					filters={{
 						search: filters.search,
 						categoryId: filters.categoryId,
 					}}
-					pagination={{
-						page: filters.page,
-						sort: filters.sort,
-						size: DASHBOARD_PRODUCT_PAGE_SIZE,
-					}}
-					totalElements={productPage?.totalElements ?? 0}
+					sort={filters.sort}
+					totalElements={productPage.totalElements}
 					categories={categories}
 					isFilterActive={isFilterActive}
-					updateFilters={(next: Partial<Filters>) => {
-						updateFilters({ ...next, page: 0 });
-					}}
-					updatePagination={(next: Partial<Pagination>) =>
-						updateFilters({ ...next, page: next.page ?? 0 })
-					}
+					onFiltersChange={handleFiltersChange}
+					onSortChange={handleSortChange}
 					onResetFilters={resetFilters}
 				/>
 
-				{productPage && (
-					<ProductTable
-						productPage={productPage}
-						isFetching={isFetchingProducts}
-						highlightedProductId={highlightedProductId}
-						onEditProduct={openProductModal}
-						onDeleteProduct={handleDeleteProduct}
-						onPageChange={handlePageChange}
-					/>
-				)}
+				<ProductTable
+					productPage={productPage}
+					isFetching={isFetchingProducts}
+					highlightedProductId={highlightedProductId}
+					onEditProduct={openProductModal}
+					onDeleteProduct={handleDeleteProduct}
+					onPageChange={handlePageChange}
+				/>
 			</div>
 
 			{/* Modals */}
-			<ProductFormModal
-				key={modal.editingProduct?.id ?? "new"}
-				isOpen={modal.open}
-				editingProduct={modal.editingProduct}
-				categories={categories}
-				onClose={closeProductModal}
-				onSubmit={handleProductSubmit}
-				onCreateCategory={handleCreateCategory}
-			/>
+			{modal.editingProduct ? (
+				<ProductFormModal
+					key={modal.editingProduct.id}
+					isOpen={modal.open}
+					mode="edit"
+					editingProduct={modal.editingProduct}
+					categories={categories}
+					onClose={closeProductModal}
+					onSubmit={handleUpdateProduct}
+					onCreateCategory={handleCreateCategory}
+				/>
+			) : (
+				<ProductFormModal
+					key="new"
+					isOpen={modal.open}
+					mode="create"
+					categories={categories}
+					onClose={closeProductModal}
+					onSubmit={handleCreateProduct}
+					onCreateCategory={handleCreateCategory}
+				/>
+			)}
 
 			<ConfirmDialog
 				isOpen={confirm.open}

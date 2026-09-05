@@ -9,7 +9,7 @@ import { CategoryMix } from "@/features/dashboard/components/overview/CategoryMi
 import { TopProducts } from "@/features/dashboard/components/overview/TopProducts";
 import { SalesChart } from "@/features/dashboard/components/overview/SalesChart";
 import { RecentOrdersGrid } from "@/features/dashboard/components/overview/RecentOrdersGrid";
-import { MetricCard } from "@/features/dashboard/components/shared/MetricCard";
+import { AnalyticsCards } from "@/features/dashboard/components/shared/AnalyticsCards";
 import { OverviewFallbackError } from "@/features/dashboard/components/overview/OverviewFallbackError";
 import { OverviewSkeleton } from "@/features/dashboard/components/overview/OverviewSkeleton";
 import { LowStockAlerts } from "@/features/dashboard/components/overview/LowStockAlerts";
@@ -48,11 +48,7 @@ export default function OverviewPage() {
 			<HeroBanner data={data} />
 
 			{/* Primary KPI Grid */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-				{metrics.map((metric, index) => (
-					<MetricCard key={metric.label} metric={metric} index={index} />
-				))}
-			</div>
+			<AnalyticsCards metrics={metrics} />
 
 			{/* Main Analytics Section */}
 			<div className="grid grid-cols-1 xl:grid-cols-[1.3fr_0.7fr] gap-6 items-start">

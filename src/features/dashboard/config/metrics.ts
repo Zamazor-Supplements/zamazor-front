@@ -2,19 +2,18 @@ import { formatCurrency } from "@/shared/utils/price";
 import {
 	AlertTriangle,
 	BadgeDollarSign,
-	CheckCircle2,
 	ClipboardList,
 	Clock3,
 	Folder,
 	Layers,
 	Package,
 	TrendingUp,
+	Truck,
 } from "lucide-react";
 import type {
 	DashboardOverview,
 	ProductAnalytics,
 } from "../schemas/dashboardSchema";
-import type { OrderPage } from "@/features/orders/schemas/orderSchema";
 
 export const OVERVIEW_METRICS_CONFIG = (data: DashboardOverview) => [
 	{
@@ -90,49 +89,38 @@ export const PRODUCT_METRICS_CONFIG = (data: ProductAnalytics) => [
 	},
 ];
 
-export const ORDER_METRICS_CONFIG = (orderPage: OrderPage) => {
-	const pendingCount = orderPage.items.filter(
-		(o) => o.status === "PENDING",
-	).length;
-
-	const paidCount = orderPage.items.filter((o) => o.status === "PAID").length;
-
-	const revenue = orderPage.items
-		.filter((o) => ["PAID", "COMPLETED", "DELIVERED"].includes(o.status))
-		.reduce((sum, o) => sum + (o.total || 0), 0);
-
-	return [
-		{
-			label: "Total Orders",
-			value: String(orderPage.totalElements),
-			subtitle: "Across current filter",
-			accent: "bg-surface-2 text-ink border-brand-900/10",
-			icon: Folder,
-			alert: false,
-		},
-		{
-			label: "Pending",
-			value: String(pendingCount),
-			subtitle: "On current page",
-			accent: "bg-amber-50 text-amber-700 border-amber-200/60",
-			icon: Clock3,
-			alert: true,
-		},
-		{
-			label: "Paid",
-			value: String(paidCount),
-			subtitle: "On current page",
-			accent: "bg-sky-50 text-sky-700 border-sky-200/60",
-			icon: CheckCircle2,
-			alert: false,
-		},
-		{
-			label: "Page Revenue",
-			value: formatCurrency(revenue),
-			subtitle: "Settled orders on this page",
-			accent: "bg-brand-50 text-brand-800 border-brand-200/60",
-			icon: BadgeDollarSign,
-			alert: false,
-		},
-	];
-};
+export const ORDER_METRICS_CONFIG = (data: DashboardOverview) => [
+	{
+		label: "Total Orders",
+		value: String(data.totalOrders),
+		subtitle: "All customers, unfiltered",
+		accent: "bg-surface-2 text-ink border-brand-900/10",
+		icon: Folder,
+		alert: false,
+	},
+	{
+		label: "Pending",
+		value: String(data.pendingOrders),
+		subtitle:
+			data.pendingOrders > 0 ? "Awaiting confirmation" : "Queue is clear",
+		accent: "bg-amber-50 text-amber-700 border-amber-200/60",
+		icon: Clock3,
+		alert: data.pendingOrders > 0,
+	},
+	{
+		label: "In Flight",
+		value: String(data.inFlightOrders),
+		subtitle: "Confirmed through shipped",
+		accent: "bg-sky-50 text-sky-700 border-sky-200/60",
+		icon: Truck,
+		alert: false,
+	},
+	{
+		label: "Total Revenue",
+		value: formatCurrency(data.totalSales),
+		subtitle: `Avg ${formatCurrency(data.averageOrderValue)} per order`,
+		accent: "bg-brand-50 text-brand-800 border-brand-200/60",
+		icon: BadgeDollarSign,
+		alert: false,
+	},
+];

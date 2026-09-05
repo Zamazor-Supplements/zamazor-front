@@ -2,9 +2,7 @@ import z from "zod/v4";
 
 export const OrderStatus = {
 	Pending: "PENDING",
-	Paid: "PAID",
 	Confirmed: "CONFIRMED",
-	Processing: "PROCESSING",
 	Shipped: "SHIPPED",
 	Delivered: "DELIVERED",
 	Canceled: "CANCELED",
@@ -17,9 +15,7 @@ export type OrderStatusFilter = OrderStatus | undefined;
 
 export const orderStatusSchema = z.enum([
 	OrderStatus.Pending,
-	OrderStatus.Paid,
 	OrderStatus.Confirmed,
-	OrderStatus.Processing,
 	OrderStatus.Shipped,
 	OrderStatus.Delivered,
 	OrderStatus.Canceled,
@@ -43,11 +39,6 @@ export const ORDER_STATUS_META: Record<OrderStatus, Meta> = {
 		badgeClass: "border-sky-200/70 bg-sky-50 text-sky-800",
 		accentClass: "bg-sky-50 text-sky-800",
 	},
-	PROCESSING: {
-		label: "Processing",
-		badgeClass: "border-violet-200/70 bg-violet-50 text-violet-800",
-		accentClass: "bg-violet-50 text-violet-800",
-	},
 	SHIPPED: {
 		label: "Shipped",
 		badgeClass: "border-cyan-200/70 bg-cyan-50 text-cyan-800",
@@ -57,11 +48,6 @@ export const ORDER_STATUS_META: Record<OrderStatus, Meta> = {
 		label: "Delivered",
 		badgeClass: "border-lime-200/70 bg-lime-50 text-lime-800",
 		accentClass: "bg-lime-50 text-lime-800",
-	},
-	PAID: {
-		label: "Paid",
-		badgeClass: "border-brand-200/70 bg-brand-50 text-brand-800",
-		accentClass: "bg-brand-50 text-brand-800",
 	},
 	CANCELED: {
 		label: "Canceled",
@@ -76,7 +62,6 @@ export const ORDER_STATUS_META: Record<OrderStatus, Meta> = {
 } as const;
 
 const FinalOrderStatus = new Set<OrderStatus>([
-	OrderStatus.Delivered,
 	OrderStatus.Canceled,
 	OrderStatus.Refunded,
 ]);

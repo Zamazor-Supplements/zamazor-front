@@ -51,11 +51,10 @@ export const createProductSchema = z.object({
 	categoryId: z.uuid(),
 	image: z
 		.instanceof(File)
-		.optional()
-		.refine((file) => {
-			if (!file) return false; // Allow optional file
-			return ACCEPTED_IMAGE_TYPES.includes(file.type);
-		}, "Invalid image type. Please upload a JPEG, PNG, or GIF file."),
+		.refine(
+			(file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
+			"Invalid image type. Please upload a JPEG, PNG, or GIF file.",
+		),
 });
 export type CreateProductInput = z.input<typeof createProductSchema>;
 export type CreateProductOutput = z.output<typeof createProductSchema>;
