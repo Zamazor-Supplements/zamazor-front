@@ -48,14 +48,14 @@ export const Tooltip = ({ content, children }: TooltipProps) => {
 			{visible &&
 				createPortal(
 					<div
-						className="absolute z-[99999] px-2.5 py-1 text-[10px] font-semibold text-white bg-slate-950 rounded-lg shadow-md whitespace-nowrap animate-in fade-in zoom-in-95 duration-100 pointer-events-none -translate-x-1/2"
+						className="absolute z-99999 px-2.5 py-1 text-[10px] font-semibold text-white bg-slate-950 rounded-lg shadow-md whitespace-nowrap animate-in fade-in zoom-in-95 duration-100 pointer-events-none -translate-x-1/2"
 						style={{ top: `${coords.top}px`, left: `${coords.left}px` }}
 					>
 						{content}
 						{/* Small Arrow indicator */}
 						<div className="absolute top-full left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 border-t-slate-950" />
 					</div>,
-					document.body
+					document.body,
 				)}
 		</div>
 	);
