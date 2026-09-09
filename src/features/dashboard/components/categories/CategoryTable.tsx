@@ -40,7 +40,6 @@ interface CategoryTableProps {
 	analytics: CategoryAnalytics;
 	pageSize?: number;
 	isFetching?: boolean;
-	refetch: () => void;
 	openEdit: (category: Category) => void;
 }
 
@@ -48,7 +47,6 @@ export default function CategoryTable({
 	analytics,
 	pageSize = 8,
 	isFetching = false,
-	refetch,
 	openEdit,
 }: CategoryTableProps) {
 	const [confirmState, setConfirmState] = useState<ConfirmState>(
@@ -72,7 +70,6 @@ export default function CategoryTable({
 			isDestructive: true,
 			onConfirm: async () => {
 				await deleteCategoryMutation.mutateAsync(category.id);
-				refetch();
 				closeConfirm();
 			},
 		});
