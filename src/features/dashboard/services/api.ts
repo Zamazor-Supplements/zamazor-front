@@ -10,7 +10,7 @@ import {
 import { API_ENDPOINTS } from "@/app/config/apiEndpoints";
 import { privateApiRequest } from "@/shared/utils/axiosPrivate";
 
-export const getOverview = async () => {
+export const getOverviewMetrics = async () => {
 	const response = await privateApiRequest<DashboardOverview>({
 		url: API_ENDPOINTS.DASHBOARD.OVERVIEW,
 		method: "GET",
@@ -22,7 +22,8 @@ export const getOverview = async () => {
 		"Dashboard overview data validation failed",
 	);
 };
-export const getCategories = async () => {
+
+export const getCategoryMetrics = async () => {
 	const response = await privateApiRequest<CategoryAnalytics>({
 		url: API_ENDPOINTS.DASHBOARD.CATEGORY,
 		method: "GET",
@@ -35,7 +36,7 @@ export const getCategories = async () => {
 	);
 };
 
-export const getProducts = async () => {
+export const getProductMetricss = async () => {
 	const response = await privateApiRequest<ProductAnalytics>({
 		url: API_ENDPOINTS.DASHBOARD.PRODUCT,
 		method: "GET",

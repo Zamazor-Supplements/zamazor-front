@@ -11,7 +11,6 @@ import { orderKeys } from "./keys";
 import { useQueryClient } from "@tanstack/react-query";
 import type { CheckoutFormValues } from "../schemas/checkoutSchema";
 import { cartKeys } from "@/features/cart/services/keys";
-import { dashboardKeys } from "@/features/dashboard/services/keys";
 import type { OrderStatus } from "../constants/orderStatus";
 
 export function useCheckout() {
@@ -22,17 +21,13 @@ export function useCheckout() {
 	const checkoutMutation = useMutation({
 		mutationFn: (payload: CheckoutFormValues) => checkout(payload),
 		onSuccess: async (newOrder) => {
-			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-			queryClient.invalidateQueries({ queryKey: dashboardKeys.overview() });
-
 			queryClient.setQueryData(orderKeys.detail(newOrder.id), newOrder);
-
-			// On checkout, the cart is converted to order
-			queryClient.removeQueries({
-				queryKey: cartKeys.all,
-			});
-
 			getPaymentUrl(newOrder.id);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+			// On checkout, the cart is converted to order
+			queryClient.invalidateQueries({ queryKey: cartKeys.all });
 		},
 	});
 
@@ -57,9 +52,10 @@ export function useChangeOrderStatus() {
 			status: OrderStatus;
 		}) => changeOrderStatus(orderId, status),
 		onSuccess: (updatedOrder) => {
-			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-			queryClient.invalidateQueries({ queryKey: dashboardKeys.overview() });
 			queryClient.setQueryData(orderKeys.detail(updatedOrder.id), updatedOrder);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 		},
 	});
 }
@@ -70,9 +66,10 @@ export function useCancelOrder() {
 	return useMutation({
 		mutationFn: (orderId: string) => cancelOrder(orderId),
 		onSuccess: (updatedOrder) => {
-			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-			queryClient.invalidateQueries({ queryKey: dashboardKeys.overview() });
 			queryClient.setQueryData(orderKeys.detail(updatedOrder.id), updatedOrder);
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
 		},
 	});
 }

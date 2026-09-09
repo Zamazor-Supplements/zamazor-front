@@ -31,6 +31,7 @@ export const API_ENDPOINTS = {
 		OVERVIEW: "/dashboard/overview",
 		CATEGORY: "/dashboard/category",
 		PRODUCT: "/dashboard/product",
+		EVENTS: "/dashboard/events",
 	},
 	CARTS: {
 		ROOT: "/carts",

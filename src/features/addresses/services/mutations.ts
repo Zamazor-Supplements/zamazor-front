@@ -12,7 +12,8 @@ export function useCreateOrUpdateAddress() {
 			createOrUpdateDefaultAddress(payload),
 		onSuccess: (updatedAddress) => {
 			queryClient.setQueryData(addressKeys.default(), updatedAddress);
-			// Also invalidate the user cache so the profile form re-reads the fresh address.
+		},
+		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: authKeys.me() });
 		},
 	});

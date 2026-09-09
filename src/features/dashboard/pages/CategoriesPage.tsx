@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type SubmitEvent } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDocumentTitle } from "@/shared/hooks/use-document-title";
 import CONFIG from "@/app/config/constants";
@@ -18,10 +18,18 @@ import {
 	useCreateCategory,
 	useUpdateCategory,
 } from "@/features/products/services/category/mutations";
-import { isSystemError } from "@/shared/types";
 import CategoryTable from "@/features/dashboard/components/categories/CategoryTable";
 import { MetricCard } from "../components/shared/MetricCard";
 import { PageHeader } from "../components/shared/PageHeader";
+import z from "zod/v4";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const categorySchema = z.object({
+	label: z.string().trim().min(1, "Category name cannot be empty."),
+});
+
+type CategoryFormValues = z.infer<typeof categorySchema>;
 
 export default function CategoriesPage() {
 	useDocumentTitle(`Categories Management | ${CONFIG.APP_NAME}`);
@@ -31,29 +39,36 @@ export default function CategoriesPage() {
 	const [editingCategory, setEditingCategory] = useState<
 		CategoryAnalytics[number] | null
 	>(null);
-	const [categoryName, setCategoryName] = useState("");
-	const [nameError, setNameError] = useState("");
 
 	const {
-		data: categoryAnalytics, isPending, isFetching, refetch,
+		data: categoryAnalytics,
+		isPending,
+		isFetching,
+		refetch,
 	} = useDashboardCategories();
 
 	const createCategoryMutation = useCreateCategory();
 	const updateCategoryMutation = useUpdateCategory();
 
-	const isSubmitting = createCategoryMutation.isPending || updateCategoryMutation.isPending;
+	const isSubmitting =
+		createCategoryMutation.isPending || updateCategoryMutation.isPending;
 
-	const resetForm = useCallback(() => {
-		setCategoryName("");
-		setNameError("");
-		setEditingCategory(null);
-	}, []);
+	const {
+		register,
+		handleSubmit,
+		reset,
+		formState: { errors },
+	} = useForm<CategoryFormValues>({
+		resolver: zodResolver(categorySchema),
+		defaultValues: { label: "" },
+	});
 
 	const closeModal = useCallback(() => {
 		setCreateOpen(false);
 		setEditOpen(false);
-		resetForm();
-	}, [resetForm]);
+		setEditingCategory(null);
+		reset({ label: "" });
+	}, [reset]);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -66,42 +81,29 @@ export default function CategoriesPage() {
 	}, [createOpen, editOpen, closeModal]);
 
 	const openCreate = () => {
-		resetForm();
+		setEditingCategory(null);
+		reset({ label: "" });
 		setCreateOpen(true);
 	};
 
 	const openEdit = (category: CategoryAnalytics[number]) => {
 		setEditingCategory(category);
-		setCategoryName(category.label);
-		setNameError("");
+		reset({ label: category.label });
 		setEditOpen(true);
 	};
 
-	const handleSave = async (e: SubmitEvent<HTMLFormElement>) => {
-		e.preventDefault();
-
-		const trimmed = categoryName.trim();
-		if (!trimmed) {
-			setNameError("Category name cannot be empty.");
-			return;
+	const onSubmit = async (data: CategoryFormValues) => {
+		const trimmed = data.label.trim();
+		if (editingCategory) {
+			await updateCategoryMutation.mutateAsync({
+				id: editingCategory.id,
+				label: trimmed,
+			});
+		} else {
+			await createCategoryMutation.mutateAsync(trimmed);
 		}
 
-		try {
-			if (editingCategory) {
-				await updateCategoryMutation.mutateAsync({
-					id: editingCategory.id,
-					label: trimmed,
-				});
-			} else {
-				await createCategoryMutation.mutateAsync(trimmed);
-			}
-
-			closeModal();
-			await refetch();
-		} catch (err: unknown) {
-			if (isSystemError(err))
-				setNameError(err?.description || "Failed to save category. Try again.");
-		}
+		closeModal();
 	};
 
 	if (isPending || !categoryAnalytics) {
@@ -154,7 +156,8 @@ export default function CategoriesPage() {
 					className="h-10 rounded-lg border-brand-900/10 text-xs font-semibold text-ink transition-colors hover:bg-surface-2"
 				>
 					<RotateCwIcon
-						className={`mr-1.5 size-3.5 ${isFetching ? "animate-spin text-brand-800" : ""}`} />
+						className={`mr-1.5 size-3.5 ${isFetching ? "animate-spin text-brand-800" : ""}`}
+					/>
 					Refresh
 				</Button>
 
@@ -169,28 +172,6 @@ export default function CategoriesPage() {
 
 			{/* Metric Cards */}
 			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-				{/* <motion.div
-                {...cardMotion}
-                className="relative overflow-hidden rounded-xl border border-brand-900/10 bg-card p-5 shadow-xs"
-            >
-                <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-ink-faint">
-                            Total Categories
-                        </p>
-                        <h3 className="mt-1 truncate text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-                            {categoryAnalytics.length}
-                        </h3>
-                        <p className="mt-1 text-[11px] font-medium text-ink-soft">
-                            Active in catalog navigation
-                        </p>
-                    </div>
-                    <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-50 text-brand-800 border border-brand-100">
-                        <FolderKanbanIcon className="size-5" />
-                    </div>
-                </div>
-            </motion.div> */}
-
 				<MetricCard metric={metric} index={1} />
 			</div>
 
@@ -198,9 +179,9 @@ export default function CategoriesPage() {
 			<CategoryTable
 				analytics={categoryAnalytics}
 				isFetching={isFetching}
-				refetch={refetch}
 				pageSize={5}
-				openEdit={openEdit} />
+				openEdit={openEdit}
+			/>
 
 			{/* Accessible Dialog Modal */}
 			<AnimatePresence>
@@ -209,7 +190,7 @@ export default function CategoriesPage() {
 						className="fixed inset-0 z-50 flex items-center justify-center bg-brand-950/50 p-4 backdrop-blur-xs"
 						onClick={(e) => {
 							if (e.target === e.currentTarget) closeModal();
-						} }
+						}}
 					>
 						<motion.div
 							initial={{ opacity: 0, scale: 0.96, y: 8 }}
@@ -235,26 +216,28 @@ export default function CategoriesPage() {
 									: "Create a new category group for organizing store products."}
 							</p>
 
-							<form onSubmit={handleSave} className="mt-6 space-y-4">
+							<form
+								onSubmit={handleSubmit(onSubmit)}
+								className="mt-6 space-y-4"
+							>
 								<div className="space-y-1.5">
 									<label className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">
 										Category Label
 									</label>
 									<Input
 										autoFocus
-										value={categoryName}
-										onChange={(e) => {
-											setCategoryName(e.target.value);
-											if (nameError) setNameError("");
-										} }
+										{...register("label")}
 										placeholder="e.g. Footwear, Accessories"
-										className={`h-11 rounded-lg border-brand-900/10 bg-surface-2/50 text-sm transition-all focus-visible:ring-brand-800 ${nameError
+										className={`h-11 rounded-lg border-brand-900/10 bg-surface-2/50 text-sm transition-all focus-visible:ring-brand-800 ${
+											errors.label
 												? "border-rose-500 focus-visible:ring-rose-500"
-												: ""}`} />
-									{nameError && (
+												: ""
+										}`}
+									/>
+									{errors.label && (
 										<div className="flex items-center gap-1.5 text-xs font-semibold text-rose-600 mt-1">
 											<AlertCircleIcon className="size-3.5 shrink-0" />
-											<span>{nameError}</span>
+											<span>{errors.label.message}</span>
 										</div>
 									)}
 								</div>

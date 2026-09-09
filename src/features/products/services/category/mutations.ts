@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCategory, deleteCategory, updateCategory } from "./api";
 import { categoryKeys } from "./keys";
 import type { Category } from "../../schemas/categorySchema";
-import { dashboardKeys } from "@/features/dashboard/services/keys";
 
 export function useCreateCategory() {
 	const queryClient = useQueryClient();
@@ -13,7 +12,6 @@ export function useCreateCategory() {
 			queryClient.invalidateQueries({
 				queryKey: categoryKeys.lists(),
 			});
-			queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
 		},
 	});
 }
@@ -28,19 +26,18 @@ export function useUpdateCategory() {
 			const previous = queryClient.getQueryData<Category[]>(
 				categoryKeys.lists(),
 			);
-			queryClient.setQueryData(categoryKeys.lists(), (current: Category[]) => {
-				return current.map((category) =>
-					category.id === target.id ? target : category,
-				);
-			});
+			queryClient.setQueryData(
+				categoryKeys.lists(),
+				(current: Category[] | undefined) => {
+					return current?.map((category) =>
+						category.id === target.id ? target : category,
+					);
+				},
+			);
 			return { previous };
 		},
 		onSuccess: (category) => {
 			queryClient.setQueryData(categoryKeys.detail(category.id), category);
-
-			queryClient.invalidateQueries({
-				queryKey: categoryKeys.lists(),
-			});
 		},
 		onError: (error, _variables, context) => {
 			if (error.status < 400 && error.status !== 0) return; // request processed
@@ -61,18 +58,17 @@ export function useDeleteCategory() {
 			const previous = queryClient.getQueryData<Category[]>(
 				categoryKeys.lists(),
 			);
-			queryClient.setQueryData(categoryKeys.lists(), (current: Category[]) => {
-				return current.filter((category) => category.id !== targetId);
-			});
+			queryClient.setQueryData(
+				categoryKeys.lists(),
+				(current: Category[] | undefined) => {
+					return current?.filter((category) => category.id !== targetId);
+				},
+			);
 			return { previous };
 		},
 		onSuccess: (_, targetId) => {
 			queryClient.removeQueries({
 				queryKey: categoryKeys.detail(targetId),
-			});
-
-			queryClient.invalidateQueries({
-				queryKey: categoryKeys.lists(),
 			});
 		},
 		onError: (error, _variables, context) => {
@@ -81,7 +77,6 @@ export function useDeleteCategory() {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
-			queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
 		},
 	});
 }

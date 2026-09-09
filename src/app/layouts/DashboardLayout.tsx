@@ -5,6 +5,7 @@ import { useLogout } from "@/features/auth/services/mutations";
 import { SidebarNav } from "@/shared/components/ui/dashboard-sidebar";
 import { Breadcrumbs } from "@/shared/components/ui/breadcrumbs";
 import { APP_ROUTES } from "@/app/routes/paths";
+import { AdminEventsProvider } from "@/features/dashboard/sse/AdminEventsProvider";
 
 const DASHBOARD_BREADCRUMBS: Record<string, string> = {
 	"/dashboard": "Overview",
@@ -63,7 +64,8 @@ export function DashboardLayout() {
 					type="button"
 					onClick={closeMobileSidebar}
 					className="fixed inset-0 z-40 bg-brand-950/60 backdrop-blur-xs md:hidden"
-					aria-label="Close navigation menu" />
+					aria-label="Close navigation menu"
+				/>
 			)}
 
 			{/* Mobile Sidebar Drawer */}
@@ -96,7 +98,9 @@ export function DashboardLayout() {
 				{/* Page Container */}
 				<main className="mx-auto w-full max-w-7xl flex-1 p-4 pt-16 sm:p-6 sm:pt-8 lg:p-8">
 					<Breadcrumbs items={breadcrumbItems} className="mb-4" />
-					<Outlet />
+					<AdminEventsProvider>
+						<Outlet />
+					</AdminEventsProvider>
 				</main>
 			</div>
 		</div>

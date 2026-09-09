@@ -4,7 +4,6 @@ import { productKeys } from "./keys";
 import type { Product, UpdateProductOutput } from "../../schemas/productSchema";
 import { categoryKeys } from "../category/keys";
 import type { Category } from "../../schemas/categorySchema";
-import { dashboardKeys } from "@/features/dashboard/services/keys";
 
 export function useCreateProduct() {
 	const queryClient = useQueryClient();
@@ -18,7 +17,6 @@ export function useCreateProduct() {
 			queryClient.invalidateQueries({
 				queryKey: productKeys.lists(),
 			});
-			queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
 		},
 	});
 }
@@ -68,7 +66,6 @@ export function useUpdateProduct() {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-			queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
 		},
 	});
 }
@@ -99,7 +96,6 @@ export function useDeleteProduct() {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: productKeys.lists() });
-			queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
 		},
 	});
 }

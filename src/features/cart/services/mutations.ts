@@ -27,11 +27,10 @@ function useAuthenticatedCartMutation<TVariables>(
 			if (!authenticated) return;
 			if (updatedCart) {
 				queryClient.setQueryData(cartKeys.all, updatedCart);
-			} else {
-				queryClient.invalidateQueries({
-					queryKey: cartKeys.all,
-				});
 			}
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: cartKeys.all });
 		},
 	});
 }
@@ -111,12 +110,10 @@ export function useReorder() {
 			);
 		},
 		onSuccess: () => {
-			if (authenticated) {
-				queryClient.invalidateQueries({
-					queryKey: cartKeys.all,
-				});
-			}
 			openCartDrawer();
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: cartKeys.all });
 		},
 	});
 }
@@ -167,14 +164,8 @@ export function useClearCart() {
 
 	const authenticatedMutation = useMutation({
 		mutationFn: clearCart,
-		onSuccess: () => {
-			queryClient.removeQueries({
-				queryKey: cartKeys.all,
-			});
-
-			queryClient.invalidateQueries({
-				queryKey: cartKeys.all,
-			});
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: cartKeys.all });
 		},
 	});
 
