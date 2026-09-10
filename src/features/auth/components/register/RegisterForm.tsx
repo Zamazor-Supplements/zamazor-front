@@ -6,94 +6,109 @@ import {
 } from "../../schemas/registerSchema";
 import { PasswordField } from "@/shared/components/fields/PasswordField";
 import { EmailField } from "@/shared/components/fields/EmailField";
-import { useNavigate, useLocation } from "react-router";
-import { authService } from "../../services/authService";
-import { isSystemError } from "@/shared/types";
-import { APP_ROUTES } from "@/core/routes/paths";
+import { Link } from "react-router";
+import { APP_ROUTES } from "@/app/routes/paths";
 import { notify } from "@/lib/notify";
 import { NameField } from "@/shared/components/fields/NameField";
 import { OriginButton } from "@/shared/components/ui/origin-button";
-import { useLanguage } from "@/shared/context/LanguageContext";
+import { useRegister } from "../../services/mutations";
 
 export const RegisterForm = () => {
-	const navigate = useNavigate();
-	const location = useLocation();
-	const { language } = useLanguage();
-	const from = location.state?.from;
-
-	const onSubmit = async (data: RegisterRequest) => {
-		const payload = registerRequestSchema.parse(data);
-		const response = await authService.register(payload);
-		if (!isSystemError(response)) {
-			navigate(APP_ROUTES.AUTH.LOGIN, { state: { from } });
-		}
-	};
-
-	const onError = () => {
-		notify.error(language === "fr" ? "Erreur de validation" : "Validation Error", {
-			description: language === "fr" ? "Veuillez corriger les erreurs dans le formulaire." : "Please fix the errors in the form.",
-			requiresInternet: false,
-		});
-	};
+	const registerMutation = useRegister();
 
 	const {
 		register,
 		handleSubmit,
 		formState: { errors, isSubmitting, isDirty },
-	} = useForm({
+	} = useForm<RegisterRequest>({
 		resolver: zodResolver(registerRequestSchema),
 	});
+
+	const isLoading = isSubmitting || registerMutation.isPending;
+
+	const onSubmit = (data: RegisterRequest) => {
+		registerMutation.mutate(data);
+	};
+
+	const onError = () => {
+		notify.error("Validation Error", {
+			description: "Please fix the highlighted fields below.",
+			requiresInternet: false,
+		});
+	};
 
 	return (
 		<form
 			onSubmit={handleSubmit(onSubmit, onError)}
 			noValidate
-			className="space-y-4"
+			className="space-y-5 w-full max-w-full"
 		>
-			<NameField
-				label={language === "fr" ? "Nom complet" : "Full Name"}
-				name="fullName"
-				errors={errors}
-				register={register}
-			/>
+			{/* Form Fields */}
+			<div className="space-y-4">
+				<div className="min-w-0">
+					<NameField
+						label="Full Name"
+						name="fullName"
+						register={register}
+						errors={errors}
+						disabled={isLoading}
+					/>
+				</div>
 
-			<EmailField
-				label={language === "fr" ? "Adresse e-mail" : "Email"}
-				name="email"
-				errors={errors}
-				register={register}
-			/>
+				<div className="min-w-0">
+					<EmailField
+						label="Email address"
+						name="email"
+						register={register}
+						errors={errors}
+						disabled={isLoading}
+					/>
+				</div>
 
-			<PasswordField
-				label={language === "fr" ? "Mot de passe" : "Password"}
-				name="password"
-				autoComplete="new-password"
-				errors={errors}
-				register={register}
-			/>
+				<div className="min-w-0">
+					<PasswordField
+						label="Password"
+						name="password"
+						autoComplete="new-password"
+						register={register}
+						errors={errors}
+						disabled={isLoading}
+					/>
+				</div>
+			</div>
 
-			<OriginButton
-				type="submit"
-				variant="emerald"
-				loading={isSubmitting}
-				disabled={!isDirty}
-				className="w-full flex justify-center rounded-lg font-semibold"
-			>
-				{isSubmitting 
-					? (language === "fr" ? "Inscription en cours…" : "Registering…") 
-					: (language === "fr" ? "S'inscrire" : "Register")}
-			</OriginButton>
+			{/* Submit Button */}
+			<div className="pt-1">
+				<OriginButton
+					type="submit"
+					loading={isLoading}
+					disabled={!isDirty || isLoading}
+					className="w-full h-12 justify-center rounded-lg text-sm font-bold shadow-xs hover:shadow-md transition-all active:scale-[0.99] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+				>
+					{isLoading ? "Creating account..." : "Create account"}
+				</OriginButton>
+			</div>
 
-			<p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4 leading-relaxed">
-				{language === "fr" ? "En vous inscrivant, vous acceptez nos " : "By registering, you agree to our "}
-				<a href="#terms" className="text-emerald-700 hover:text-emerald-800 dark:text-lime-400 dark:hover:text-lime-300 hover:underline">
-					{language === "fr" ? "Conditions d'utilisation" : "Terms of Service"}
-				</a>
-				{language === "fr" ? " et notre " : " and "}
-				<a href="#privacy" className="text-emerald-700 hover:text-emerald-800 dark:text-lime-400 dark:hover:text-lime-300 hover:underline">
-					{language === "fr" ? "Politique de confidentialité" : "Privacy Policy"}
-				</a>.
-			</p>
+			{/* Terms & Privacy Legal Footer */}
+			<div className="pt-2">
+				<p className="text-center text-xs text-slate-500 leading-relaxed">
+					By registering, you agree to our{" "}
+					<Link
+						to={APP_ROUTES.PAGES.TERMS}
+						className="font-medium text-brand-800 hover:text-brand-950 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-brand-800/20 rounded-xs"
+					>
+						Terms of Service
+					</Link>{" "}
+					and{" "}
+					<Link
+						to={APP_ROUTES.PAGES.PRIVACY}
+						className="font-medium text-brand-800 hover:text-brand-950 hover:underline transition-colors focus:outline-none focus:ring-2 focus:ring-brand-800/20 rounded-xs"
+					>
+						Privacy Policy
+					</Link>
+					.
+				</p>
+			</div>
 		</form>
 	);
 };

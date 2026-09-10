@@ -1,4 +1,4 @@
-import { normalizeError, type SystemError } from "@/shared/types";
+import { normalizeError } from "@/shared/types";
 import { isCancel, type Axios, type AxiosRequestConfig } from "axios";
 import { notify } from "@/lib/notify";
 
@@ -6,7 +6,7 @@ const toastDebounceMap = new Map<string, boolean>();
 
 interface NotificationMessage {
 	title: string;
-	description?: string;
+	description?: string | undefined;
 }
 
 export type ApiRequestOptions = {
@@ -19,7 +19,8 @@ export type ApiRequestOptions = {
 
 function getToastKey(config: AxiosRequestConfig): string {
 	const method = (config.method ?? "GET").toUpperCase();
-	const cleanUrl = (config.url ?? "unknown_url").split("?")[0];
+	const url = config.url ?? "unknown_url";
+	const cleanUrl = url.split("?")[0] ?? "unknown_url";
 
 	const normalizedUrl = cleanUrl
 		.replace(/\/\d+/g, "/:id")
@@ -43,7 +44,7 @@ function triggerNotification({
 	title,
 	description,
 	autoResetMs = 5000,
-}: NotificationConfig): void {
+}: NotificationConfig) {
 	if (toastDebounceMap.get(toastKey)) return;
 
 	notify[type](title, { description });
@@ -57,7 +58,7 @@ function triggerNotification({
 export async function coreApiRequest<T>(
 	config: AxiosRequestConfig,
 	options: ApiRequestOptions,
-): Promise<T | SystemError> {
+): Promise<T> {
 	const {
 		successMessage,
 		errorMessage,
@@ -84,16 +85,18 @@ export async function coreApiRequest<T>(
 		return response.data;
 	} catch (error) {
 		const apiError = normalizeError(error);
-		if (isCancel(error) || ignoreErrors) return apiError;
+		if (isCancel(error)) throw apiError;
 
-		triggerNotification({
-			type: "error",
-			toastKey,
-			title: errorMessage?.title ?? apiError.title,
-			description: errorMessage?.description ?? apiError.description,
-			autoResetMs,
-		});
+		if (!ignoreErrors) {
+			triggerNotification({
+				type: "error",
+				toastKey,
+				title: errorMessage?.title ?? apiError.title,
+				description: errorMessage?.description ?? apiError.description,
+				autoResetMs,
+			});
+		}
 
-		return apiError;
+		throw apiError;
 	}
 }

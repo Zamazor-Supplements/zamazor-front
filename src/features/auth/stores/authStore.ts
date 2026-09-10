@@ -1,24 +1,35 @@
 import { create } from "zustand";
-import { type User } from "../schemas/userSchema";
-import { AuthStatus } from "../types";
-import { tokenManager } from "../globals/tokenManager";
+import { AuthStatus } from "../types/auth";
+import { devtools } from "zustand/middleware";
 
-type AuthState =
-	| {
-			readonly user: null;
-			readonly status: Exclude<AuthStatus, typeof AuthStatus.Authenticated>;
-	  }
-	| {
-			readonly user: Readonly<User>;
-			readonly status: typeof AuthStatus.Authenticated;
-	  };
+type AuthState = {
+	status:
+		| typeof AuthStatus.Loading
+		| typeof AuthStatus.Authenticated
+		| typeof AuthStatus.Unauthenticated;
 
-export const useAuthStore = create<AuthState>(() => ({
-	user: null,
-	status: AuthStatus.Loading,
-}));
-
-export const clearAuth = () => {
-	useAuthStore.setState({ user: null, status: AuthStatus.Unauthenticated });
-	tokenManager.clear();
+	setAuthenticated: () => void;
+	setUnauthenticated: () => void;
+	setLoading: () => void;
 };
+
+export const useAuthStore = create<AuthState>()(
+	devtools((set) => ({
+		status: AuthStatus.Loading,
+
+		setAuthenticated: () =>
+			set(
+				{ status: AuthStatus.Authenticated },
+				undefined,
+				"auth/setAuthenticated",
+			),
+		setUnauthenticated: () =>
+			set(
+				{ status: AuthStatus.Unauthenticated },
+				undefined,
+				"auth/setUnauthenticated",
+			),
+		setLoading: () =>
+			set({ status: AuthStatus.Loading }, undefined, "auth/setLoading"),
+	})),
+);

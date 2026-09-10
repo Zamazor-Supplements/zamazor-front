@@ -6,7 +6,7 @@ const systemErrorSchema = z.object({
 	type: z.string().default("about:blank"),
 	status: z.number(),
 	title: z.string(),
-	detail: z.string().default(""),
+	detail: z.unknown(),
 	instance: z.string().optional(),
 	description: z.string().default(""),
 });
@@ -16,13 +16,13 @@ export function isSystemError(value: unknown): value is SystemError {
 	return systemErrorSchema.safeParse(value).success;
 }
 
-const CANCELLED_ERROR = {
+const CANCELED_ERROR = {
 	type: "about:blank",
 	title: "Request Canceled",
-	description: "Request was cancelled",
+	description: "Request was canceled",
 	status: 499,
 	detail: "The network request was intentionally aborted.",
-	code: "REQUEST_CANCELLED",
+	code: "REQUEST_CANCELED",
 } satisfies SystemError;
 
 const NETWORK_ERROR = {
@@ -44,13 +44,29 @@ const TIMEOUT_ERROR = {
 	code: "REQUEST_TIMEOUT",
 } satisfies SystemError;
 
+const getErrorDetail = (error: unknown): unknown => {
+	if (isAxiosError(error)) {
+		const responseData = error.response?.data;
+
+		if (responseData) {
+			if (typeof responseData === "string") {
+				return responseData;
+			}
+			if (typeof responseData === "object" && responseData !== null)
+				return responseData;
+		}
+		return error.message || "The request failed unexpectedly.";
+	}
+	return error;
+};
+
 const createRuntimeError = (error: unknown) =>
 	({
 		type: "about:blank",
 		title: "Runtime Error",
 		description: "An unexpected error occurred.",
 		status: 500,
-		detail: error instanceof Error ? error.message : String(error),
+		detail: getErrorDetail(error),
 		code: "RUNTIME_ERROR",
 	}) satisfies SystemError;
 
@@ -60,12 +76,13 @@ const createUnexpectedError = (error: AxiosError) =>
 		title: error.response?.statusText?.trim() || "Server Error",
 		status: error.response?.status ?? 500,
 		description: "Unexpected server response.",
-		detail: error.message || "The request failed unexpectedly.",
+		detail: getErrorDetail(error),
 		code: "SYSTEM_ERROR",
 	}) satisfies SystemError;
 
 export function normalizeError(error: unknown): SystemError {
-	if (isCancel(error)) return CANCELLED_ERROR;
+	if (isSystemError(error)) return error;
+	if (isCancel(error)) return CANCELED_ERROR;
 	if (!isAxiosError(error)) return createRuntimeError(error);
 	if (error.code === "ECONNABORTED") return TIMEOUT_ERROR;
 

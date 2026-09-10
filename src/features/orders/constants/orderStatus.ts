@@ -1,24 +1,34 @@
-export const ORDER_STATUSES = [
-	"PENDING",
-	"PAID",
-	"CONFIRMED",
-	"PROCESSING",
-	"SHIPPED",
-	"DELIVERED",
-	"CANCELED",
-	"REFUNDED",
-] as const;
+import z from "zod/v4";
 
-type OrderStatus = (typeof ORDER_STATUSES)[number];
+export const OrderStatus = {
+	Pending: "PENDING",
+	Confirmed: "CONFIRMED",
+	Shipped: "SHIPPED",
+	Delivered: "DELIVERED",
+	Canceled: "CANCELED",
+	Refunded: "REFUNDED",
+} as const;
 
-const ORDER_STATUS_META: Record<
-	OrderStatus,
-	{
-		label: string;
-		badgeClass: string;
-		accentClass: string;
-	}
-> = {
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+
+export type OrderStatusFilter = OrderStatus | undefined;
+
+export const orderStatusSchema = z.enum([
+	OrderStatus.Pending,
+	OrderStatus.Confirmed,
+	OrderStatus.Shipped,
+	OrderStatus.Delivered,
+	OrderStatus.Canceled,
+	OrderStatus.Refunded,
+]);
+
+type Meta = {
+	label: string;
+	badgeClass: string;
+	accentClass: string;
+};
+
+export const ORDER_STATUS_META: Record<OrderStatus, Meta> = {
 	PENDING: {
 		label: "Pending",
 		badgeClass: "border-amber-200/70 bg-amber-50 text-amber-800",
@@ -29,11 +39,6 @@ const ORDER_STATUS_META: Record<
 		badgeClass: "border-sky-200/70 bg-sky-50 text-sky-800",
 		accentClass: "bg-sky-50 text-sky-800",
 	},
-	PROCESSING: {
-		label: "Processing",
-		badgeClass: "border-violet-200/70 bg-violet-50 text-violet-800",
-		accentClass: "bg-violet-50 text-violet-800",
-	},
 	SHIPPED: {
 		label: "Shipped",
 		badgeClass: "border-cyan-200/70 bg-cyan-50 text-cyan-800",
@@ -43,11 +48,6 @@ const ORDER_STATUS_META: Record<
 		label: "Delivered",
 		badgeClass: "border-lime-200/70 bg-lime-50 text-lime-800",
 		accentClass: "bg-lime-50 text-lime-800",
-	},
-	PAID: {
-		label: "Paid",
-		badgeClass: "border-emerald-200/70 bg-emerald-50 text-emerald-800",
-		accentClass: "bg-emerald-50 text-emerald-800",
 	},
 	CANCELED: {
 		label: "Canceled",
@@ -61,25 +61,15 @@ const ORDER_STATUS_META: Record<
 	},
 } as const;
 
-export const ORDER_STATUS_OPTIONS = ORDER_STATUSES.map((status) => ({
-	value: status,
-	label: ORDER_STATUS_META[status].label,
-}));
+const FinalOrderStatus = new Set<OrderStatus>([
+	OrderStatus.Canceled,
+	OrderStatus.Refunded,
+]);
+type FinalOrderStatus =
+	typeof FinalOrderStatus extends Set<infer T> ? T : never;
 
-const FINAL_ORDER_STATUSES = ["DELIVERED", "CANCELED", "REFUNDED"] as const;
-
-export function isFinalOrderStatus(status: string) {
-	return FINAL_ORDER_STATUSES.includes(status as (typeof FINAL_ORDER_STATUSES)[number]);
-}
-
-export function getOrderStatusMeta(status: string) {
-	if (status in ORDER_STATUS_META) {
-		return ORDER_STATUS_META[status as OrderStatus];
-	}
-
-	return {
-		label: status,
-		badgeClass: "border-teal-200/70 bg-teal-50 text-teal-800",
-		accentClass: "bg-teal-50 text-teal-800",
-	};
+export function isFinalOrderStatus(
+	status: OrderStatus,
+): status is FinalOrderStatus {
+	return FinalOrderStatus.has(status);
 }

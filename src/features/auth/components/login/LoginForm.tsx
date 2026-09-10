@@ -4,122 +4,73 @@ import {
 	loginRequestSchema,
 	type LoginRequest,
 } from "../../schemas/loginSchema";
-import { EmailField } from "../../../../shared/components/fields/EmailField";
-import { PasswordField } from "../../../../shared/components/fields/PasswordField";
+import { EmailField } from "@/shared/components/fields/EmailField";
+import { PasswordField } from "@/shared/components/fields/PasswordField";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate } from "react-router";
-import { APP_ROUTES } from "@/core/routes/paths";
-import { authService } from "../../services/authService";
-import { isSystemError } from "@/shared/types";
-import { useLanguage } from "@/shared/context/LanguageContext";
-import { useAuthStore } from "../../stores/authStore";
+import { Link } from "react-router";
+import { APP_ROUTES } from "@/app/routes/paths";
+import { useLogin } from "../../services/mutations";
 
 export const LoginForm = () => {
-	const navigate = useNavigate();
-	const location = useLocation();
-	const { language } = useLanguage();
-	const from = location.state?.from?.pathname || APP_ROUTES.HOME;
-
-	const getLoginErrorMessage = (response: unknown) => {
-		if (!isSystemError(response)) {
-			return language === "fr"
-				? "Impossible de se connecter."
-				: "Unable to sign in.";
-		}
-
-		if (response.status === 401) {
-			return language === "fr"
-				? "Adresse e-mail ou mot de passe incorrect."
-				: "Incorrect email or password.";
-		}
-
-		if (response.status === 403) {
-			return language === "fr"
-				? "Votre accès est refusé."
-				: "Your access is denied.";
-		}
-
-		if (response.status === 429) {
-			return language === "fr"
-				? "Trop de tentatives. Veuillez réessayer plus tard."
-				: "Too many attempts. Please try again later.";
-		}
-
-		return (
-			response.description ||
-			response.title ||
-			(language === "fr" ? "Connexion impossible." : "Login failed.")
-		);
-	};
-
-	const onSubmit = async (data: LoginRequest) => {
-		const response = await authService.login(data);
-		if (isSystemError(response)) {
-			setError("root", {
-				type: "server",
-				message: getLoginErrorMessage(response),
-			});
-			return;
-		} else {
-			const user = useAuthStore.getState().user;
-			if (user?.role === "ADMIN") {
-				navigate(APP_ROUTES.DASHBOARD, { replace: true });
-			} else {
-				navigate(from, { replace: true });
-			}
-		}
-	};
+	const loginMutation = useLogin();
 
 	const {
 		register,
 		handleSubmit,
-		setError,
-		clearErrors,
 		formState: { errors, isSubmitting, isDirty },
-	} = useForm({
+	} = useForm<LoginRequest>({
 		resolver: zodResolver(loginRequestSchema),
 	});
 
+	const isLoading = isSubmitting || loginMutation.isPending;
+
+	const onSubmit = (data: LoginRequest) => {
+		loginMutation.mutate(data);
+	};
+
 	return (
-		<form
-			onSubmit={handleSubmit(onSubmit)}
-			noValidate
-			className="space-y-6"
-		>
-			<EmailField
-				name="email"
-				label={language === "fr" ? "Adresse e-mail" : "Email"}
-				register={register}
-				errors={errors}
-			/>
-			<PasswordField
-				name="password"
-				label={language === "fr" ? "Mot de passe" : "Password"}
-				register={register}
-				errors={errors}
-			/>
+		<form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+			{/* Form Fields */}
+			<div className="space-y-4">
+				<EmailField
+					name="email"
+					label="Email address"
+					register={register}
+					errors={errors}
+					disabled={isLoading}
+				/>
 
-			{errors.root?.message && (
-				<p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">
-					{errors.root.message}
-				</p>
-			)}
+				<div className="space-y-1.5">
+					{/* Header Row: Label + Password Reset Link */}
+					<div className="flex items-center justify-between">
+						<span className="text-xs font-semibold text-slate-700">
+							Password
+						</span>
+						<Link
+							to={APP_ROUTES.AUTH.FORGOT_PASSWORD}
+							className="text-xs font-medium text-brand-800 hover:text-brand-950 hover:underline transition-colors"
+						>
+							Forgot password?
+						</Link>
+					</div>
 
+					<PasswordField
+						name="password"
+						register={register}
+						errors={errors}
+						disabled={isLoading}
+					/>
+				</div>
+			</div>
+
+			{/* Submit Button */}
 			<OriginButton
 				type="submit"
-				variant="emerald"
-				loading={isSubmitting}
-				disabled={!isDirty}
-				onClick={() => clearErrors("root")}
-				className="w-full flex justify-center rounded-lg font-semibold"
+				loading={isLoading}
+				disabled={!isDirty || isLoading}
+				className="w-full justify-center rounded-lg py-3 text-sm font-bold shadow-xs hover:shadow-md transition-all active:scale-[0.99]"
 			>
-				{isSubmitting
-					? language === "fr"
-						? "Connexion en cours…"
-						: "Signing in…"
-					: language === "fr"
-						? "Se connecter"
-						: "Sign in"}
+				{isLoading ? "Signing in..." : "Sign in"}
 			</OriginButton>
 		</form>
 	);

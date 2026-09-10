@@ -1,32 +1,40 @@
+import { orderStatusSchema } from "@/features/orders/constants/orderStatus";
 import z from "zod/v4";
 
 export const recentOrderSchema = z.object({
 	id: z.uuid(),
-	total: z.number().nonnegative(),
-	status: z.string(),
+	status: orderStatusSchema,
+	subtotal: z.number().positive(),
+	shippingCost: z.number().nonnegative(),
+	discount: z.number().nonnegative(),
+	tax: z.number().nonnegative(),
+	total: z.number().positive(),
 	shippingCountry: z.string(),
 	shippingCity: z.string(),
 	shippingStreet: z.string(),
 	phone: z.string(),
-	createdAt: z.iso.datetime(),
+	createdAt: z.iso.datetime().pipe(z.coerce.date()),
 });
+export type RecentOrder = z.infer<typeof recentOrderSchema>;
 
 export const lowStockProductSchema = z.object({
 	id: z.uuid(),
 	name: z.string(),
-	stockQuantity: z.number().int().nonnegative(),
+	stockQuantity: z.int().nonnegative(),
 	category: z.string(),
 });
+export type LowStockProduct = z.infer<typeof lowStockProductSchema>;
 
 export const categorySummarySchema = z.object({
 	category: z.string(),
-	count: z.number().int().nonnegative(),
+	count: z.int().nonnegative(),
 });
+export type CategorySummary = z.infer<typeof categorySummarySchema>;
 
 export const topProductSchema = z.object({
 	id: z.uuid(),
 	name: z.string(),
-	quantity: z.number().int().nonnegative(),
+	quantity: z.int().nonnegative(),
 	revenue: z.number().nonnegative(),
 	category: z.string(),
 });
@@ -34,25 +42,31 @@ export const topProductSchema = z.object({
 export const dashboardOverviewSchema = z.object({
 	totalSales: z.number().nonnegative(),
 	averageOrderValue: z.number().nonnegative(),
-	totalOrders: z.number().int().nonnegative(),
-	pendingOrders: z.number().int().nonnegative(),
-	completedOrders: z.number().int().nonnegative(),
-	canceledOrders: z.number().int().nonnegative(),
-	inFlightOrders: z.number().int().nonnegative(),
+	totalOrders: z.int().nonnegative(),
+	pendingOrders: z.int().nonnegative(),
+	completedOrders: z.int().nonnegative(),
+	canceledOrders: z.int().nonnegative(),
+	inFlightOrders: z.int().nonnegative(),
 	recentOrders: z.array(recentOrderSchema),
 	lowStockProducts: z.array(lowStockProductSchema),
 	categorySummary: z.array(categorySummarySchema),
 	topProducts: z.array(topProductSchema),
 });
-
 export type DashboardOverview = z.infer<typeof dashboardOverviewSchema>;
 
 export const categoryAnalyticsSchema = z.array(
 	z.object({
 		id: z.uuid(),
 		label: z.string(),
-		productCount: z.number().int().nonnegative(),
+		productCount: z.int().nonnegative(),
 	}),
 );
-
 export type CategoryAnalytics = z.infer<typeof categoryAnalyticsSchema>;
+
+export const productAnalyticsSchema = z.object({
+	totalProducts: z.int().nonnegative(),
+	totalCategories: z.int().nonnegative(),
+	lowStockCount: z.int().nonnegative(),
+	averagePrice: z.number().positive(),
+});
+export type ProductAnalytics = z.infer<typeof productAnalyticsSchema>;

@@ -1,30 +1,21 @@
 import { Input } from "@/shared/components/ui/input";
 import { useId } from "react";
-import type {
-	FieldErrors,
-	FieldValues,
-	Path,
-	UseFormRegister,
-} from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 import { User } from "lucide-react";
 import { Field, FieldLabel, FieldError } from "@/shared/components/ui/field";
-
-interface NameFieldProps<T extends FieldValues> {
-	name: Path<T>;
-	label: string;
-	register: UseFormRegister<T>;
-	errors: FieldErrors<T>;
-	placeholder?: string;
-	autoComplete?: "name" | "family-name" | "given-name";
-}
+import type { NameFieldProps } from "@/shared/types/fields";
+import { cn } from "@/lib/utils";
 
 export const NameField = <T extends FieldValues>({
 	name,
-	label,
-	register,
-	errors,
+	label = "Full Name",
 	placeholder = "John Doe",
 	autoComplete = "name",
+	register,
+	errors,
+	disabled,
+	className = "",
+	...rest
 }: NameFieldProps<T>) => {
 	const baseId = useId();
 
@@ -33,27 +24,37 @@ export const NameField = <T extends FieldValues>({
 	const fieldError = errors[name];
 
 	return (
-		<Field className="space-y-2">
-			<FieldLabel htmlFor={inputId} className="block text-sm/6 font-medium">
-				{label}
-			</FieldLabel>
+		<Field className="space-y-1.5">
+			{label && (
+				<FieldLabel
+					htmlFor={inputId}
+					className="block text-xs font-semibold text-slate-700"
+				>
+					{label}
+				</FieldLabel>
+			)}
+
 			<div className="relative">
-				<User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+				<User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
 				<Input
 					id={inputId}
 					{...register(name)}
+					{...rest}
 					type="text"
 					placeholder={placeholder}
 					autoComplete={autoComplete}
+					disabled={disabled}
 					aria-invalid={!!fieldError}
 					aria-required="true"
 					aria-describedby={fieldError ? errorId : undefined}
-					className="pl-10"
+					className={cn("pl-10", className)}
 				/>
 			</div>
 
 			{fieldError && (
-				<FieldError id={errorId}>{fieldError.message as string}</FieldError>
+				<FieldError id={errorId} className="text-xs text-red-600 font-medium">
+					{fieldError.message as string}
+				</FieldError>
 			)}
 		</Field>
 	);

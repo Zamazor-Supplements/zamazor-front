@@ -1,28 +1,37 @@
-export function parsePrice(value: string | number | null | undefined): number {
-	if (typeof value === "number") {
-		return Number.isFinite(value) ? value : 0;
-	}
-
-	if (typeof value !== "string") {
-		return 0;
-	}
-
-	const normalized = value.replace(/[^0-9.,-]/g, "").replace(/,/g, ".");
-	const parsed = parseFloat(normalized);
-	return Number.isFinite(parsed) ? parsed : 0;
-}
-
-export function formatMadCompact(value: string | number | null | undefined): string {
-	const amount = parsePrice(value);
-
-	if (Math.abs(amount) < 1000) {
-		return `${amount.toFixed(2)} MAD`;
-	}
-
-	const compact = new Intl.NumberFormat("en", {
+export const formatCurrency = (
+	amount: number,
+	locale = "fr-MA",
+	currency = "MAD",
+) => {
+	return new Intl.NumberFormat(locale, {
+		style: "currency",
+		currency,
 		notation: "compact",
-		maximumFractionDigits: 1,
-	});
+		compactDisplay: "short",
+		currencyDisplay: "code",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 2,
+	}).format(amount);
+};
 
-	return `${compact.format(amount)} MAD`;
+interface FormatPriceOptions {
+	/** Use compact notation (e.g. "1,2 k DH") for dashboard metric cards. Defaults to exact amounts. */
+	compact?: boolean;
 }
+
+/** Exact-price formatter for storefront surfaces (PDP, cart, checkout). */
+export const formatPrice = (
+	amount: number,
+	options: FormatPriceOptions = {},
+) => {
+	const { compact = false } = options;
+	return new Intl.NumberFormat("fr-MA", {
+		style: "currency",
+		currency: "MAD",
+		currencyDisplay: "narrowSymbol",
+		notation: compact ? "compact" : "standard",
+		compactDisplay: "short",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 2,
+	}).format(amount);
+};

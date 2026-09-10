@@ -10,7 +10,7 @@ const DefaultDocumentTitleOptions = {
 export function useDocumentTitle(
 	title: string,
 	options: UseDocumentTitleOptions = DefaultDocumentTitleOptions,
-): void {
+) {
 	const { preserveTitleOnUnmount } = options;
 	const defaultTitle = useRef<string | null>(null);
 

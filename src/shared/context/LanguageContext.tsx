@@ -1,7 +1,11 @@
-/* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useEffect } from "react";
-
-type Language = "en" | "fr";
+import {
+	useState,
+	useEffect,
+	useCallback,
+	useMemo,
+	type ReactNode,
+} from "react";
+import { LanguageContext, type Language } from "../hooks/use-language";
 
 interface TranslationDictionary {
 	[key: string]: string | TranslationDictionary;
@@ -32,20 +36,27 @@ const translations: Record<Language, TranslationDictionary> = {
 			save: "Save Changes",
 			close: "Close",
 			loading: "Loading...",
+			adding: "Adding...",
 			noDescription: "No description provided.",
 			delete: "Delete",
+			free: "Free",
+			viewCart: "View Cart",
+			backToShop: "Back to Shop",
 		},
 		homepage: {
 			hero: {
 				badge1: "100% CLEAN FORMULAS",
 				title1: "Fuel Your Highest Potential",
-				desc1: "Premium, zero-compromise plant proteins and organic nutrition designed to elevate your energy and recovery.",
+				desc1:
+					"Premium, zero-compromise plant proteins and organic nutrition designed to elevate your energy and recovery.",
 				badge2: "ZERO ARTIFICIAL SWEETENERS",
 				title2: "Matcha Botanical Green Energy",
-				desc2: "Harness clean cellular focus with organic ceremonial matcha blended with high-absorption plant enzymes.",
+				desc2:
+					"Harness clean cellular focus with organic ceremonial matcha blended with high-absorption plant enzymes.",
 				badge3: "DEEP SLEEP & REPAIR",
 				title3: "Nighttime Recovery Peptides",
-				desc3: "Calm your nervous system and repair muscle fibers overnight with rich minerals and tart cherry extracts.",
+				desc3:
+					"Calm your nervous system and repair muscle fibers overnight with rich minerals and tart cherry extracts.",
 				shopNow: "Shop Formulas",
 				quiz: "Take Wellness Quiz",
 			},
@@ -78,6 +89,18 @@ const translations: Record<Language, TranslationDictionary> = {
 			benefits: "Key Benefits",
 			usage: "Recommended Usage",
 			ingredients: "Active Ingredients",
+			goals: "Shop by Goal",
+			dietary: "Dietary",
+			dietaryNote: "All formulas are free from artificial colors, GMOs, and gluten.",
+			goalPerformance: "Performance",
+			goalGreens: "Daily Greens",
+			goalEnergy: "Energy",
+			goalRecovery: "Recovery",
+			goalWellness: "Wellness",
+			dietVegan: "Vegan",
+			dietOrganic: "Organic",
+			dietKeto: "Keto",
+			dietGlutenFree: "Gluten Free",
 		},
 		cart: {
 			title: "Your Cart",
@@ -89,9 +112,39 @@ const translations: Record<Language, TranslationDictionary> = {
 			total: "Total",
 			checkoutBtn: "Proceed to Checkout",
 			freeShipping: "Free shipping active on all orders.",
+			freeShippingLeft: "You're {amount} away from free shipping",
+			freeShippingUnlocked: "Free shipping unlocked",
+			freeShippingThreshold: "Free shipping on orders over {amount}",
 			promoCode: "Promo Code",
 			apply: "Apply",
 			remove: "Remove",
+		},
+		pdp: {
+			dosage: "Dosage",
+			dosageTitle: "Recommended Dosage",
+			ingredientsTitle: "Ingredients",
+			ingredients: "Active Ingredients",
+			reviews: "Reviews",
+			reviewsTitle: "Customer Reviews",
+			reviewsNote: "Curated preview while verified reviews arrive.",
+			cleanNote: "All Zamazor formulas are free from artificial colors, GMOs, and gluten.",
+			optimalWindow: "Optimal Daily Window",
+			evidence: "Evidence",
+			verifiedBadge: "Verified purchase",
+			outOfStock: "Out of Stock",
+		},
+		hero: {
+			trustLabTested: "Lab Tested",
+			trustGmp: "GMP Certified",
+			trustNatural: "100% Natural",
+		},
+		cartDrawer: {
+			title: "Your Cart",
+			description: "Review the items in your cart before checkout.",
+			viewFullCart: "View Full Cart",
+			emptyTitle: "Your cart is empty",
+			emptyDesc: "Choose some clean formulas to get started.",
+			continueShopping: "Continue Shopping",
 		},
 		checkout: {
 			title: "Secure Checkout",
@@ -114,7 +167,8 @@ const translations: Record<Language, TranslationDictionary> = {
 			placeOrder: "Place Order",
 			orderSummary: "Order Summary",
 			successTitle: "Thank you for your order!",
-			successDesc: "Your clean stack order has been successfully placed. We've sent updates to your email.",
+			successDesc:
+				"Your clean stack order has been successfully placed. We've sent updates to your email.",
 			orderNumber: "Order ID",
 			delivery: "Delivery Method",
 			standardShipping: "Standard Insured (3-5 days)",
@@ -148,7 +202,7 @@ const translations: Record<Language, TranslationDictionary> = {
 			newProduct: "New Product",
 			editProduct: "Edit Product",
 			deleteConfirm: "Are you sure you want to delete this product?",
-		}
+		},
 	},
 	fr: {
 		nav: {
@@ -172,20 +226,27 @@ const translations: Record<Language, TranslationDictionary> = {
 			save: "Enregistrer",
 			close: "Fermer",
 			loading: "Chargement...",
+			adding: "Ajoutant...",
 			noDescription: "Aucune description fournie.",
 			delete: "Supprimer",
+			free: "Gratuit",
+			viewCart: "Voir le Panier",
+			backToShop: "Retour à la Boutique",
 		},
 		homepage: {
 			hero: {
 				badge1: "FORMULES 100% PROPRES",
 				title1: "Libérez Votre Plus Grand Potentiel",
-				desc1: "Protéines végétales de qualité supérieure et nutrition biologique conçues pour élever votre énergie et votre récupération.",
+				desc1:
+					"Protéines végétales de qualité supérieure et nutrition biologique conçues pour élever votre énergie et votre récupération.",
 				badge2: "SANS ÉDULCORANTS ARTIFICIELS",
 				title2: "Énergie Verte au Matcha Botanique",
-				desc2: "Exploitez une concentration cellulaire propre grâce à du matcha de cérémonie biologique mélangé à des enzymes végétales.",
+				desc2:
+					"Exploitez une concentration cellulaire propre grâce à du matcha de cérémonie biologique mélangé à des enzymes végétales.",
 				badge3: "SOMMEIL PROFOND & RÉPARATION",
 				title3: "Peptides de Récupération Nocturne",
-				desc3: "Calmez votre système nerveux et réparez vos fibres musculaires pendant la nuit grâce aux minéraux et extraits de cerise acidulée.",
+				desc3:
+					"Calmez votre système nerveux et réparez vos fibres musculaires pendant la nuit grâce aux minéraux et extraits de cerise acidulée.",
 				shopNow: "Découvrir les Formules",
 				quiz: "Faire le Quiz Bien-être",
 			},
@@ -218,6 +279,18 @@ const translations: Record<Language, TranslationDictionary> = {
 			benefits: "Avantages Clés",
 			usage: "Conseils d'Utilisation",
 			ingredients: "Ingrédients Actifs",
+			goals: "Objectif",
+			dietary: "Régime",
+			dietaryNote: "Toutes les formules sont exemptes de colorants artificiels, d'OGM et de gluten.",
+			goalPerformance: "Performance",
+			goalGreens: "Verts Quotidiens",
+			goalEnergy: "Énergie",
+			goalRecovery: "Récupération",
+			goalWellness: "Bien-être",
+			dietVegan: "Vegan",
+			dietOrganic: "Bio",
+			dietKeto: "Kéto",
+			dietGlutenFree: "Sans Gluten",
 		},
 		cart: {
 			title: "Votre Panier",
@@ -229,9 +302,39 @@ const translations: Record<Language, TranslationDictionary> = {
 			total: "Total",
 			checkoutBtn: "Passer commande",
 			freeShipping: "Livraison gratuite active sur toutes les commandes.",
+			freeShippingLeft: "Plus que {amount} pour la livraison gratuite",
+			freeShippingUnlocked: "Livraison gratuite débloquée",
+			freeShippingThreshold: "Livraison gratuite dès {amount}",
 			promoCode: "Code Promo",
 			apply: "Appliquer",
 			remove: "Retirer",
+		},
+		pdp: {
+			dosage: "Dosage",
+			dosageTitle: "Dosage Recommandé",
+			ingredientsTitle: "Ingrédients",
+			ingredients: "Ingrédients Actifs",
+			reviews: "Avis",
+			reviewsTitle: "Avis Clients",
+			reviewsNote: "Aperçu sélectionné en attendant les avis vérifiés.",
+			cleanNote: "Toutes les formules Zamazor sont exemptes de colorants artificiels, d'OGM et de gluten.",
+			optimalWindow: "Fenêtre Quotidienne Optimale",
+			evidence: "Preuves",
+			verifiedBadge: "Achat vérifié",
+			outOfStock: "Rupture de Stock",
+		},
+		hero: {
+			trustLabTested: "Testé en Laboratoire",
+			trustGmp: "Certifié GMP",
+			trustNatural: "100% Naturel",
+		},
+		cartDrawer: {
+			title: "Votre Panier",
+			description: "Vérifiez les articles de votre panier avant le paiement.",
+			viewFullCart: "Voir le Panier Complet",
+			emptyTitle: "Votre panier est vide",
+			emptyDesc: "Choisissez des formules propres pour commencer.",
+			continueShopping: "Continuer Mes Achats",
 		},
 		checkout: {
 			title: "Paiement Sécurisé",
@@ -254,41 +357,28 @@ const translations: Record<Language, TranslationDictionary> = {
 			placeOrder: "Passer la Commande",
 			orderSummary: "Résumé de la Commande",
 			successTitle: "Merci pour votre commande !",
-			successDesc: "Votre commande a été passée avec succès. Nous avons envoyé les détails de la commande par e-mail.",
+			successDesc:
+				"Votre commande a été passée avec succès. Nous avons envoyé les détails de la commande par e-mail.",
 			orderNumber: "ID de Commande",
 			delivery: "Mode de Livraison",
 			standardShipping: "Livraison Standard Assurée (3-5 jours)",
 			returnHome: "Retour à la Boutique",
 		},
 		profile: {
-			title: "Paramètres du profil",
+			title: "Paramètres du Profil",
 			desc: "Gérez vos adresses de livraison, mettez à jour vos coordonnées et consultez l'historique de vos commandes.",
-			fullName: "Nom complet",
+			fullName: "Nom Complet",
 			street: "Adresse",
 			city: "Ville",
-			zip: "Code postal",
-			phone: "Numéro de téléphone",
+			zip: "Code Postal",
+			phone: "Numéro de Téléphone",
 			country: "Pays",
-			ordersHistory: "Historique des commandes",
+			ordersHistory: "Historique des Commandes",
 			emptyOrders: "Vous n'avez pas encore passé de commande.",
 			status: "Statut",
 			date: "Date",
 			total: "Total",
-			viewDetails: "Voir les détails",
-			accountSummary: "Résumé du compte",
-			accountSummaryDesc: "Votre profil connecté et votre adresse enregistrée.",
-			registeredEmail: "Adresse e-mail enregistrée",
-			personalSettings: "Paramètres personnels",
-			emailReadonly: "Adresse e-mail (non modifiable)",
-			shippingAddress: "Adresse de livraison",
-			primary: "Principale",
-			shippingAddressDesc: "Modifiez l'adresse utilisée pour les commandes, la livraison et le remplissage automatique au paiement.",
-			loadingOrders: "Récupération de vos commandes...",
-			emptyOrdersDesc: "Créez votre routine bien-être et passez votre première commande.",
-			browseFormulas: "Parcourir les formules",
-			orderPrefix: "Commande #",
-			totalAmount: "Montant total",
-			shippingDetails: "Détails de livraison",
+			viewDetails: "Voir les Détails",
 		},
 		dashboard: {
 			title: "Console d'Administration",
@@ -302,60 +392,52 @@ const translations: Record<Language, TranslationDictionary> = {
 			newProduct: "Nouveau Produit",
 			editProduct: "Modifier le Produit",
 			deleteConfirm: "Êtes-vous sûr de vouloir supprimer ce produit ?",
-		}
-	}
+		},
+	},
 };
 
-interface LanguageContextProps {
-	language: Language;
-	setLanguage: (lang: Language) => void;
-	t: (key: string) => string;
-}
-
-const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
-
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 	const [language, setLanguageState] = useState<Language>(() => {
 		const stored = localStorage.getItem("zamazor-language");
 		return (stored === "fr" || stored === "en" ? stored : "en") as Language;
 	});
 
-	const setLanguage = (lang: Language) => {
+	const setLanguage = useCallback((lang: Language) => {
 		setLanguageState(lang);
 		localStorage.setItem("zamazor-language", lang);
 		document.documentElement.lang = lang;
-	};
+	}, []);
 
 	useEffect(() => {
 		document.documentElement.lang = language;
 	}, [language]);
 
 	// Dot notation translator: e.g. t("homepage.hero.title")
-	const t = (key: string): string => {
-		const keys = key.split(".");
-		let current: TranslationValue = translations[language];
+	const t = useCallback(
+		(key: string): string => {
+			const keys = key.split(".");
+			let current: TranslationValue = translations[language];
 
-		for (const k of keys) {
-			if (typeof current === "string" || !(k in current)) {
-				return key;
+			for (const k of keys) {
+				if (typeof current === "string" || !(k in current)) {
+					return key;
+				}
+				current = current[k] || "";
 			}
-			current = current[k];
-		}
 
-		return typeof current === "string" ? current : key;
-	};
+			return typeof current === "string" ? current : key;
+		},
+		[language],
+	);
+
+	const value = useMemo(
+		() => ({ language, setLanguage, t }),
+		[language, setLanguage, t],
+	);
 
 	return (
-		<LanguageContext.Provider value={{ language, setLanguage, t }}>
+		<LanguageContext.Provider value={value}>
 			{children}
 		</LanguageContext.Provider>
 	);
-};
-
-export const useLanguage = () => {
-	const context = useContext(LanguageContext);
-	if (!context) {
-		throw new Error("useLanguage must be used within a LanguageProvider");
-	}
-	return context;
 };
